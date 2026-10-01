@@ -28,6 +28,8 @@ public class Assignment
     [Display(Name = "Created At")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+    public bool IsActive { get; set; } = true;
+
     public ICollection<Submission> Submissions { get; set; } =
-    new List<Submission>();
+        new List<Submission>();
 }
