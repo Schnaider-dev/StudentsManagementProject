@@ -19,6 +19,8 @@ builder.Services.AddScoped<ICourseService, CourseService>();
 
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+
 builder.Services
     .AddDefaultIdentity<ApplicationUser>(options =>
     {
