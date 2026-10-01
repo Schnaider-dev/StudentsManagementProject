@@ -17,6 +17,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<ICourseService, CourseService>();
 
+builder.Services.AddScoped<IAssignmentService, AssignmentService>();
+
 builder.Services
     .AddDefaultIdentity<ApplicationUser>(options =>
     {
