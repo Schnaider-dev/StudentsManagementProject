@@ -11,13 +11,16 @@ namespace StudentManager.Areas.Student.Controllers;
 public class CoursesController : Controller
 {
     private readonly IEnrollmentService _enrollmentService;
+    private readonly IProgressService _progressService;
     private readonly UserManager<ApplicationUser> _userManager;
 
     public CoursesController(
-        IEnrollmentService enrollmentService,
-        UserManager<ApplicationUser> userManager)
+    IEnrollmentService enrollmentService,
+    IProgressService progressService,
+    UserManager<ApplicationUser> userManager)
     {
         _enrollmentService = enrollmentService;
+        _progressService = progressService;
         _userManager = userManager;
     }
 
@@ -118,6 +121,32 @@ public class CoursesController : Controller
         return RedirectToAction(nameof(MyCourses));
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Progress(int courseId)
+    {
+        if (courseId <= 0)
+        {
+            return BadRequest();
+        }
+
+        var studentId = GetCurrentUserId();
+
+        if (studentId is null)
+        {
+            return Challenge();
+        }
+
+        var model = await _progressService.GetCourseProgressAsync(
+            courseId,
+            studentId);
+
+        if (model is null)
+        {
+            return NotFound();
+        }
+
+        return View(model);
+    }
     private string? GetCurrentUserId()
     {
         return _userManager.GetUserId(User);

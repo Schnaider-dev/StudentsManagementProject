@@ -25,6 +25,8 @@ builder.Services.AddScoped<ISubmissionService, SubmissionService>();
 
 builder.Services.AddScoped<IGradingService, GradingService>();
 
+builder.Services.AddScoped<IProgressService, ProgressService>();
+
 builder.Services
     .AddDefaultIdentity<ApplicationUser>(options =>
     {
