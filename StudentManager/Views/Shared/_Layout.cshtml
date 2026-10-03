@@ -15,6 +15,7 @@
 }
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -29,6 +30,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/StudentManager.styles.css" asp-append-version="true" />
 </head>
+
 <body class="@roleClass">
     <a class="skip-link" href="#main-content">Skip to content</a>
 
@@ -39,9 +41,8 @@
                     StudentManager
                 </a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#mainNav" aria-controls="mainNav"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                        aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
@@ -50,25 +51,32 @@
                         @if (User.IsInRole("Student"))
                         {
                             <li class="nav-item">
-                                <a class="@NavClass("Student", "Index")" asp-area="" asp-controller="Student" asp-action="Index">Dashboard</a>
+                                <a class="@NavClass("Student", "Index")" asp-area="" asp-controller="Student"
+                                   asp-action="Index">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Student", "Courses")" asp-area="" asp-controller="Student" asp-action="Courses">My courses</a>
+                                <a class="@NavClass("Student", "Courses")" asp-area="" asp-controller="Student"
+                                   asp-action="Courses">My courses</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Student", "Assignments")" asp-area="" asp-controller="Student" asp-action="Assignments">Assignments</a>
+                                <a class="@NavClass("Student", "Assignments")" asp-area="" asp-controller="Student"
+                                   asp-action="Assignments">Assignments</a>
                             </li>
                         }
                         else if (User.IsInRole("Teacher"))
                         {
                             <li class="nav-item">
-                                <a class="@NavClass("Teacher", "Index")" asp-area="" asp-controller="Teacher" asp-action="Index">Dashboard</a>
+                                <a class="@NavClass("Teacher", "Index")" asp-area="" asp-controller="Teacher"
+                                   asp-action="Index">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Teacher", "Courses")" asp-area="" asp-controller="Teacher" asp-action="Courses">My courses</a>
+                                <a class="@NavClass("Teacher", "Courses")" asp-area="" asp-controller="Teacher"
+                                   asp-action="Courses">My courses</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Teacher", "Students")" asp-area="" asp-controller="Teacher" asp-action="Students">Students</a>
+                                // TODO: Check controller/action mapping
+                                <a class="@NavClass("Teacher", "Students")" asp-area="" asp-controller="Teacher"
+                                   asp-action="Students">Students</a>
                             </li>
                         }
                     </ul>
@@ -94,4 +102,5 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

@@ -1,0 +1,47 @@
+@using StudentManager.Models
+@model StudentManager.ViewModels.Student.StudentDashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+@* public class StudentDashboardViewModel
+{
+public int ActiveCourseCount { get; set; }
+
+public int PendingAssignmentCount { get; set; }
+
+public int GradedAssignmentCount { get; set; }
+
+public decimal? OverallAveragePercentage { get; set; }
+} *@
+
+<div class="dashboard-container">
+    <section class="summary-cards">
+        <div class="card">
+            <h4>Active Courses</h4>
+            <p>@Model.ActiveCourseCount</p>
+        </div>
+        <div class="card">
+            <h4>Pending Assignments</h4>
+            <p>@Model.PendingAssignmentCount</p>
+        </div>
+        <div class="card">
+            <h4>Graded Assigments</h4>
+            <p>@Model.GradedAssignmentCount</p>
+        </div>
+        <div class="card">
+            <h4>Overall Average</h4>
+            <p>@Model.OverallAveragePercentage</p>
+        </div>
+    </section>
+
+    <section class="dashboard.content">
+        <div class="courses-section">
+            <h4>My Courses</h4>
+            @foreach (Course course in Model.ActiveCourses ?? Enumerable.Empty<Course>())
+            {
+                <p>=> @course.Name @course.Code</p>
+            }
+        </div>
+    </section>
+</div>

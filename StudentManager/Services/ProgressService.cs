@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using StudentManager.Data;
 using StudentManager.Models.Enums;
+using StudentManager.Models;
 using StudentManager.Services.Interfaces;
 using StudentManager.ViewModels.Student;
 using StudentManager.ViewModels.Teacher;
@@ -25,6 +26,21 @@ public class ProgressService : IProgressService
                 enrollment.StudentId == studentId &&
                 enrollment.Status == EnrollmentStatus.Active &&
                 enrollment.Course.IsActive);
+
+        var activeCourses = await _context.Enrollments
+            .AsNoTracking()
+            .Where(enrollment =>
+                enrollment.StudentId == studentId &&
+                enrollment.Status == EnrollmentStatus.Active &&
+                enrollment.Course.IsActive)
+            .Select(enrollment => new Course
+            {
+                CourseId = enrollment.CourseId,
+                Code = enrollment.Course.Code,
+                Name = enrollment.Course.Name
+            })
+            .Distinct()
+            .ToListAsync();
 
         var pendingAssignmentCount = await _context.Assignments
             .AsNoTracking()
@@ -66,7 +82,9 @@ public class ProgressService : IProgressService
             GradedAssignmentCount = gradedResults.Count,
             OverallAveragePercentage = CalculatePercentage(
                 earnedPoints,
-                possiblePoints)
+                possiblePoints),
+            ActiveCourses = activeCourses
+
         };
     }
 
