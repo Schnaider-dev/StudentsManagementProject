@@ -1,3 +1,5 @@
+using StudentManager.Models;
+
 namespace StudentManager.ViewModels.Student;
 
 public class StudentDashboardViewModel
@@ -9,4 +11,6 @@ public class StudentDashboardViewModel
     public int GradedAssignmentCount { get; set; }
 
     public decimal? OverallAveragePercentage { get; set; }
+
+    public List<Course>? ActiveCourses { get; set; }
 }

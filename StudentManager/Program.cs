@@ -49,6 +49,11 @@ var app = builder.Build();
 
 await DbInitializer.SeedRolesAsync(app.Services);
 
+if (app.Environment.IsDevelopment())
+{
+    await SeedData.SeedAsync(app.Services);
+}
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
