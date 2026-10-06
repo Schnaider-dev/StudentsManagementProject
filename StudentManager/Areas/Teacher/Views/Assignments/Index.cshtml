@@ -1,0 +1,61 @@
+@model AssignmentIndexViewModel
+
+@{
+    ViewData["Title"] = $"{Model.CourseCode} Assignments";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+    <div>
+        <a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.CourseId" class="text-decoration-none">&larr; @Model.CourseName</a>
+        <h1 class="mt-2">Assignments</h1>
+        <p class="text-muted mb-0">@Model.CourseCode — @Model.CourseName</p>
+    </div>
+    <a asp-action="Create" asp-route-courseId="@Model.CourseId" class="btn btn-primary">Create assignment</a>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success" role="status">@successMessage</div>
+}
+
+@if (Model.Assignments.Count == 0)
+{
+    <div class="alert alert-info" role="status">
+        This course has no active assignments yet.
+        <a asp-action="Create" asp-route-courseId="@Model.CourseId" class="alert-link">Create an assignment</a>.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">Assignment</th>
+                    <th scope="col">Due</th>
+                    <th scope="col">Points</th>
+                    <th scope="col">Submissions</th>
+                    <th scope="col">Graded</th>
+                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var assignment in Model.Assignments)
+                {
+                    <tr>
+                        <td><a asp-action="Details" asp-route-id="@assignment.AssignmentId">@assignment.Title</a></td>
+                        <td><time datetime="@assignment.DueDate.ToString("O")">@assignment.DueDate.ToLocalTime().ToString("g")</time></td>
+                        <td>@assignment.MaxPoints</td>
+                        <td>@assignment.Submissions.Count</td>
+                        <td>@assignment.Submissions.Count(submission => submission.Grade != null)</td>
+                        <td class="text-nowrap">
+                            <a asp-controller="Grades" asp-action="Index" asp-route-assignmentId="@assignment.AssignmentId" class="btn btn-sm btn-outline-primary">Grades</a>
+                            <a asp-action="Edit" asp-route-id="@assignment.AssignmentId" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@assignment.AssignmentId" class="btn btn-sm btn-outline-danger">Archive</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
