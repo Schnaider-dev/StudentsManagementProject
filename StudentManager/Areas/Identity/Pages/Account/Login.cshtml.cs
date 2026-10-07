@@ -70,11 +70,16 @@ namespace StudentManager.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(
-                    Input.Email,
-                    Input.Password,
-                    Input.RememberMe,
-                    lockoutOnFailure: false);
+                // Look the user up by email: the user name is not guaranteed to match it
+                var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
+
+                var result = user == null
+                    ? Microsoft.AspNetCore.Identity.SignInResult.Failed
+                    : await _signInManager.PasswordSignInAsync(
+                        user,
+                        Input.Password,
+                        Input.RememberMe,
+                        lockoutOnFailure: false);
 
                 if (result.Succeeded)
                 {
