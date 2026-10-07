@@ -230,6 +230,62 @@ body.role-guest .app-header {
     padding-left: 1.1rem;
 }
 
+/* ---------- Главная страница ---------- */
+
+.home-hero {
+    max-width: 40rem;
+    padding-block: 1.5rem 2.5rem;
+}
+
+.home-hero h1 {
+    font-size: 2.25rem;
+    text-wrap: balance;
+}
+
+.home-lead {
+    color: var(--color-muted);
+    font-size: 1.15rem;
+    margin-bottom: 1.5rem;
+}
+
+.home-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.home-roles {
+    display: grid;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .home-roles { grid-template-columns: 1fr 1fr; }
+}
+
+/* Цветная полоса сверху — тот же приём, что и в шапке: зелёный студент, синий учитель */
+.home-role {
+    padding: 1.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-top: 4px solid var(--color-student);
+    border-radius: var(--radius-md);
+}
+
+.home-role-teacher {
+    border-top-color: var(--color-teacher);
+}
+
+.home-role ul {
+    margin: 0.75rem 0 0;
+    padding-left: 1.1rem;
+    color: var(--color-muted);
+}
+
+.home-role li + li {
+    margin-top: 0.25rem;
+}
+
 /* ---------- Формы (стили Register из шаблона) ---------- */
 
 .form-floating > .form-control-plaintext::placeholder,

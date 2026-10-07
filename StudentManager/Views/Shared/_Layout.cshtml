@@ -1,10 +1,11 @@
 @{
-    // Текущий контроллер и действие — нужны, чтобы подсветить активный пункт меню
+    // Текущие область, контроллер и действие — нужны, чтобы подсветить активный пункт меню
+    var currentArea = ViewContext.RouteData.Values["area"]?.ToString();
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 
-    string NavClass(string controller, string action) =>
-        currentController == controller && currentAction == action
+    string NavClass(string area, string controller, string action) =>
+        currentArea == area && currentController == controller && currentAction == action
             ? "nav-link active"
             : "nav-link";
 
@@ -51,32 +52,28 @@
                         @if (User.IsInRole("Student"))
                         {
                             <li class="nav-item">
-                                <a class="@NavClass("Student", "Index")" asp-area="" asp-controller="Student"
-                                   asp-action="Index">Dashboard</a>
+                                <a class="@NavClass("Student", "Dashboard", "Index")" asp-area="Student"
+                                   asp-controller="Dashboard" asp-action="Index">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Student", "Courses")" asp-area="" asp-controller="Student"
-                                   asp-action="Courses">My courses</a>
+                                <a class="@NavClass("Student", "Courses", "MyCourses")" asp-area="Student"
+                                   asp-controller="Courses" asp-action="MyCourses">My courses</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Student", "Assignments")" asp-area="" asp-controller="Student"
-                                   asp-action="Assignments">Assignments</a>
+                                <a class="@NavClass("Student", "Courses", "Available")" asp-area="Student"
+                                   asp-controller="Courses" asp-action="Available">Find courses</a>
                             </li>
                         }
                         else if (User.IsInRole("Teacher"))
                         {
+                            @* Задания, оценки и студенты открываются со страницы курса — им нужен id курса *@
                             <li class="nav-item">
-                                <a class="@NavClass("Teacher", "Index")" asp-area="" asp-controller="Teacher"
-                                   asp-action="Index">Dashboard</a>
+                                <a class="@NavClass("Teacher", "Dashboard", "Index")" asp-area="Teacher"
+                                   asp-controller="Dashboard" asp-action="Index">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Teacher", "Courses")" asp-area="" asp-controller="Teacher"
-                                   asp-action="Courses">My courses</a>
-                            </li>
-                            <li class="nav-item">
-                                // TODO: Check controller/action mapping
-                                <a class="@NavClass("Teacher", "Students")" asp-area="" asp-controller="Teacher"
-                                   asp-action="Students">Students</a>
+                                <a class="@NavClass("Teacher", "Courses", "Index")" asp-area="Teacher"
+                                   asp-controller="Courses" asp-action="Index">My courses</a>
                             </li>
                         }
                     </ul>
