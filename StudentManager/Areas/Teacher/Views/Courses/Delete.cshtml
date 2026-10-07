@@ -1,0 +1,25 @@
+@model Course
+
+@{
+    ViewData["Title"] = "Archive Course";
+}
+
+<h1>Archive course</h1>
+<div class="alert alert-warning mt-3" role="alert">
+    <p>Archive <strong>@Model.Code — @Model.Name</strong>?</p>
+    <p class="mb-0">The course and its assignments will no longer be active. Existing student records will be retained.</p>
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Students</dt>
+    <dd class="col-sm-9">@Model.Enrollments.Count</dd>
+    <dt class="col-sm-3">Assignments</dt>
+    <dd class="col-sm-9">@Model.Assignments.Count</dd>
+</dl>
+
+<form asp-action="Delete" asp-route-id="@Model.CourseId" method="post">
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-danger">Archive course</button>
+        <a asp-action="Details" asp-route-id="@Model.CourseId" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>

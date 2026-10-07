@@ -1,0 +1,45 @@
+@model GradeEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Grade";
+}
+
+<div class="mb-4">
+    <a asp-action="Index" asp-route-assignmentId="@Model.AssignmentId" class="text-decoration-none">&larr; Back to submissions</a>
+    <h1 class="mt-2">@(Model.GradeId.HasValue ? "Edit grade" : "Grade submission")</h1>
+    <p class="text-muted mb-0">@Model.StudentName · @Model.AssignmentTitle</p>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <p class="mb-0">Maximum score: <strong>@Model.MaxPoints</strong> points</p>
+    </div>
+</div>
+
+<form asp-action="Edit" asp-route-id="@Model.SubmissionId" method="post" novalidate>
+    <input asp-for="GradeId" type="hidden" />
+    <input asp-for="SubmissionId" type="hidden" />
+    <input asp-for="AssignmentId" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+    <div class="mb-3">
+        <label asp-for="Score" class="form-label"></label>
+        <div class="input-group">
+            <input asp-for="Score" type="number" min="0" max="@Model.MaxPoints" step="0.01" class="form-control" />
+            <span class="input-group-text">/ @Model.MaxPoints</span>
+        </div>
+        <span asp-validation-for="Score" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Feedback" class="form-label"></label>
+        <textarea asp-for="Feedback" class="form-control" rows="5"></textarea>
+        <span asp-validation-for="Feedback" class="text-danger"></span>
+    </div>
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Save grade</button>
+        <a asp-action="Index" asp-route-assignmentId="@Model.AssignmentId" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
