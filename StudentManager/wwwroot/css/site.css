@@ -10,8 +10,10 @@
     --color-surface: #FFFFFF;      /* карточки, шапка */
     --color-background: #F3F5F7;   /* фон страницы */
     --color-border: #DDE2E8;
+    --color-border-darker: #9d9fa1;
 
     --color-student: #1E5A4C;      /* зелёный: роль студента, основной цвет */
+    --color-lightgreen: #95f09a; 
     --color-teacher: #2B4C7E;      /* синий: роль учителя */
     --color-highlight: #F2C94C;    /* жёлтый маркер: скорые дедлайны */
     --color-danger: #B42318;       /* просрочено, ошибки */
@@ -35,6 +37,12 @@
     --bs-border-color: var(--color-border);
     --bs-link-color-rgb: 30, 90, 76;
     --bs-link-hover-color-rgb: 20, 64, 54;
+}
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
 }
 
 body.role-teacher {

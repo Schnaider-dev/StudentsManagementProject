@@ -1,47 +1,94 @@
 @using StudentManager.Models
 @model StudentManager.ViewModels.Student.StudentDashboardViewModel
 
-@{
-    ViewData["Title"] = "Dashboard";
+@section Styles {
+    <link rel=" stylesheet" href="~/css/dashboard.css" />
 }
-@* public class StudentDashboardViewModel
-{
-public int ActiveCourseCount { get; set; }
 
-public int PendingAssignmentCount { get; set; }
-
-public int GradedAssignmentCount { get; set; }
-
-public decimal? OverallAveragePercentage { get; set; }
-} *@
+<h1>Dashboard</h1>
 
 <div class="dashboard-container">
     <section class="summary-cards">
         <div class="card">
-            <h4>Active Courses</h4>
             <p>@Model.ActiveCourseCount</p>
+            <hr />
+            <h4>Active Courses</h4>
         </div>
         <div class="card">
-            <h4>Pending Assignments</h4>
             <p>@Model.PendingAssignmentCount</p>
+            <hr />
+            <h4>Pending Assignments</h4>
+            
         </div>
         <div class="card">
-            <h4>Graded Assigments</h4>
             <p>@Model.GradedAssignmentCount</p>
+            <hr />
+            <h4>Graded Assigments</h4>
+            
         </div>
         <div class="card">
-            <h4>Overall Average</h4>
-            <p>@Model.OverallAveragePercentage</p>
+            @if(Model.OverallAveragePercentage is decimal average) {
+                <p>@average.ToString("0.##")%</p>
+            }
+            else {
+                <p class="not-graded">Not graded yet</p>
+            }
+            
+            <hr />
+            <h4>Your Score</h4>
+            
         </div>
     </section>
 
-    <section class="dashboard.content">
-        <div class="courses-section">
-            <h4>My Courses</h4>
-            @foreach (Course course in Model.ActiveCourses ?? Enumerable.Empty<Course>())
+    <section class="dashboard-content">
+        <div
+            class="courses-section @(Model.ActiveCourses is not null && Model.ActiveCourses.Any() ? "" : "rm-height")">
+            <h3>My Courses</h3>
+
+            @if (Model.ActiveCourses is not null && Model.ActiveCourses.Any())
             {
-                <p>=> @course.Name @course.Code</p>
+                foreach (Course course in Model.ActiveCourses)
+                {
+                    <p class="course">
+                        @course.Name @course.Code
+                    </p>
+                }
+                
             }
+            else
+            {
+                <p>No Active Courses</p>
+                <a class="no-course" href="/Student/Courses/Available">Register a course</a>
+            }
+        </div>
+
+        <div class="assignment-section @(Model.PendingAssignments is not null && Model.PendingAssignments.Any() ? "" : "rm-height")">
+            <h2>Pending Assignments</h2>
+            @if (Model.PendingAssignments is not null && Model.PendingAssignments.Any())
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Due Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var assignment in Model.PendingAssignments)
+                        {
+                            <tr>
+                                <td>@assignment.Title</td>
+                                <td>@assignment.DueDate.ToString("MMMM dd, yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+               <p>No Pending Assignment</p>
+            }
+            
         </div>
     </section>
 </div>
