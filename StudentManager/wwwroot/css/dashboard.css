@@ -1,0 +1,140 @@
+.dashboard-container {
+  display: grid;
+  width: 860px;
+  margin: 0 auto;
+}
+
+.summary-cards {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.summary-cards .card {
+  width: 180px;
+  text-align: center;
+  box-shadow: 2px 2px var(--color-student);
+  cursor: pointer;
+}
+.summary-cards .card:hover {
+  box-shadow: 4px 4px var(--color-student);
+  transition: ease-in-out 0.2s;
+}
+
+.summary-cards .card h4 {
+  font-size: 0.9rem;
+}
+
+.summary-cards .card p {
+  height: 50px;
+  font-size: 2rem;
+  padding-top: 1.5rem;
+}
+
+.summary-cards .card .not-graded {
+  font-size: 1.3rem;
+}
+
+/* *************** dashboard content ************* */
+
+.dashboard-content {
+  display: flex;
+  flex-direction: row;
+  margin-top: 2rem;
+  gap: 2rem;
+}
+
+.dashboard-content .courses-section,
+.dashboard-content .assignment-section {
+  width: 50%;
+  border: 1px solid var(--color-ink);
+  min-height: 30vh;
+  border-radius: 5px;
+}
+
+.dashboard-content .courses-section.rm-height, .dashboard-content .assignment-section.rm-height {
+  min-height: 0;
+  height: auto;
+}
+
+.dashboard-content .assignment-section table {
+  width: 100%;
+  border-collapse: collapse; /* removes double borders */
+  font-family: Arial, sans-serif;
+  background-color: var(--color-background);
+  overflow: hidden;
+}
+
+.dashboard-content .assignment-section table thead {
+  background-color: var(--color-lightgreen);
+  color: var(--color-ink);
+}
+
+.dashboard-content .assignment-section th,
+.dashboard-content .assignment-section td {
+  padding: 5px 6px;
+  text-align: left;
+}
+
+.dashboard-content .assignment-section tbody tr {
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-border);
+}
+
+.dashboard-content .assignment-section tbody tr:hover {
+  background-color: var(--color-border-darker); /* subtle hover effect */
+  cursor: pointer;
+}
+
+.dashboard-content .assignment-section td:first-child {
+  font-weight: 600; /* emphasize title */
+}
+
+.dashboard-content .courses-section h3,
+.dashboard-content .assignment-section h2 {
+  font-size: larger;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-student);
+  color: var(--color-surface);
+  border-radius: 2px;
+}
+
+.dashboard-content .courses-section p, .dashboard-content .assignment-section p {
+  padding-left: 10px;
+  background-color: var(--color-border);
+  margin-bottom: 5px;
+}
+
+.dashboard-content .courses-section.rm-height p, .dashboard-content .assignment-section.rm-height p {
+    background: none;
+    text-align: center;
+}
+
+.dashboard-content .courses-section .course {
+  font-weight: 500;
+}
+
+.dashboard-content .courses-section .no-course {
+  padding: 5px;
+  text-decoration: none;
+  border: 1px solid;
+  border-radius: 5px;
+  background-color: var(--color-background);
+  display: block;
+  text-align: center;
+  margin: 5px;
+}
+
+.dashboard-content .courses-section .no-course:hover {
+  background-color: var(--color-student);
+  color: whitesmoke;
+}
+
+.dashboard-content .courses-section .no-course::after {
+  content: "→";
+  margin-left: 8px;
+  line-height: 1;
+  font-size: 1.5rem;
+  display: inline-block;
+  vertical-align: middle;
+}
