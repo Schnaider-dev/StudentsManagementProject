@@ -1,16 +1,21 @@
+@* Import the view-model namespace so this view can use MyCourseViewModel by its short name. *@
 @using StudentManager.ViewModels.Student
+@* UserManager looks up the identity record for the signed-in browser user. *@
 @inject UserManager<ApplicationUser> UserManager
+@* The controller passes the enrolled courses as this view's model. *@
 @model List<MyCourseViewModel>;
 
 @{
+    // Resolve the signed-in user's profile; the view can use it for personalized content.
     var currentUser = await UserManager.GetUserAsync(User);
 }
 
 @section Styles {
+    @* Load styles specific to the My Courses page into the layout's Styles section. *@
     <link rel="stylesheet" href="~/css/mycourses.css" />
 }
 
-
+@* Keep the page title and the route to the available-course catalog together. *@
 <div class="courses-page-heading">
     <h1>My Courses</h1>
     <a asp-area="Student" asp-controller="Courses" asp-action="Available" class="btn btn-primary">
@@ -18,12 +23,15 @@
     </a>
 </div>
 
+@* Bootstrap's accordion behavior is enabled by these classes and data-bs attributes below. *@
 <div class="courses-list accordion" id="myCoursesAccordion">
+    @* Render one collapsible accordion item for each enrolled course. *@
     @foreach (var course in Model)
     {
         <div class="course-card accordion-item mb-2">
             <div class="course-header accordion-header" id="heading-@course.CourseId">
                 <h2>
+                    @* data-bs-target connects this button to the matching panel ID. *@
                     <button class="accordion-button collapsed" data-bs-toggle="collapse" type="button"
                             data-bs-target="#collapse-@course.CourseId" aria-expanded="false"
                             aria-controls="collapse-@course.CourseId">
@@ -31,6 +39,7 @@
                     </button>
                 </h2>
             </div>
+            @* The matching course ID makes each panel target unique; data-bs-parent allows one open panel. *@
             <div id="collapse-@course.CourseId" class="accordion-collapse collapse"
                  aria-labelledby="heading-@course.CourseId" data-bs-parent="#myCoursesAccordion">
                 <div class="accordion-body">
@@ -39,12 +48,16 @@
                             @course.TeacherName
                         </p>
                         <p><strong>Desciption:</strong> @course.Description</p>
+                        <p><strong>Assignments:</strong> @course.AssignmentCount</p>
+                        <p><strong>Enrolled:</strong> @course.EnrolledAt.ToString("MMMM dd, yyyy")</p>
                     </div>
                     <div class="view-details">
+                        @* Tag helpers turn these asp-* attributes into a routed assignments URL. *@
                         <a asp-area="Student" asp-controller="Assignments" asp-action="Index"
                            asp-route-id="@course.CourseId">View
                             Assignments</a>
-                            <form asp-area="Student" asp-controller="Courses" asp-action="Drop"
+                            @* Dropping changes data, so use POST; the form tag helper adds an antiforgery token. *@
+                            <form asp-area="Student" asp-controller="Courses" asp-action="Drop" @* courseId binds to Drop(int courseId); the server also checks the signed-in student. *@
                                   asp-route-courseId="@course.CourseId" method="post">
                                 <button type="submit" class="btn btn-outline-danger btn-sm">Drop Course</button>
                             </form>

@@ -1,6 +1,9 @@
+/* Remove the browser's default paragraph spacing inside the course details. */
 p {
   margin: 0;
 }
+
+/* Put the title and catalog link on one row, allowing them to wrap on narrow screens. */
 .courses-page-heading {
   display: flex;
   align-items: center;
@@ -11,6 +14,7 @@ p {
   margin: 0 auto 1.5rem;
 }
 
+/* Make the page title use the role-specific primary color from site.css. */
 .courses-page-heading h1 {
   margin: 0;
   font-size: 2rem;
@@ -18,31 +22,38 @@ p {
   color: var(--color-primary);
 }
 
+/* Constrain and center the list so it stays readable on wide screens. */
 .courses-list {
   width: min(860px, 90%);
   margin: 1.5rem auto;
 }
 
+/* Add a subtle accent around each course item. */
 .courses-list .course-card {
   box-shadow: 0 0 5px var(--color-primary);
   margin-bottom: 1.2rem;
 }
 
+/* Use the same primary color for each accordion header and keep its label legible. */
 .courses-list .course-card .course-header h2 .accordion-button {
   font-size: 1rem;
   background-color: var(--color-primary);
   color: white;
 }
+
+/* Bootstrap draws the arrow as an SVG background; this filter turns its dark strokes white. */
 .courses-list .accordion-button::after {
   filter: brightness(0) invert(1);
 }
 
+/* Lay out course details side by side on larger screens. */
 .courses-list .course-card .accordion-body {
   display: flex;
   justify-content: space-between;
   background-color: var(--color-surface);
 }
 
+/* On phones, stack the details and actions and add space between them. */
 @media (max-width: 767.98px) {
   .courses-list .course-card .accordion-body {
     flex-direction: column;
@@ -50,16 +61,19 @@ p {
   }
 }
 
+/* Override Bootstrap's expanded-state colors to keep the text readable. */
 .courses-list .accordion-button:not(.collapsed) {
   color: var(--color-ink);
   background-color: #e9ecef;
 }
 
+/* Keep a visible keyboard-focus ring, tinted with the role's primary color. */
 .courses-list .accordion-button:focus {
   border-color: var(--color-border-darker);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 85%, black);
 }
 
+/* Style the assignment link as a small action inside the course details. */
 .courses-list .course-card .accordion-body .view-details a {
   border: 1px solid var(--color-border-darker);
   background-color: var(--color-lightgreen);
@@ -69,10 +83,12 @@ p {
   color: var(--color-ink);
 }
 
+/* Keep the drop form inline with the assignment link instead of taking a full row. */
 .courses-list .course-card .accordion-body .view-details form {
-    display: inline-flex;
+  display: inline-flex;
 }
 
+/* Give the assignment link a stronger hover state. */
 .courses-list .course-card .accordion-body .view-details a:hover {
   background-color: var(--color-student);
   color: var(--color-surface);

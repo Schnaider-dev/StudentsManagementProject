@@ -1,5 +1,55 @@
-@using StudentManager.ViewModels.Student
-@model AvailableCourseViewModel
+@model IEnumerable<StudentManager.ViewModels.Student.AvailableCourseViewModel>
 
+@{
+    ViewData["Title"] = "Available Courses";
+}
 
-<h1>All Courses</h1>
+<div class="container mt-4">
+    <h2 class="mb-3">Available Courses</h2>
+
+    <!-- Search and Filter Bar -->
+    <form class="d-flex mb-4" method="get">
+        <input type="text" name="search" class="form-control me-2" placeholder="Search by code, name, or teacher..." />
+        <select name="filter" class="form-select me-2">
+            <option value="">Filter</option>
+            <option value="code">By Code</option>
+            <option value="teacher">By Teacher</option>
+        </select>
+        <button type="submit" class="btn btn-secondary">Search</button>
+    </form>
+
+    <!-- Course List -->
+    <div class="list-group">
+        @foreach (var course in Model)
+        {
+            <div class="list-group-item mb-3 shadow-sm rounded">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="mb-1">(@course.Code) @course.Name</h5>
+                        <p class="mb-1 text-muted">Taught by: <strong>@course.TeacherName</strong></p>
+                        <p>@course.Description</p>
+                    </div>
+                    <div>
+                        <a asp-controller="Student"
+                           asp-action="Enroll"
+                           asp-route-id="@course.CourseId"
+                           class="btn btn-primary">
+                            Enroll
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Course navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled"><a class="page-link" href="#">«</a></li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">Next »</a></li>
+        </ul>
+    </nav>
+</div>
