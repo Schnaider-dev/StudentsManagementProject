@@ -78,6 +78,8 @@ public static class SeedData
         {
             new AssignmentSeed(0, "Variables and Control Flow"),
             new AssignmentSeed(1, "Build a Course Portal"),
+            new AssignmentSeed(1, "Display an assignment from a list of assignments"),
+            new AssignmentSeed(1, "Display a second assignment from a list of assignments"),
             new AssignmentSeed(2, "Relational Data Model")
         };
 
@@ -129,7 +131,7 @@ public static class SeedData
         await dbContext.SaveChangesAsync();
 
         var submissions = new List<Submission>();
-        for (var index = 0; index < assignments.Count; index++)
+        for (var index = 0; index < 3; index++)
         {
             var assignment = assignments[index];
             var student = studentUsers[index];

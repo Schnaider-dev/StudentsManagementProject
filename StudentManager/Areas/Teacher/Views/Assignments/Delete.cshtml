@@ -1,0 +1,26 @@
+@model Assignment
+
+@{
+    ViewData["Title"] = "Archive Assignment";
+}
+
+<h1>Archive assignment</h1>
+<p class="text-muted">@Model.Course.Code — @Model.Course.Name</p>
+<div class="alert alert-warning mt-3" role="alert">
+    <p>Archive <strong>@Model.Title</strong>?</p>
+    <p class="mb-0">Students will no longer be able to work on this assignment. Existing submissions and grades will be retained.</p>
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Due date</dt>
+    <dd class="col-sm-9"><time datetime="@Model.DueDate.ToString("O")">@Model.DueDate.ToLocalTime().ToString("g")</time></dd>
+    <dt class="col-sm-3">Submissions</dt>
+    <dd class="col-sm-9">@Model.Submissions.Count</dd>
+</dl>
+
+<form asp-action="Delete" asp-route-id="@Model.AssignmentId" method="post">
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-danger">Archive assignment</button>
+        <a asp-action="Details" asp-route-id="@Model.AssignmentId" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>

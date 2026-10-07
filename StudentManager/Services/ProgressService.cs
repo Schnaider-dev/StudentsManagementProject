@@ -53,6 +53,19 @@ public class ProgressService : IProgressService
                 !assignment.Submissions.Any(submission =>
                     submission.StudentId == studentId));
 
+        var pendingAssignments = await _context.Assignments
+            .AsNoTracking()
+            .Where(assignment =>
+                assignment.IsActive &&
+                assignment.Course.IsActive &&
+                assignment.Course.Enrollments.Any(enrollment =>
+                    enrollment.StudentId == studentId &&
+                    enrollment.Status == EnrollmentStatus.Active) &&
+                !assignment.Submissions.Any(submission =>
+                    submission.StudentId == studentId))
+            .OrderBy(assignment => assignment.DueDate)
+            .ToListAsync();
+
         var gradedResults = await _context.Grades
             .AsNoTracking()
             .Where(grade =>
@@ -79,12 +92,12 @@ public class ProgressService : IProgressService
         {
             ActiveCourseCount = activeCourseCount,
             PendingAssignmentCount = pendingAssignmentCount,
+            PendingAssignments = pendingAssignments,
             GradedAssignmentCount = gradedResults.Count,
             OverallAveragePercentage = CalculatePercentage(
                 earnedPoints,
                 possiblePoints),
             ActiveCourses = activeCourses
-
         };
     }
 

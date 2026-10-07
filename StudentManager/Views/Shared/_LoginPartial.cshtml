@@ -1,6 +1,8 @@
 @using Microsoft.AspNetCore.Identity
 @using StudentManager.Models
 @inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
 
 <ul class="navbar-nav align-items-md-center gap-md-2">
     @if (SignInManager.IsSignedIn(User))
@@ -8,6 +10,9 @@
         var role = User.IsInRole("Teacher") ? "Teacher"
                  : User.IsInRole("Student") ? "Student"
                  : null;
+
+        var currentUser = await UserManager.GetUserAsync(User);
+
 
         @if (role != null)
         {
@@ -18,7 +23,7 @@
 
         <li class="nav-item">
             <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index" title="Account settings">
-                @User.Identity?.Name
+                @(currentUser is null ? User.Identity?.Name : $"{currentUser.FirstName} {currentUser.LastName}")
             </a>
         </li>
 

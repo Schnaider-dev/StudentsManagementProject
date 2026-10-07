@@ -1,0 +1,64 @@
+@model GradingListViewModel
+
+@{
+    ViewData["Title"] = $"Grades — {Model.AssignmentTitle}";
+}
+
+<div class="mb-4">
+    <a asp-controller="Assignments" asp-action="Index" asp-route-courseId="@Model.CourseId" class="text-decoration-none">&larr; @Model.CourseCode assignments</a>
+    <h1 class="mt-2">Submissions</h1>
+    <p class="text-muted mb-0">@Model.AssignmentTitle · @Model.CourseCode · Maximum @Model.MaxPoints points</p>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success" role="status">@successMessage</div>
+}
+
+@if (Model.Submissions.Count == 0)
+{
+    <div class="alert alert-info" role="status">No submissions have been received for this assignment.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">Student</th>
+                    <th scope="col">Student number</th>
+                    <th scope="col">Submitted</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Score</th>
+                    <th scope="col">Feedback</th>
+                    <th scope="col"><span class="visually-hidden">Actions</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var submission in Model.Submissions)
+                {
+                    <tr>
+                        <td>@submission.StudentName</td>
+                        <td>@(string.IsNullOrWhiteSpace(submission.StudentNumber) ? "—" : submission.StudentNumber)</td>
+                        <td><time datetime="@submission.SubmittedAt.ToString("O")">@submission.SubmittedAt.ToLocalTime().ToString("g")</time></td>
+                        <td>
+                            @if (submission.IsLate)
+                            {
+                                <span class="badge text-bg-warning">Late</span>
+                            }
+                            else
+                            {
+                                <span>On time</span>
+                            }
+                        </td>
+                        <td>@(submission.Score.HasValue ? $"{submission.Score.Value} / {Model.MaxPoints}" : "—")</td>
+                        <td>@(string.IsNullOrWhiteSpace(submission.Feedback) ? "—" : submission.Feedback)</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@submission.SubmissionId" class="btn btn-sm btn-primary">@(submission.IsGraded ? "Edit grade" : "Grade")</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
