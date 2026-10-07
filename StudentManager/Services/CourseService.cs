@@ -44,6 +44,7 @@ public class CourseService : ICourseService
             .Include(course => course.Enrollments)
                 .ThenInclude(enrollment => enrollment.Student)
             .Include(course => course.Assignments)
+                .ThenInclude(assignment => assignment.Submissions)
             .FirstOrDefaultAsync(course =>
                 course.CourseId == courseId &&
                 course.TeacherId == teacherId);
