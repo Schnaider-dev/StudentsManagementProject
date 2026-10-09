@@ -20,6 +20,8 @@ public class ProgressService : IProgressService
     public async Task<StudentDashboardViewModel>
         GetStudentDashboardAsync(string studentId)
     {
+        const int dashboardPreviewLimit = 5;
+
         var activeCourseCount = await _context.Enrollments
             .AsNoTracking()
             .CountAsync(enrollment =>
@@ -40,6 +42,9 @@ public class ProgressService : IProgressService
                 Name = enrollment.Course.Name
             })
             .Distinct()
+            .OrderBy(course => course.Name)
+            .ThenBy(course => course.Code)
+            .Take(dashboardPreviewLimit)
             .ToListAsync();
 
         var pendingAssignmentCount = await _context.Assignments
@@ -64,6 +69,8 @@ public class ProgressService : IProgressService
                 !assignment.Submissions.Any(submission =>
                     submission.StudentId == studentId))
             .OrderBy(assignment => assignment.DueDate)
+            .ThenBy(assignment => assignment.Title)
+            .Take(dashboardPreviewLimit)
             .ToListAsync();
 
         var gradedResults = await _context.Grades
@@ -163,6 +170,8 @@ public class ProgressService : IProgressService
                         : CalculatePercentage(
                             grade.Score,
                             assignment.MaxPoints),
+                    Grade = ToGradeLetter(grade?.Score),
+                    Status = ShowStatus(submission is not null, grade is not null),
                     Feedback = grade?.Feedback
                 };
             })
@@ -355,5 +364,33 @@ public class ProgressService : IProgressService
         return Math.Round(
             earnedPoints / possiblePoints * 100,
             2);
+    }
+
+    private static string? ToGradeLetter(decimal? percentage)
+    {
+        var grade = percentage switch
+        {
+            >= 97 => "A+",
+            >= 93 => "A",
+            >= 90 => "A-",
+            >= 87 => "B+",
+            >= 83 => "B",
+            >= 80 => "B-",
+            >= 77 => "C+",
+            >= 73 => "C",
+            >= 70 => "C-",
+            >= 67 => "D+",
+            >= 63 => "D",
+            >= 60 => "D-",
+            >= 0 => "F",
+            _ => "_"
+        };
+        return grade;
+    }
+
+    private static string ShowStatus(bool isSubmitted, bool isGraded)
+    {
+        var status = isGraded ? "Graded" : isSubmitted ? "Submitted" : "Pending";
+        return status;
     }
 }

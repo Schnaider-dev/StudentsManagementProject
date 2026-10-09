@@ -49,16 +49,18 @@ public class EnrollmentService : IEnrollmentService
             .AsNoTracking()
             // Keep active courses and exclude courses where this student already has an
             // enrollment that is not dropped. 
+            //Any(...) asks: “Is there at least one enrollment for this student whose status is not Dropped?”
+            //Any checks whether a matching row exists.
             .Where(course =>
                 course.IsActive &&
-                !course.Enrollments.Any(enrollment => //Any checks whether a matching row exists.
+                !course.Enrollments.Any(enrollment =>
                     enrollment.StudentId == studentId &&
                     enrollment.Status != EnrollmentStatus.Dropped));
 
         // Do not add search conditions for an empty search box.
         if (!string.IsNullOrWhiteSpace(search))
         {
-            // A switch expression chooses one query condition based on the selected filter.
+            // A switch expression chooses one query condition based on the selected filter, concise, returns a value directly.
             query = filter switch
             {
                 // Match the search text against only the requested field.

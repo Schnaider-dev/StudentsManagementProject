@@ -1,94 +1,166 @@
 @using StudentManager.Models
-@model StudentManager.ViewModels.Student.StudentDashboardViewModel
+@model StudentDashboardViewModel
 
-@section Styles {
-    <link rel=" stylesheet" href="~/css/dashboard.css" />
+@{
+    ViewData["Title"] = "My Dashboard";
 }
 
-<h1>Dashboard</h1>
+@section Styles {
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+}
 
-<div class="dashboard-container">
-    <section class="summary-cards">
-        <div class="card">
-            <p>@Model.ActiveCourseCount</p>
-            <hr />
-            <h4>Active Courses</h4>
-        </div>
-        <div class="card">
-            <p>@Model.PendingAssignmentCount</p>
-            <hr />
-            <h4>Pending Assignments</h4>
-            
-        </div>
-        <div class="card">
-            <p>@Model.GradedAssignmentCount</p>
-            <hr />
-            <h4>Graded Assigments</h4>
-            
-        </div>
-        <div class="card">
-            @if(Model.OverallAveragePercentage is decimal average) {
-                <p>@average.ToString("0.##")%</p>
+<header class="dashboard-page-heading">
+    <h1>@ViewData["Title"]</h1>
+</header>
+
+<main class="dashboard-container">
+    <section class="summary-cards" aria-label="Your learning summary">
+        <article class="dashboard-stat-card">
+            <p class="dashboard-stat-value">@Model.ActiveCourseCount</p>
+            <h2>Active courses</h2>
+        </article>
+        <article class="dashboard-stat-card">
+            <p class="dashboard-stat-value">@Model.PendingAssignmentCount</p>
+            <h2>Pending assignments</h2>
+        </article>
+        <article class="dashboard-stat-card">
+            <p class="dashboard-stat-value">@Model.GradedAssignmentCount</p>
+            <h2>Graded assignments</h2>
+        </article>
+        <article class="dashboard-stat-card">
+            @if (Model.OverallAveragePercentage is decimal average)
+            {
+                <p class="dashboard-stat-value">@average.ToString("0.##")%</p>
             }
-            else {
-                <p class="not-graded">Not graded yet</p>
+            else
+            {
+                <p class="dashboard-stat-value dashboard-stat-empty">Not graded yet</p>
             }
-            
-            <hr />
-            <h4>Your Score</h4>
-            
-        </div>
+            <h2>Overall score</h2>
+        </article>
     </section>
 
     <section class="dashboard-content">
-        <div
-            class="courses-section @(Model.ActiveCourses is not null && Model.ActiveCourses.Any() ? "" : "rm-height")">
-            <h3>My Courses</h3>
-
-            @if (Model.ActiveCourses is not null && Model.ActiveCourses.Any())
-            {
-                foreach (Course course in Model.ActiveCourses)
+        <section class="dashboard-panel courses-section">
+            <header class="dashboard-panel-heading">
+                <div>
+                    <p class="dashboard-section-label">Your learning</p>
+                    <h2>My courses</h2>
+                </div>
+                @if (Model.ActiveCourseCount > 0)
                 {
-                    <p class="course">
-                        @course.Name @course.Code
+                    <a class="dashboard-panel-link" asp-area="Student" asp-controller="Courses"
+                       asp-action="MyCourses">All courses <span aria-hidden="true">→</span></a>
+                }
+            </header>
+
+            @if (Model.ActiveCourses is { Count: > 0 })
+            {
+                <ul class="course-preview-list">
+                    @foreach (Course course in Model.ActiveCourses)
+                    {
+                        <li>
+                            <a class="course-preview-card" asp-area="Student" asp-controller="Courses"
+                               asp-action="Progress" asp-route-courseId="@course.CourseId">
+                                <span class="course-preview-code">@course.Code</span>
+                                <span class="course-preview-name">@course.Name</span>
+                                <span class="course-preview-action" aria-hidden="true">View progress →</span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+                @if (Model.ActiveCourseCount > Model.ActiveCourses.Count)
+                {
+                    <p class="dashboard-preview-note">
+                        Showing @Model.ActiveCourses.Count of @Model.ActiveCourseCount courses.
                     </p>
                 }
-                
             }
             else
             {
-                <p>No Active Courses</p>
-                <a class="no-course" href="/Student/Courses/Available">Register a course</a>
+                <div class="dashboard-empty-state">
+                    <p>You are not enrolled in any active courses yet.</p>
+                    <a class="dashboard-panel-link" asp-area="Student" asp-controller="Courses"
+                       asp-action="Available">Browse available courses <span aria-hidden="true">→</span></a>
+                </div>
             }
-        </div>
+        </section>
 
-        <div class="assignment-section @(Model.PendingAssignments is not null && Model.PendingAssignments.Any() ? "" : "rm-height")">
-            <h2>Pending Assignments</h2>
-            @if (Model.PendingAssignments is not null && Model.PendingAssignments.Any())
+        <section class="dashboard-panel assignment-section">
+            <header class="dashboard-panel-heading">
+                <div>
+                    <p class="dashboard-section-label">Coming up</p>
+                    <h2>Pending assignments</h2>
+                </div>
+                @if (Model.PendingAssignmentCount > 0)
+                {
+                    <a class="dashboard-panel-link" asp-area="Student" asp-controller="Assignments"
+                       asp-action="All">All assignments <span aria-hidden="true">→</span></a>
+                }
+            </header>
+
+            @if (Model.PendingAssignments is { Count: > 0 })
             {
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Due Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var assignment in Model.PendingAssignments)
-                        {
+                <div class="assignment-table-scroll">
+                    <table class="assignment-preview-table">
+                        <thead>
                             <tr>
-                                <td>@assignment.Title</td>
-                                <td>@assignment.DueDate.ToString("MMMM dd, yyyy")</td>
+                                <th scope="col">Assignment</th>
+                                <th scope="col">Due date</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var assignment in Model.PendingAssignments)
+                            {
+                                var daysUntilDue = (assignment.DueDate.Date - DateTime.Today).Days;
+                                var dueDateClass = daysUntilDue < 0
+                                    ? "is-overdue"
+                                    : daysUntilDue <= 3
+                                        ? "is-due-soon"
+                                        : string.Empty;
+                                var dueDateLabel = daysUntilDue < 0
+                                    ? "Overdue"
+                                    : daysUntilDue == 0
+                                        ? "Due today"
+                                        : daysUntilDue <= 3
+                                            ? "Due soon"
+                                            : string.Empty;
+
+                                <tr>
+                                    <td data-label="Assignment">
+                                        <a class="assignment-preview-title" asp-area="Student"
+                                           asp-controller="Assignments" asp-action="Details"
+                                           asp-route-id="@assignment.AssignmentId">@assignment.Title</a>
+                                    </td>
+                                    <td data-label="Due date">
+                                        <span class="assignment-due-date @dueDateClass">
+                                            @assignment.DueDate.ToString("MMM dd, yyyy")
+                                        </span>
+                                        @if (!string.IsNullOrEmpty(dueDateLabel))
+                                        {
+                                            <span class="assignment-due-label @dueDateClass">@dueDateLabel</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @if (Model.PendingAssignmentCount > Model.PendingAssignments.Count)
+                {
+                    <p class="dashboard-preview-note">
+                        Showing the next @Model.PendingAssignments.Count of @Model.PendingAssignmentCount assignments.
+                        <a asp-area="Student" asp-controller="Courses" asp-action="MyCourses">Browse all courses</a>
+                        to see their assignments.
+                    </p>
+                }
             }
             else
             {
-               <p>No Pending Assignment</p>
+                <div class="dashboard-empty-state">
+                    <p>You are all caught up—there are no pending assignments.</p>
+                </div>
             }
-            
-        </div>
+        </section>
     </section>
-</div>
+</main>

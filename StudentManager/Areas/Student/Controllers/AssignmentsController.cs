@@ -22,6 +22,22 @@ public class AssignmentsController : Controller
     }
 
     [HttpGet]
+    public async Task<IActionResult> All()
+    {
+        var studentId = GetCurrentUserId();
+
+        if (studentId is null)
+        {
+            return Challenge();
+        }
+
+        var assignments =
+            await _submissionService.GetAllAssignmentsAsync(studentId);
+
+        return View(assignments);
+    }
+
+    [HttpGet]
     public async Task<IActionResult> Index(int courseId)
     {
         if (courseId <= 0)

@@ -1,2 +1,142 @@
+@model StudentAssignmentViewModel
 
-<h1>Assigments Details Page</h1>
+@{
+    ViewData["Title"] = Model.Title;
+    var isSubmitted = Model.SubmissionId.HasValue;
+    var isOverdue = !isSubmitted && Model.DueDate < DateTime.Now;
+    var statusText = Model.IsGraded
+        ? "Graded"
+        : isSubmitted
+            ? "Submitted"
+            : isOverdue
+                ? "Overdue"
+                : "To submit";
+    var statusClass = Model.IsGraded
+        ? "assignment-status-graded"
+        : isSubmitted
+            ? "assignment-status-submitted"
+            : isOverdue
+                ? "assignment-status-overdue"
+                : "assignment-status-pending";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/student-assignments.css" asp-append-version="true" />
+}
+
+<div class="student-assignments-page assignment-details-page">
+    <div class="student-assignments-header assignment-details-header">
+        <a class="assignments-back-link" asp-area="Student" asp-controller="Assignments" asp-action="Index"
+           asp-route-courseId="@Model.CourseId">
+            <span aria-hidden="true">←</span> Back to @Model.CourseCode assignments
+        </a>
+        <p class="assignments-eyebrow">@Model.CourseCode · @Model.CourseName</p>
+        <div class="assignment-details-title-row">
+            <h1>@Model.Title</h1>
+            <span class="assignment-status @statusClass">@statusText</span>
+        </div>
+        <p class="assignments-subtitle">Review the assignment instructions, due date, and your submission.</p>
+    </div>
+
+    <div class="assignment-details-layout">
+        <div>
+            <section class="assignment-detail-panel" aria-labelledby="instructions-heading">
+                <div class="assignment-detail-panel-heading">
+                    <p class="assignments-eyebrow">Assignment</p>
+                    <h2 id="instructions-heading">Instructions</h2>
+                </div>
+                <div class="assignment-description">
+                    @if (string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <p>No additional instructions were provided for this assignment.</p>
+                    }
+                    else
+                    {
+                        <p>@Model.Description</p>
+                    }
+                </div>
+            </section>
+
+            @if (isSubmitted && Model.IsGraded && !string.IsNullOrWhiteSpace(Model.Feedback))
+            {
+                <section class="assignment-detail-panel assignment-feedback" aria-labelledby="feedback-heading">
+                    <div class="assignment-detail-panel-heading">
+                        <p class="assignments-eyebrow">Instructor</p>
+                        <h2 id="feedback-heading">Feedback</h2>
+                    </div>
+                    <p>@Model.Feedback</p>
+                </section>
+            }
+
+        </div>
+        <aside class="assignment-detail-sidebar">
+            <section class="assignment-detail-panel" aria-labelledby="details-heading">
+                <div class="assignment-detail-panel-heading">
+                    <h2 id="details-heading">Details</h2>
+                </div>
+                <dl class="assignment-facts">
+                    <div>
+                        <dt>Due date</dt>
+                        <dd>
+                            <time datetime="@Model.DueDate.ToString("O")">
+                                @Model.DueDate.ToLocalTime().ToString("MMMM d, yyyy")
+                            </time>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Maximum points</dt>
+                        <dd>@Model.MaxPoints.ToString("0.##")</dd>
+                    </div>
+                    @if (Model.SubmittedAt is DateTime submittedAt)
+                    {
+                        <div>
+                            <dt>Submitted</dt>
+                            <dd>
+                                <time datetime="@submittedAt.ToString("O")">
+                                    @submittedAt.ToLocalTime().ToString("MMMM d, yyyy 'at' h:mm tt")
+                                </time>
+                            </dd>
+                        </div>
+                    }
+                    @if (Model.IsGraded && Model.Score is decimal score)
+                    {
+                        <div>
+                            <dt>Score</dt>
+                            <dd class="assignment-score">@score.ToString("0.##") / @Model.MaxPoints.ToString("0.##")</dd>
+                        </div>
+                    }
+                </dl>
+            </section>
+
+            <section class="assignment-detail-panel assignment-next-step" aria-labelledby="next-step-heading">
+                <h2 id="next-step-heading">Your submission</h2>
+                @if (Model.IsGraded && Model.SubmissionId is int gradedSubmissionId)
+                {
+                    <p>This assignment has been graded.</p>
+                    <a class="assignment-primary-action" asp-area="Student" asp-controller="Submissions"
+                       asp-action="Details" asp-route-id="@gradedSubmissionId">View your submission</a>
+                }
+                else if (Model.SubmissionId is int submissionId)
+                {
+                    <p>Your work has been submitted and is awaiting a grade.</p>
+                    <div class="assignment-action-group">
+                        <a class="assignment-primary-action" asp-area="Student" asp-controller="Submissions"
+                           asp-action="Details" asp-route-id="@submissionId">View submission</a>
+                        <a class="assignment-secondary-action" asp-area="Student" asp-controller="Submissions"
+                           asp-action="Edit" asp-route-id="@submissionId">Edit submission</a>
+                    </div>
+                }
+                else
+                {
+                    <p>
+                        @(isOverdue
+                            ? "This assignment is past its due date, but you can still submit your work."
+                            : "You have not submitted this assignment yet.")
+                    </p>
+                    <a class="assignment-primary-action" asp-area="Student" asp-controller="Submissions" asp-action="Create"
+                       asp-route-assignmentId="@Model.AssignmentId">Submit assignment</a>
+                }
+            </section>
+        </aside>
+    </div>
+</div>

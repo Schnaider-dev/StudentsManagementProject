@@ -1,0 +1,119 @@
+@model CourseProgressViewModel
+
+@{
+    ViewData["Title"] = "Course Progress";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/course-progress.css" asp-append-version="true" />
+}
+
+<div class="course-progress-page">
+    <div class="course-progress-header">
+        <div>
+            <a class="course-progress-back-link" asp-area="Student" asp-controller="Courses"
+               asp-action="MyCourses">
+                <span aria-hidden="true">←</span> Back to My Courses
+            </a>
+            <p class="course-progress-eyebrow">@Model.CourseCode</p>
+            <h1>@ViewData["Title"]</h1>
+            <h2>@Model.CourseName</h2>
+            <p class="course-progress-teacher">Instructor: @Model.TeacherName</p>
+        </div>
+    </div>
+
+    <section class="summary-section" aria-label="Course summary">
+        <article class="summary-card">
+            <h3>Total assignments</h3>
+            <p class="summary-value">@Model.TotalAssignments</p>
+        </article>
+        <article class="summary-card">
+            <h3>Submitted</h3>
+            <p class="summary-value">@Model.SubmittedAssignments</p>
+        </article>
+        <article class="summary-card">
+            <h3>Graded</h3>
+            <p class="summary-value">@Model.GradedAssignments</p>
+        </article>
+        <article class="summary-card">
+            <h3>Average score</h3>
+            @if (Model.AveragePercentage is decimal average)
+            {
+                <p class="summary-value">@average.ToString("0.##")<span>%</span></p>
+            }
+            else
+            {
+                <p class="summary-value summary-value-empty">Not graded yet</p>
+            }
+        </article>
+    </section>
+
+    <section class="progress-section" aria-labelledby="progress-heading">
+        <div class="section-heading">
+            <div>
+                <p class="section-eyebrow">Your work</p>
+                <h2 id="progress-heading">Assignment progress</h2>
+            </div>
+        </div>
+        @{
+            var submittedRatio = Model.TotalAssignments == 0
+                ? 0
+                : Model.SubmittedAssignments * 100 / Model.TotalAssignments;
+        }
+        <div class="submission-progress-track" role="progressbar" aria-label="Assignments submitted" aria-valuemin="0"
+             aria-valuemax="100" aria-valuenow="@submittedRatio">
+            <div class="submission-progress-fill" style="width: @submittedRatio%"></div>
+        </div>
+        <div class="progress-legend">
+            <span><span class="legend-dot legend-dot-submitted"></span>@Model.SubmittedAssignments submitted</span>
+            <span><span class="legend-dot legend-dot-pending"></span>@(Model.TotalAssignments -
+                                Model.SubmittedAssignments) pending</span>
+            </div>
+        </section>
+
+        <section class="assignments-section" aria-labelledby="assignments-heading">
+            <div class="section-heading">
+                <div>
+                    <p class="section-eyebrow">Coursework</p>
+                    <h2 id="assignments-heading">Assignments</h2>
+                </div>
+            </div>
+            <div class="assignments-table-scroll">
+                <table class="assignments-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Assignment</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Grade</th>
+                            <th scope="col">Due date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var assignment in Model.Assignments)
+                        {
+                            var statusClass = assignment.Status switch
+                            {
+                                "Graded" => "status-graded",
+                                "Submitted" => "status-submitted",
+                                _ => "status-pending"
+                            };
+
+                            <tr>
+                                <td data-label="Assignment">
+                                    <a asp-area="Student" asp-controller="Assignments" asp-action="Details"
+                                       asp-route-id="@assignment.AssignmentId">
+                                        @assignment.Title
+                                    </a>
+                                </td>
+                                <td data-label="Status">
+                                    <span class="assignment-status @statusClass">@assignment.Status</span>
+                                </td>
+                                <td data-label="Grade">@assignment.Grade</td>
+                                <td data-label="Due date">@assignment.DueDate.ToString("MMM dd, yyyy")</td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>

@@ -52,16 +52,16 @@
                         @if (User.IsInRole("Student"))
                         {
                             <li class="nav-item">
-                                <a class="@NavClass("Student", "Index")" asp-area="" asp-controller="Student"
-                                   asp-action="Index">Dashboard</a>
+                                <a class="@NavClass("Dashboard", "Index")" asp-area="Student"
+                                   asp-controller="Dashboard" asp-action="Index">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Student", "Courses")" asp-area="" asp-controller="Student"
-                                   asp-action="Courses">My courses</a>
+                                <a class="@NavClass("Courses", "MyCourses")" asp-area="Student"
+                                   asp-controller="Courses" asp-action="MyCourses">My courses</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Student", "Assignments")" asp-area="" asp-controller="Student"
-                                   asp-action="Assignments">Assignments</a>
+                                <a class="@NavClass("Assignments", "All")" asp-area="Student"
+                                   asp-controller="Assignments" asp-action="All">Assignments</a>
                             </li>
                         }
                         else if (User.IsInRole("Teacher"))
