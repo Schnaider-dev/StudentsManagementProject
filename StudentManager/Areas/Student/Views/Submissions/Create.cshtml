@@ -1,0 +1,59 @@
+@model SubmissionViewModel
+
+@{
+    ViewData["Title"] = "Submit Assignment";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/submission-form.css" asp-append-version="true" />
+}
+
+<div class="submission-form-page">
+    <div class="submission-form-header">
+        <a class="submission-back-link" asp-area="Student" asp-controller="Assignments"
+           asp-action="Details" asp-route-id="@Model.AssignmentId">
+            <span aria-hidden="true">←</span> Back to assignment
+        </a>
+        <p class="submission-eyebrow">Assignment submission</p>
+        <h1>@Model.AssignmentTitle</h1>
+        <p class="submission-intro">Write your response below, then review it before submitting.</p>
+    </div>
+
+    <section class="submission-form-panel" aria-labelledby="submission-content-heading">
+        <div class="submission-panel-heading">
+            <p class="submission-eyebrow">Your work</p>
+            <h2 id="submission-content-heading">Submission content</h2>
+        </div>
+
+        <form method="post" asp-area="Student" asp-controller="Submissions" asp-action="Create"
+              class="submission-form">
+            <input type="hidden" asp-for="AssignmentId" />
+
+            <div asp-validation-summary="ModelOnly" class="submission-validation-summary" role="alert"></div>
+
+            <label asp-for="Content" class="submission-content-label">
+                Your response
+                <span>Required · up to 5,000 characters</span>
+            </label>
+            <textarea asp-for="Content" class="submission-content-input" rows="12"
+                      placeholder="Enter your assignment response here..." autocomplete="off"></textarea>
+            <span asp-validation-for="Content" class="submission-field-error"></span>
+
+            <p class="submission-form-note">
+                Make sure your response is complete before submitting. You can edit it later if it has not been graded.
+            </p>
+
+            <div class="submission-form-actions">
+                <a class="submission-cancel-action" asp-area="Student" asp-controller="Assignments"
+                   asp-action="Details" asp-route-id="@Model.AssignmentId">Cancel</a>
+                <button type="submit" class="submission-submit-action">
+                    Submit assignment <span aria-hidden="true">→</span>
+                </button>
+            </div>
+        </form>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,209 @@
+.submission-form-page {
+  width: min(760px, calc(100% - 2rem));
+  margin: 2rem auto;
+  color: var(--color-ink);
+}
+
+.submission-form-header {
+  margin-bottom: 1.25rem;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-left: 5px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgb(28 36 48 / 6%);
+}
+
+.submission-back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.submission-back-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.submission-eyebrow {
+  margin: 0 0 0.25rem;
+  color: var(--color-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.submission-form-header h1 {
+  margin: 0 0 0.5rem;
+  color: var(--color-primary);
+  font-size: 1.8rem;
+  overflow-wrap: anywhere;
+}
+
+.submission-intro {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.submission-form-panel {
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgb(28 36 48 / 5%);
+}
+
+.submission-panel-heading {
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.submission-panel-heading h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.submission-form {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.submission-validation-summary {
+  color: var(--color-danger);
+}
+
+.submission-validation-summary:empty {
+  display: none;
+}
+
+.submission-content-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  font-weight: 650;
+}
+
+.submission-content-label span {
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  font-weight: 400;
+}
+
+.submission-content-input {
+  width: 100%;
+  min-height: 16rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border-darker);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.submission-content-input::placeholder {
+  color: var(--color-muted);
+  opacity: 0.8;
+}
+
+.submission-content-input:focus {
+  border-color: var(--color-primary);
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 22%, transparent);
+  outline-offset: 1px;
+}
+
+.submission-content-input.input-validation-error {
+  border-color: var(--color-danger);
+}
+
+.submission-field-error {
+  color: var(--color-danger);
+  font-size: 0.88rem;
+}
+
+.submission-form-note {
+  margin: 0.15rem 0 0.5rem;
+  color: var(--color-muted);
+  font-size: 0.88rem;
+}
+
+.submission-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.submission-cancel-action,
+.submission-submit-action {
+  display: inline-flex;
+  min-height: 2.7rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.submission-cancel-action {
+  background: var(--color-surface);
+  color: var(--color-primary);
+}
+
+.submission-cancel-action:hover {
+  background: color-mix(in srgb, var(--color-primary) 7%, var(--color-surface));
+  color: var(--color-primary);
+}
+
+.submission-submit-action {
+  background: var(--color-primary);
+  color: var(--color-surface);
+}
+
+.submission-submit-action:hover {
+  background: color-mix(in srgb, var(--color-primary) 78%, black);
+  color: var(--color-surface);
+}
+
+.submission-back-link:focus-visible,
+.submission-cancel-action:focus-visible,
+.submission-submit-action:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 40%, transparent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 520px) {
+  .submission-form-page {
+    width: calc(100% - 1.25rem);
+    margin-block: 1.25rem;
+  }
+
+  .submission-form-header,
+  .submission-form-panel {
+    padding: 1rem;
+  }
+
+  .submission-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .submission-cancel-action,
+  .submission-submit-action {
+    width: 100%;
+  }
+}

@@ -2,10 +2,9 @@
     // Текущие область, контроллер и действие — нужны, чтобы подсветить активный пункт меню
     var currentArea = ViewContext.RouteData.Values["area"]?.ToString();
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
-    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 
-    string NavClass(string area, string controller, string action) =>
-        currentArea == area && currentController == controller && currentAction == action
+    string NavClass(string area, string controller, string? relatedController = null) =>
+        currentArea == area && currentController == controller || currentController == relatedController
             ? "nav-link active"
             : "nav-link";
 
@@ -53,15 +52,15 @@
                         @if (User.IsInRole("Student"))
                         {
                             <li class="nav-item">
-                                <a class="@NavClass("Dashboard", "Index")" asp-area="Student"
+                                <a class="@NavClass("Student","Dashboard")" asp-area="Student"
                                    asp-controller="Dashboard" asp-action="Index">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Courses", "MyCourses")" asp-area="Student"
+                                <a class="@NavClass("Student", "Courses")" asp-area="Student"
                                    asp-controller="Courses" asp-action="MyCourses">My courses</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Assignments", "All")" asp-area="Student"
+                                <a class="@NavClass("Student","Assignments", "Submissions")" asp-area="Student"
                                    asp-controller="Assignments" asp-action="All">Assignments</a>
                             </li>
                         }
@@ -69,11 +68,11 @@
                         {
                             @* Задания, оценки и студенты открываются со страницы курса — им нужен id курса *@
                             <li class="nav-item">
-                                <a class="@NavClass("Teacher", "Dashboard", "Index")" asp-area="Teacher"
+                                <a class="@NavClass("Teacher", "Dashboard")" asp-area="Teacher"
                                    asp-controller="Dashboard" asp-action="Index">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Teacher", "Courses", "Index")" asp-area="Teacher"
+                                <a class="@NavClass("Teacher", "Courses")" asp-area="Teacher"
                                    asp-controller="Courses" asp-action="Index">My courses</a>
                             </li>
                         }

@@ -1,2 +1,109 @@
+@model Submission
 
-<h1>Submissions Details Page</h1>
+@{
+    ViewData["Title"] = "Submission Details";
+    var assignment = Model.Assignment;
+    var isGraded = Model.Grade is not null;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/submission-details.css" asp-append-version="true" />
+}
+
+<div class="submission-details-page">
+    <div class="submission-details-header">
+        <a class="submission-details-back-link" asp-area="Student" asp-controller="Assignments" asp-action="Details"
+           asp-route-id="@Model.AssignmentId">
+            <span aria-hidden="true">←</span> Back to assignment
+        </a>
+        <p class="submission-details-eyebrow">@assignment.Course.Code · @assignment.Course.Name</p>
+        <div class="submission-details-title-row">
+            <div>
+                <p class="submission-details-kicker">Submission receipt</p>
+                <h1>@assignment.Title</h1>
+            </div>
+            @if (isGraded)
+            {
+                <span class="submission-details-status submission-details-status-graded">Graded</span>
+            }
+            else if (Model.IsLate)
+            {
+                <span class="submission-details-status submission-details-status-late">Submitted late</span>
+            }
+            else
+            {
+                <span class="submission-details-status submission-details-status-submitted">Submitted</span>
+            }
+        </div>
+    </div>
+
+    <section class="submission-receipt" aria-label="Submission information">
+        <div class="submission-receipt-item">
+            <span>Submitted</span>
+            <time datetime="@Model.SubmittedAt.ToString("O")">
+                @Model.SubmittedAt.ToLocalTime().ToString("MMM d, yyyy")
+            </time>
+        </div>
+        <div class="submission-receipt-item">
+            <span>Due date</span>
+            <time datetime="@assignment.DueDate.ToString("O")">
+                @assignment.DueDate.ToLocalTime().ToString("MMM d, yyyy")
+            </time>
+        </div>
+        @if (Model.UpdatedAt is DateTime updatedAt)
+        {
+            <div class="submission-receipt-item">
+                <span>Last updated</span>
+                <time datetime="@updatedAt.ToString("O")">
+                    @updatedAt.ToLocalTime().ToString("MMM d, yyyy")
+                </time>
+            </div>
+        }
+        <div class="submission-receipt-item">
+            <span>Points possible</span>
+            <strong>@assignment.MaxPoints.ToString("0.##")</strong>
+        </div>
+        @if (Model.Grade is not null)
+        {
+            <div class="submission-receipt-item submission-receipt-score">
+                <span>Score</span>
+                <strong>@Model.Grade.Score.ToString("0.##") / @assignment.MaxPoints.ToString("0.##")</strong>
+            </div>
+        }
+    </section>
+
+    <section class="submission-document" aria-labelledby="submitted-work-heading">
+        <div class="submission-document-heading">
+            <p class="submission-details-eyebrow">Submitted work</p>
+            <h2 id="submitted-work-heading">Your response</h2>
+        </div>
+        <div class="submission-details-content">@Model.Content</div>
+    </section>
+
+    @if (Model.Grade is not null && !string.IsNullOrWhiteSpace(Model.Grade.Feedback))
+    {
+        <section class="submission-review" aria-labelledby="submission-feedback-heading">
+            <div class="submission-document-heading">
+                <p class="submission-details-eyebrow">Instructor review</p>
+                <h2 id="submission-feedback-heading">Feedback</h2>
+            </div>
+            <p>@Model.Grade.Feedback</p>
+        </section>
+    }
+
+    <div class="submission-details-footer">
+        @if (isGraded)
+        {
+            <p>This submission has been graded and can no longer be edited.</p>
+        }
+        else
+        {
+            <p>You can update your response until it has been graded.</p>
+            <a class="submission-details-edit-link" asp-area="Student" asp-controller="Submissions" asp-action="Edit"
+               asp-route-id="@Model.SubmissionId">
+                Edit submission <span aria-hidden="true">→</span>
+            </a>
+        }
+    </div>
+    
+</div>
