@@ -5,6 +5,9 @@ namespace StudentManager.Services.Interfaces;
 
 public interface ISubmissionService
 {
+    Task<IReadOnlyList<StudentAssignmentViewModel>> GetAllAssignmentsAsync(
+        string studentId);
+
     Task<CourseAssignmentsViewModel?> GetCourseAssignmentsAsync(
         int courseId,
         string studentId);

@@ -1,46 +1,188 @@
-p {
-  margin: 0;
-}
 .courses-page-heading {
   display: flex;
-  align-items: center;
+  align-items: end;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
-  width: min(860px, 100%);
+  width: min(var(--content-width), calc(100% - 2rem));
   margin: 0 auto 1.5rem;
 }
 
-.courses-page-heading h1 {
+.courses-page-title {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.courses-page-title h1 {
   margin: 0;
+  color: var(--color-primary);
   font-size: 2rem;
   line-height: 1.15;
+}
+
+.courses-dashboard-link,
+.courses-browse-link {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.courses-dashboard-link {
+  color: var(--color-muted);
+}
+
+.courses-browse-link {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: var(--color-surface);
+}
+
+.courses-dashboard-link:hover {
   color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.courses-browse-link:hover {
+  background: color-mix(in srgb, var(--color-primary) 78%, black);
+  color: var(--color-surface);
+}
+
+.courses-dashboard-link:focus-visible,
+.courses-browse-link:focus-visible,
+.courses-list .accordion-button:focus-visible,
+.courses-list .view-details a:focus-visible,
+.courses-list .course-drop-button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 40%, transparent);
+  outline-offset: 3px;
 }
 
 .courses-list {
-  width: min(860px, 90%);
-  margin: 1.5rem auto;
+  width: min(var(--content-width), calc(100% - 2rem));
+  margin: 0 auto 2rem;
 }
 
 .courses-list .course-card {
-  box-shadow: 0 0 5px var(--color-primary);
-  margin-bottom: 1.2rem;
+  overflow: hidden;
+  margin: 0 0 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgb(28 36 48 / 5%);
 }
 
-.courses-list .course-card .course-header h2 .accordion-button {
-  font-size: 1rem;
-  background-color: var(--color-primary);
-  color: white;
+.courses-list .course-header h2 {
+  margin: 0;
 }
+
+.courses-list .course-header h2 .accordion-button {
+  min-height: 3.5rem;
+  padding: 0.9rem 1.1rem;
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+  font-size: 1rem;
+  font-weight: 650;
+}
+
 .courses-list .accordion-button::after {
-  filter: brightness(0) invert(1);
+  filter: none;
+}
+
+.courses-list .accordion-button:not(.collapsed) {
+  background-color: color-mix(in srgb, var(--color-primary) 7%, var(--color-surface));
+  color: var(--color-primary);
+  box-shadow: inset 0 -1px 0 var(--color-border);
+}
+
+.courses-list .accordion-button:focus {
+  border-color: var(--color-border);
+  box-shadow: none;
+}
+
+.courses-list .accordion-collapse {
+  border-top: 1px solid var(--color-border);
 }
 
 .courses-list .course-card .accordion-body {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  background-color: var(--color-surface);
+  gap: 1.5rem;
+  padding: 1.1rem;
+  background: var(--color-surface);
+}
+
+.courses-list .left-side {
+  display: grid;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.courses-list .left-side p {
+  margin: 0;
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+.courses-list .left-side strong {
+  color: var(--color-ink);
+}
+
+.courses-list .course-card .accordion-body .view-details {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.courses-list .course-card .accordion-body .view-details a {
+  display: inline-flex;
+  min-height: 2.4rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: var(--color-surface);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.courses-list .course-card .accordion-body .view-details a:hover {
+  background: color-mix(in srgb, var(--color-primary) 78%, black);
+  color: var(--color-surface);
+}
+
+.courses-list .course-card .accordion-body .view-details form {
+  display: inline-flex;
+}
+
+.courses-list .course-drop-button {
+  min-height: 2.4rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-danger);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.courses-list .course-drop-button:hover {
+  background: var(--color-danger);
+  color: var(--color-surface);
 }
 
 @media (max-width: 767.98px) {
@@ -50,30 +192,17 @@ p {
   }
 }
 
-.courses-list .accordion-button:not(.collapsed) {
-  color: var(--color-ink);
-  background-color: #e9ecef;
-}
+@media (max-width: 480px) {
+  .courses-page-heading,
+  .courses-list {
+    width: calc(100% - 1.25rem);
+  }
 
-.courses-list .accordion-button:focus {
-  border-color: var(--color-border-darker);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 85%, black);
-}
+  .courses-page-heading {
+    align-items: flex-start;
+  }
 
-.courses-list .course-card .accordion-body .view-details a {
-  border: 1px solid var(--color-border-darker);
-  background-color: var(--color-lightgreen);
-  text-decoration: none;
-  padding: 5px;
-  border-radius: 5px;
-  color: var(--color-ink);
-}
-
-.courses-list .course-card .accordion-body .view-details form {
-    display: inline-flex;
-}
-
-.courses-list .course-card .accordion-body .view-details a:hover {
-  background-color: var(--color-student);
-  color: var(--color-surface);
+  .courses-list .course-card .accordion-body .view-details {
+    width: 100%;
+  }
 }

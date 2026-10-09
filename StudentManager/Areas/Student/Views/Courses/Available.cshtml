@@ -1,5 +1,137 @@
-@using StudentManager.ViewModels.Student
-@model AvailableCourseViewModel
+@* The controller supplies one page of courses plus paging and search information. *@
+@model AvailableCoursesPageViewModel
 
+@{
+    // This value becomes the browser tab title in the shared layout.
+    ViewData["Title"] = "Available Courses";
+}
 
-<h1>All Courses</h1>
+@section Styles {
+    <link rel="stylesheet" href="~/css/available-courses.css" asp-append-version="true" />
+}
+
+<div class="available-courses-page">
+    <h1 class="available-courses-title">@ViewData["Title"]</h1>
+
+    @* GET keeps search and filter values in the URL so links can be shared and bookmarked. *@
+    <form asp-area="Student" asp-controller="Courses" asp-action="Available" class="course-search-form" method="get">
+        
+        @* A visually hidden label gives the search input an accessible name. *@
+        <label class="available-visually-hidden" for="course-search">Search courses</label>
+
+        @* value restores the previous search after submitting or changing pages. *@
+        <input id="course-search" type="search" name="search" value="@Model.Search" class="course-search-input"
+               placeholder="Search courses..." />
+        <label class="available-visually-hidden" for="course-filter">Search field</label>
+
+        @* The selected option is restored from the filter sent by the controller. *@
+        <select id="course-filter" name="filter" class="course-search-filter">
+            <option value="" selected="@(Model.Filter is null)">All fields</option>
+            <option value="code" selected="@(Model.Filter == "code")">By Code</option>
+            <option value="name" selected="@(Model.Filter == "name")">By Name</option>
+            <option value="teacher" selected="@(Model.Filter == "teacher")">By Teacher</option>
+        </select>
+        <button type="submit" class="course-action-button">Search</button>
+    </form>
+
+    @* Count on this page versus total matching courses helps explain pagination. *@
+    <p class="available-courses-count" aria-live="polite">
+        Showing @Model.Courses.Count of @Model.TotalCount available courses
+    </p>
+
+    @* Show an empty-state message instead of an empty list when no records match. *@
+    @if (Model.Courses.Count == 0)
+    {
+        <section class="available-courses-empty" aria-live="polite">
+            <p>No available courses match your search.</p>
+            @if (string.IsNullOrWhiteSpace(Model.Search))
+            {
+                <a class="course-action-button course-return-link" asp-area="Student" asp-controller="Courses"
+                   asp-action="MyCourses">Go Back</a>
+            }
+            else
+            {
+                <a class="course-action-button course-return-link" asp-area="Student" asp-controller="Courses"
+                   asp-action="Available">Go Back</a>
+            }
+           
+        </section>
+    }
+    else
+    {
+        @* Loop over only the records fetched for this page. *@
+        <div class="available-course-list">
+            @foreach (var course in Model.Courses)
+            {
+                <article class="available-course-card">
+                    <div class="available-course-details">
+                        <div class="available-course-copy">
+                            <h2 class="available-course-name">(@course.Code) @course.Name</h2>
+                            <p class="available-course-teacher">Taught by: <strong>@course.TeacherName</strong></p>
+                            <p class="available-course-description">@course.Description</p>
+                        </div>
+                        <form asp-area="Student" asp-controller="Courses" asp-action="Enroll"
+                              asp-route-courseId="@course.CourseId" method="post">
+                            <button type="submit" class="course-action-button">Enroll</button>
+                        </form>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+
+    @* Pagination is unnecessary when all results fit on one page. *@
+    @if (Model.TotalPages > 1)
+    {
+        @* Show at most five numbered pages, centered around the current page when possible. *@
+        var firstPage = Math.Max(1, Model.CurrentPage - 2);
+        var lastPage = Math.Min(Model.TotalPages, firstPage + 4);
+
+        @* Shift the window left near the end so it still contains up to five pages. *@
+        firstPage = Math.Max(1, lastPage - 4);
+
+        @* Each page link carries search and filter so browsing does not lose the current query. *@
+        <nav aria-label="Course pages" class="course-pagination">
+            <ul class="course-pagination-list">
+                <li class="course-pagination-item @(Model.HasPreviousPage ? "" : "is-disabled")">
+
+                    @* Render a link only when a previous page exists; otherwise show disabled text. *@
+                    @if (Model.HasPreviousPage)
+                    {
+                        <a class="course-page-link" asp-area="Student" asp-controller="Courses" asp-action="Available"
+                           asp-route-page="@(Model.CurrentPage - 1)" asp-route-search="@Model.Search"
+                           asp-route-filter="@Model.Filter" aria-label="Previous page">Previous</a>
+                    }
+                    else
+                    {
+                        <span class="course-page-link" aria-disabled="true">Previous</span>
+                    }
+                </li>
+
+                @* Generate page links from the calculated window instead of hardcoding page numbers. *@
+                @for (var pageNumber = firstPage; pageNumber <= lastPage; pageNumber++)
+                {
+                    <li class="course-pagination-item @(pageNumber == Model.CurrentPage ? "is-current" : "")">
+                        <a class="course-page-link" asp-area="Student" asp-controller="Courses" asp-action="Available"
+                           asp-route-page="@pageNumber" asp-route-search="@Model.Search" asp-route-filter="@Model.Filter"
+                           aria-current="@(pageNumber == Model.CurrentPage ? "page" : null)">@pageNumber</a>
+                    </li>
+                }
+
+                <li class="course-pagination-item @(Model.HasNextPage ? "" : "is-disabled")">
+                    @* Render a next-page link only when another page exists. *@
+                    @if (Model.HasNextPage)
+                    {
+                        <a class="course-page-link" asp-area="Student" asp-controller="Courses" asp-action="Available"
+                           asp-route-page="@(Model.CurrentPage + 1)" asp-route-search="@Model.Search"
+                           asp-route-filter="@Model.Filter" aria-label="Next page">Next</a>
+                    }
+                    else
+                    {
+                        <span class="course-page-link" aria-disabled="true">Next</span>
+                    }
+                </li>
+            </ul>
+        </nav>
+    }
+</div>

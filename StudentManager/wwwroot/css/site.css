@@ -4,172 +4,193 @@
    ========================================================= */
 
 :root {
-    /* Палитра */
-    --color-ink: #1C2430;          /* основной текст */
-    --color-muted: #5B6675;        /* второстепенный текст */
-    --color-surface: #FFFFFF;      /* карточки, шапка */
-    --color-background: #F3F5F7;   /* фон страницы */
-    --color-border: #DDE2E8;
-    --color-border-darker: #9d9fa1;
+  /* Палитра */
+  --color-ink: #1c2430; /* основной текст */
+  --color-muted: #5b6675; /* второстепенный текст */
+  --color-surface: #ffffff; /* карточки, шапка */
+  --color-background: #f3f5f7; /* фон страницы */
+  --color-border: #dde2e8;
+  --color-border-darker: #9d9fa1;
 
-    --color-student: #1E5A4C;      /* зелёный: роль студента, основной цвет */
-    --color-lightgreen: #95f09a; 
-    --color-teacher: #2B4C7E;      /* синий: роль учителя */
-    --color-highlight: #F2C94C;    /* жёлтый маркер: скорые дедлайны */
-    --color-danger: #B42318;       /* просрочено, ошибки */
-    --color-success: #1F7A4D;      /* оценено, сдано */
+  --color-student: #1e5a4c; /* зелёный: роль студента, основной цвет */
+  --color-lightgreen: #95f09a;
+  --color-teacher: #2b4c7e; /* синий: роль учителя */
+  --color-highlight: #f2c94c; /* жёлтый маркер: скорые дедлайны */
+  --color-danger: #b42318; /* просрочено, ошибки */
+  --color-success: #1f7a4d; /* оценено, сдано */
 
-    /* Основной цвет меняется в зависимости от роли (см. body.role-*) */
-    --color-primary: var(--color-student);
+  /* Основной цвет меняется в зависимости от роли (см. body.role-*) */
+  --color-primary: var(--color-student);
 
-    /* Типографика */
-    --font-main: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Типографика */
+  --font-main: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
 
-    /* Отступы и скругления */
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --space: 1rem;
+  /* Отступы и скругления */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --space: 1rem;
 
-    /* Связываем с Bootstrap, чтобы его кнопки и ссылки брали наши цвета */
-    --bs-body-font-family: var(--font-main);
-    --bs-body-color: var(--color-ink);
-    --bs-body-bg: var(--color-background);
-    --bs-border-color: var(--color-border);
-    --bs-link-color-rgb: 30, 90, 76;
-    --bs-link-hover-color-rgb: 20, 64, 54;
+  /* Связываем с Bootstrap, чтобы его кнопки и ссылки брали наши цвета */
+  --bs-body-font-family: var(--font-main);
+  --bs-body-color: var(--color-ink);
+  --bs-body-bg: var(--color-background);
+  --bs-border-color: var(--color-border);
+  --bs-link-color-rgb: 30, 90, 76;
+  --bs-link-hover-color-rgb: 20, 64, 54;
+  --content-width: 900px;
 }
 
 * {
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
 body.role-teacher {
-    --color-primary: var(--color-teacher);
-    --bs-link-color-rgb: 43, 76, 126;
-    --bs-link-hover-color-rgb: 30, 54, 92;
+  --color-primary: var(--color-teacher);
+  --bs-link-color-rgb: 43, 76, 126;
+  --bs-link-hover-color-rgb: 30, 54, 92;
 }
 
 /* ---------- Базовые элементы ---------- */
 
 html {
-    font-size: 15px;
-    position: relative;
-    min-height: 100%;
+  font-size: 15px;
+  position: relative;
+  min-height: 100%;
 }
 
 @media (min-width: 768px) {
-    html { font-size: 16px; }
+  html {
+    font-size: 16px;
+  }
 }
 
 body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    line-height: 1.55;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  line-height: 1.55;
 }
 
-h1, h2, h3, h4 {
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: -0.01em;
-    color: var(--color-ink);
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
 }
 
-h1 { font-size: 1.85rem; margin-bottom: 0.75rem; }
-h2 { font-size: 1.4rem; }
-h3 { font-size: 1.15rem; }
+h1 {
+  font-size: 1.85rem;
+  margin-bottom: 0.75rem;
+}
+h2 {
+  font-size: 1.4rem;
+}
+h3 {
+  font-size: 1.15rem;
+}
 
 /* ---------- Шапка ---------- */
 
 .app-header {
-    background: var(--color-surface);
-    border-bottom: 1px solid var(--color-border);
-    /* Цветная полоса сверху показывает, под какой ролью ты вошла */
-    border-top: 4px solid var(--color-primary);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  /* Цветная полоса сверху показывает, под какой ролью ты вошла */
+  border-top: 4px solid var(--color-primary);
 }
 
 body.role-guest .app-header {
-    border-top-color: var(--color-border);
+  border-top-color: var(--color-border);
 }
 
 .app-header .navbar {
-    padding-block: 0.6rem;
+  padding-block: 0.6rem;
 }
 
 .navbar-brand {
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: var(--color-primary);
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--color-primary);
 }
 
 .navbar-brand:hover {
-    color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .app-header .nav-link {
-    color: var(--color-muted);
-    font-weight: 500;
-    padding-inline: 0.75rem;
-    border-radius: var(--radius-sm);
+  color: var(--color-muted);
+  font-weight: 500;
+  padding-inline: 0.75rem;
+  border-radius: var(--radius-sm);
 }
 
 .app-header .nav-link:hover {
-    color: var(--color-ink);
-    background: var(--color-background);
+  color: var(--color-ink);
+  background: var(--color-background);
 }
 
 .app-header .nav-link.active {
-    color: var(--color-primary);
-    font-weight: 600;
+  color: var(--color-primary);
+  font-weight: 600;
 }
 
 /* Подчёркивание активного пункта на десктопе */
 @media (min-width: 768px) {
-    .app-header .navbar-nav.me-auto .nav-link.active {
-        box-shadow: inset 0 -2px 0 var(--color-primary);
-        border-radius: 0;
-    }
+  .app-header .navbar-nav.me-auto .nav-link.active {
+    box-shadow: inset 0 -2px 0 var(--color-primary);
+    border-radius: 0;
+  }
 }
 
 .role-pill {
-    display: inline-block;
-    padding: 0.15rem 0.6rem;
-    border-radius: 999px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--color-primary);
-    border: 1px solid var(--color-primary);
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
 }
 
 /* ---------- Основная область ---------- */
 
 .app-main {
-    flex: 1;
-    padding-block: 2rem 3rem;
+  flex: 1;
+  padding-block: 2rem 3rem;
 }
 
 /* ---------- Подвал ---------- */
 
 .app-footer {
-    border-top: 1px solid var(--color-border);
-    background: var(--color-surface);
-    color: var(--color-muted);
-    font-size: 0.875rem;
-    padding-block: 1rem;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-muted);
+  font-size: 0.875rem;
+  padding-block: 1rem;
 }
 
 /* ---------- Кнопки (поверх Bootstrap) ---------- */
 
 .btn-primary {
-    --bs-btn-bg: var(--color-primary);
-    --bs-btn-border-color: var(--color-primary);
-    --bs-btn-hover-bg: color-mix(in srgb, var(--color-primary) 85%, black);
-    --bs-btn-hover-border-color: color-mix(in srgb, var(--color-primary) 85%, black);
-    --bs-btn-active-bg: color-mix(in srgb, var(--color-primary) 75%, black);
-    --bs-btn-active-border-color: color-mix(in srgb, var(--color-primary) 75%, black);
-    font-weight: 600;
+  --bs-btn-bg: var(--color-primary);
+  --bs-btn-border-color: var(--color-primary);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--color-primary) 85%, black);
+  --bs-btn-hover-border-color: color-mix(
+    in srgb,
+    var(--color-primary) 85%,
+    black
+  );
+  --bs-btn-active-bg: color-mix(in srgb, var(--color-primary) 75%, black);
+  --bs-btn-active-border-color: color-mix(
+    in srgb,
+    var(--color-primary) 75%,
+    black
+  );
+  font-weight: 600;
 }
 
 /* ---------- Доступность ---------- */
@@ -180,62 +201,66 @@ body.role-guest .app-header {
 .form-control:focus,
 .form-select:focus,
 .form-check-input:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-primary);
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--color-surface),
+    0 0 0 4px var(--color-primary);
 }
 
 /* Ссылка «перейти к содержимому» видна только при фокусе с клавиатуры */
 .skip-link {
-    position: absolute;
-    left: 1rem;
-    top: -3rem;
-    z-index: 1000;
-    padding: 0.5rem 1rem;
-    background: var(--color-primary);
-    color: #fff;
-    border-radius: var(--radius-sm);
+  position: absolute;
+  left: 1rem;
+  top: -3rem;
+  z-index: 1000;
+  padding: 0.5rem 1rem;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-sm);
 }
 
 .skip-link:focus {
-    top: 1rem;
+  top: 1rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    * {
-        transition: none !important;
-        animation: none !important;
-    }
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
 /* ---------- Вход и регистрация ---------- */
 
 .auth-card {
-    max-width: 30rem;
-    margin-inline: auto;
-    padding: 1.5rem;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
+  max-width: 30rem;
+  margin-inline: auto;
+  padding: 1.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
 }
 
 @media (min-width: 768px) {
-    .auth-card { padding: 2.25rem; }
+  .auth-card {
+    padding: 2.25rem;
+  }
 }
 
 .auth-lead {
-    color: var(--color-muted);
-    margin-bottom: 1.5rem;
+  color: var(--color-muted);
+  margin-bottom: 1.5rem;
 }
 
 /* Сообщения об ошибках под полями */
 .field-validation-error {
-    display: block;
-    margin-top: 0.25rem;
-    font-size: 0.875rem;
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
 }
 
 .validation-summary-errors ul {
-    padding-left: 1.1rem;
+  padding-left: 1.1rem;
 }
 
 /* ---------- Главная страница ---------- */
@@ -298,11 +323,23 @@ body.role-guest .app-header {
 
 .form-floating > .form-control-plaintext::placeholder,
 .form-floating > .form-control::placeholder {
-    color: var(--bs-secondary-color);
-    text-align: end;
+  color: var(--bs-secondary-color);
+  text-align: end;
 }
 
 .form-floating > .form-control-plaintext:focus::placeholder,
 .form-floating > .form-control:focus::placeholder {
-    text-align: start;
+  text-align: start;
+}
+
+.return-btn {
+    text-decoration: none;
+}
+.return-btn::before {
+  content: "←";
+  font-size: 1.5rem;
+  line-height: 1;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.5rem;
 }

@@ -1,140 +1,317 @@
+.dashboard-page-heading {
+  width: min(var(--content-width), calc(100% - 2rem));
+  margin: 0 auto 1.5rem;
+}
+
+.dashboard-page-heading h1 {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
 .dashboard-container {
-  display: grid;
-  width: 860px;
-  margin: 0 auto;
+  width: min(var(--content-width), calc(100% - 2rem));
+  margin: 0 auto 2rem;
 }
 
 .summary-cards {
-  display: flex;
-  gap: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
 }
 
-.summary-cards .card {
-  width: 180px;
-  text-align: center;
-  box-shadow: 2px 2px var(--color-student);
-  cursor: pointer;
-}
-.summary-cards .card:hover {
-  box-shadow: 4px 4px var(--color-student);
-  transition: ease-in-out 0.2s;
-}
-
-.summary-cards .card h4 {
-  font-size: 0.9rem;
+.dashboard-stat-card {
+  min-width: 0;
+  padding: 1.1rem;
+  border: 1px solid var(--color-border);
+  border-top: 3px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgb(28 36 48 / 5%);
 }
 
-.summary-cards .card p {
-  height: 50px;
+.dashboard-stat-value {
+  margin: 0 0 0.45rem;
+  color: var(--color-primary);
   font-size: 2rem;
-  padding-top: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
-.summary-cards .card .not-graded {
-  font-size: 1.3rem;
+.dashboard-stat-card h2 {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
-/* *************** dashboard content ************* */
+.dashboard-stat-empty {
+  font-size: 1.1rem;
+}
 
 .dashboard-content {
-  display: flex;
-  flex-direction: row;
-  margin-top: 2rem;
-  gap: 2rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
 }
 
-.dashboard-content .courses-section,
-.dashboard-content .assignment-section {
-  width: 50%;
-  border: 1px solid var(--color-ink);
-  min-height: 30vh;
-  border-radius: 5px;
-}
-
-.dashboard-content .courses-section.rm-height, .dashboard-content .assignment-section.rm-height {
-  min-height: 0;
-  height: auto;
-}
-
-.dashboard-content .assignment-section table {
-  width: 100%;
-  border-collapse: collapse; /* removes double borders */
-  font-family: Arial, sans-serif;
-  background-color: var(--color-background);
+.dashboard-panel {
+  min-width: 0;
   overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgb(28 36 48 / 5%);
 }
 
-.dashboard-content .assignment-section table thead {
-  background-color: var(--color-lightgreen);
+.dashboard-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dashboard-section-label {
+  margin: 0 0 0.15rem;
+  color: var(--color-primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dashboard-panel-heading h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.dashboard-panel-link {
+  flex: 0 0 auto;
+  color: var(--color-primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.dashboard-panel-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.course-preview-list {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 1rem;
+  list-style: none;
+}
+
+.course-preview-list li {
+  margin: 0;
+}
+
+.course-preview-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   color: var(--color-ink);
+  text-decoration: none;
+  transition: border-color 150ms ease, background-color 150ms ease, transform 150ms ease;
 }
 
-.dashboard-content .assignment-section th,
-.dashboard-content .assignment-section td {
-  padding: 5px 6px;
+.course-preview-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 4%, var(--color-surface));
+}
+
+.course-preview-card:focus-visible,
+.dashboard-panel-link:focus-visible,
+.assignment-preview-title:focus-visible,
+.dashboard-preview-note a:focus-visible {
+  border-radius: 2px;
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 40%, transparent);
+  outline-offset: 2px;
+}
+
+.course-preview-code {
+  padding: 0.25rem 0.45rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface));
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.course-preview-name {
+  min-width: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.course-preview-action {
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.dashboard-preview-note {
+  margin: 0;
+  padding: 0 1rem 1rem;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.dashboard-preview-note a {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.dashboard-empty-state {
+  padding: 1.25rem;
+  color: var(--color-muted);
+}
+
+.dashboard-empty-state p {
+  margin: 0 0 0.75rem;
+}
+
+.dashboard-empty-state p:last-child {
+  margin-bottom: 0;
+}
+
+.assignment-table-scroll {
+  overflow-x: auto;
+}
+
+.assignment-preview-table {
+  width: 100%;
+  border-collapse: collapse;
   text-align: left;
 }
 
-.dashboard-content .assignment-section tbody tr {
+.assignment-preview-table th,
+.assignment-preview-table td {
+  padding: 0.8rem 1rem;
   border-bottom: 1px solid var(--color-border);
-  background-color: var(--color-border);
-}
-
-.dashboard-content .assignment-section tbody tr:hover {
-  background-color: var(--color-border-darker); /* subtle hover effect */
-  cursor: pointer;
-}
-
-.dashboard-content .assignment-section td:first-child {
-  font-weight: 600; /* emphasize title */
-}
-
-.dashboard-content .courses-section h3,
-.dashboard-content .assignment-section h2 {
-  font-size: larger;
-  padding: 5px 8px;
-  border-bottom: 1px solid var(--color-border);
-  background-color: var(--color-student);
-  color: var(--color-surface);
-  border-radius: 2px;
-}
-
-.dashboard-content .courses-section p, .dashboard-content .assignment-section p {
-  padding-left: 10px;
-  background-color: var(--color-border);
-  margin-bottom: 5px;
-}
-
-.dashboard-content .courses-section.rm-height p, .dashboard-content .assignment-section.rm-height p {
-    background: none;
-    text-align: center;
-}
-
-.dashboard-content .courses-section .course {
-  font-weight: 500;
-}
-
-.dashboard-content .courses-section .no-course {
-  padding: 5px;
-  text-decoration: none;
-  border: 1px solid;
-  border-radius: 5px;
-  background-color: var(--color-background);
-  display: block;
-  text-align: center;
-  margin: 5px;
-}
-
-.dashboard-content .courses-section .no-course:hover {
-  background-color: var(--color-student);
-  color: whitesmoke;
-}
-
-.dashboard-content .courses-section .no-course::after {
-  content: "→";
-  margin-left: 8px;
-  line-height: 1;
-  font-size: 1.5rem;
-  display: inline-block;
   vertical-align: middle;
+}
+
+.assignment-preview-table th {
+  background: var(--color-background);
+  color: var(--color-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.assignment-preview-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.assignment-preview-table tbody tr:hover {
+  background: color-mix(in srgb, var(--color-primary) 4%, var(--color-surface));
+}
+
+.assignment-preview-title {
+  color: var(--color-ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.assignment-preview-title:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.assignment-due-date {
+  display: block;
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+
+.assignment-due-date.is-overdue {
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+.assignment-due-date.is-due-soon {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+.assignment-due-label {
+  display: inline-block;
+  margin-top: 0.2rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.assignment-due-label.is-overdue {
+  background: color-mix(in srgb, var(--color-danger) 12%, var(--color-surface));
+  color: var(--color-danger);
+}
+
+.assignment-due-label.is-due-soon {
+  background: color-mix(in srgb, var(--color-highlight) 30%, var(--color-surface));
+  color: var(--color-ink);
+}
+
+@media (max-width: 760px) {
+  .summary-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-content {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-page-heading,
+  .dashboard-container {
+    width: calc(100% - 1.25rem);
+  }
+
+  .summary-cards {
+    gap: 0.65rem;
+  }
+
+  .dashboard-stat-card {
+    padding: 0.85rem;
+  }
+
+  .course-preview-card {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .course-preview-action {
+    grid-column: 2;
+  }
+
+  .assignment-preview-table {
+    min-width: 400px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .course-preview-card {
+    transition: none;
+  }
 }

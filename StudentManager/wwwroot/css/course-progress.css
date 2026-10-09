@@ -1,0 +1,278 @@
+.course-progress-page {
+  width: min(var(--content-width), calc(100% - 2rem));
+  margin: 2rem auto;
+  color: var(--color-ink);
+}
+
+.course-progress-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-left: 5px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgb(28 36 48 / 6%);
+}
+
+.course-progress-back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.course-progress-back-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.course-progress-back-link:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 40%, transparent);
+  outline-offset: 3px;
+}
+
+.course-progress-eyebrow,
+.section-eyebrow {
+  margin-bottom: 0.25rem;
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.course-progress-header h1 {
+  margin: 0 0 0.4rem;
+  color: var(--color-primary);
+  font-size: 2rem;
+}
+
+.course-progress-header h2 {
+  margin-bottom: 0.35rem;
+  font-size: 1.3rem;
+}
+
+.course-progress-teacher {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.summary-section {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-card {
+  min-width: 0;
+  padding: 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgb(28 36 48 / 5%);
+}
+
+.summary-card h3 {
+  margin-bottom: 0.6rem;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.summary-value {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.summary-value span {
+  margin-left: 0.1rem;
+  font-size: 1.1rem;
+}
+
+.summary-value-empty {
+  font-size: 1rem;
+}
+
+.progress-section,
+.assignments-section {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgb(28 36 48 / 5%);
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.submission-progress-track {
+  height: 0.75rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-background);
+}
+
+.submission-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-primary);
+  transition: width 200ms ease;
+}
+
+.progress-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-top: 0.75rem;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.progress-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legend-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+}
+
+.legend-dot-submitted {
+  background: var(--color-primary);
+}
+
+.legend-dot-pending {
+  background: var(--color-border-darker);
+}
+
+.assignments-table-scroll {
+  overflow-x: auto;
+}
+
+.assignments-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.assignments-table th,
+.assignments-table td {
+  padding: 0.8rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.assignments-table th {
+  background: var(--color-background);
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.assignments-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.assignments-table tbody tr:hover {
+  background: color-mix(in srgb, var(--color-primary) 5%, var(--color-surface));
+}
+
+.assignments-table tbody tr td a {
+    text-decoration: none;
+}
+
+.assignments-table tbody tr td a:hover {
+    text-decoration: underline;
+}
+
+.assignment-status {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-graded {
+  background: color-mix(in srgb, var(--color-success) 12%, white);
+  color: var(--color-success);
+}
+
+.status-submitted {
+  background: color-mix(in srgb, var(--color-primary) 10%, white);
+  color: var(--color-primary);
+}
+
+.status-pending {
+  background: color-mix(in srgb, var(--color-highlight) 25%, white);
+  color: var(--color-ink);
+}
+
+@media (max-width: 720px) {
+  .summary-section {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .assignments-table {
+    min-width: 600px;
+  }
+}
+
+@media (max-width: 480px) {
+  .course-progress-page {
+    width: calc(100% - 1.25rem);
+    margin-block: 1.25rem;
+  }
+
+  .course-progress-header,
+  .progress-section,
+  .assignments-section {
+    padding: 1rem;
+  }
+
+  .summary-section {
+    gap: 0.65rem;
+  }
+
+  .summary-card {
+    padding: 0.85rem;
+  }
+
+  .summary-value {
+    font-size: 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .submission-progress-fill {
+    transition: none;
+  }
+}

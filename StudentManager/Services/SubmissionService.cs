@@ -16,6 +16,32 @@ public class SubmissionService : ISubmissionService
         _context = context;
     }
 
+    public async Task<IReadOnlyList<StudentAssignmentViewModel>>
+        GetAllAssignmentsAsync(string studentId)
+    {
+        var assignments = await _context.Assignments
+            .AsNoTracking()
+            .Where(assignment =>
+                assignment.IsActive &&
+                assignment.Course.IsActive &&
+                assignment.Course.Enrollments.Any(enrollment =>
+                    enrollment.StudentId == studentId &&
+                    enrollment.Status == EnrollmentStatus.Active))
+            .Include(assignment => assignment.Course)
+            .Include(assignment => assignment.Submissions
+                .Where(submission =>
+                    submission.StudentId == studentId))
+                .ThenInclude(submission => submission.Grade)
+            .OrderBy(assignment => assignment.DueDate)
+            .ThenBy(assignment => assignment.Course.Code)
+            .ThenBy(assignment => assignment.Title)
+            .ToListAsync();
+
+        return assignments
+            .Select(MapAssignment)
+            .ToList();
+    }
+
     public async Task<CourseAssignmentsViewModel?>
         GetCourseAssignmentsAsync(int courseId, string studentId)
     {
