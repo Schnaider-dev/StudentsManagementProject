@@ -26,8 +26,6 @@
     </a>
 </div>
 
-@* <p>@TempData["SuccessMessage"]</p> *@
-
 @* Bootstrap's accordion behavior is enabled by these classes and data-bs attributes below. *@
 <div class="courses-list accordion" id="myCoursesAccordion">
     @* Render one collapsible accordion item for each enrolled course. *@
@@ -53,7 +51,7 @@
                             @course.TeacherName
                         </p>
                         <p><strong>Description:</strong> @course.Description</p>
-                        <p><strong>Assignments:</strong> @course.AssignmentCount</p>
+                        <p><strong>Assignment(s):</strong> @course.AssignmentCount</p>
                         <p><strong>Enrolled:</strong> @course.EnrolledAt.ToString("MMMM dd, yyyy")</p>
                     </div>
                     <div class="view-details">

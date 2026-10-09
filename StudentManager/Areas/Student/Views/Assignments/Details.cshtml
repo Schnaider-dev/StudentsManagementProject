@@ -57,14 +57,25 @@
                 </div>
             </section>
 
-            @if (isSubmitted && Model.IsGraded && !string.IsNullOrWhiteSpace(Model.Feedback))
+            @if (isSubmitted)
             {
                 <section class="assignment-detail-panel assignment-feedback" aria-labelledby="feedback-heading">
                     <div class="assignment-detail-panel-heading">
                         <p class="assignments-eyebrow">Instructor</p>
-                        <h2 id="feedback-heading">Feedback</h2>
+                        <h2 id="feedback-heading">Instructor feedback</h2>
                     </div>
-                    <p>@Model.Feedback</p>
+                    @if (Model.IsGraded && !string.IsNullOrWhiteSpace(Model.Feedback))
+                    {
+                        <p>@Model.Feedback</p>
+                    }
+                    else if (Model.IsGraded)
+                    {
+                        <p>Your submission has been graded. No written feedback was provided.</p>
+                    }
+                    else
+                    {
+                        <p>Your submission is awaiting review. Feedback will appear here once it has been graded.</p>
+                    }
                 </section>
             }
 
