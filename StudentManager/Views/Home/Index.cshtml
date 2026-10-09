@@ -1,8 +1,64 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Home";
+
+    var area = User.IsInRole("Teacher") ? "Teacher"
+             : User.IsInRole("Student") ? "Student"
+             : null;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="home-hero">
+    @if (area == "Teacher")
+    {
+        <h1>Welcome back</h1>
+        <p class="home-lead">Manage your courses, set assignments, and grade your students' work.</p>
+        <div class="home-actions">
+            <a class="btn btn-primary btn-lg" asp-area="Teacher" asp-controller="Dashboard" asp-action="Index">Go to dashboard</a>
+            <a class="btn btn-outline-secondary btn-lg" asp-area="Teacher" asp-controller="Courses" asp-action="Index">My courses</a>
+        </div>
+    }
+    else if (area == "Student")
+    {
+        <h1>Welcome back</h1>
+        <p class="home-lead">Check your courses, upcoming assignments, and grades.</p>
+        <div class="home-actions">
+            <a class="btn btn-primary btn-lg" asp-area="Student" asp-controller="Dashboard" asp-action="Index">Go to dashboard</a>
+            <a class="btn btn-outline-secondary btn-lg" asp-area="Student" asp-controller="Courses" asp-action="MyCourses">My courses</a>
+        </div>
+    }
+    else
+    {
+        <h1>Keep track of courses, assignments, and grades</h1>
+        <p class="home-lead">
+            StudentManager is one place for students to follow their progress
+            and for teachers to run their courses.
+        </p>
+        <div class="home-actions">
+            <a class="btn btn-primary btn-lg" asp-area="Identity" asp-page="/Account/Register">Create account</a>
+            <a class="btn btn-outline-secondary btn-lg" asp-area="Identity" asp-page="/Account/Login">Log in</a>
+        </div>
+    }
+</section>
+
+@if (area == null)
+{
+    <section class="home-roles" aria-label="What you can do">
+        <div class="home-role home-role-student">
+            <h2>For students</h2>
+            <ul>
+                <li>Enrol in courses and drop them</li>
+                <li>See assignments and their deadlines</li>
+                <li>Submit your work and read feedback</li>
+                <li>Follow your grades and average</li>
+            </ul>
+        </div>
+        <div class="home-role home-role-teacher">
+            <h2>For teachers</h2>
+            <ul>
+                <li>Create and manage courses</li>
+                <li>Set assignments with deadlines</li>
+                <li>Grade submissions and leave feedback</li>
+                <li>See how each student is doing</li>
+            </ul>
+        </div>
+    </section>
+}
