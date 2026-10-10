@@ -113,7 +113,7 @@ public class CoursesController : Controller
         TempData["SuccessMessage"] =
             "You enrolled in the course successfully.";
 
-        return RedirectToAction(nameof(MyCourses));
+        return RedirectToAction(nameof(Available));
     }
 
     [HttpPost]

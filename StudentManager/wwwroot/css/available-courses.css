@@ -10,6 +10,26 @@
   color: var(--color-ink);
 }
 
+.avalaible-course-mycourses-link {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.avalaible-course-mycourses-link {
+  color: var(--color-muted);
+}
+
+.avalaible-course-mycourses-link:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .available-courses-title {
   margin-bottom: 1.25rem;
   color: var(--color-primary);

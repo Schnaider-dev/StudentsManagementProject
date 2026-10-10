@@ -11,6 +11,9 @@
 }
 
 <div class="available-courses-page">
+    <a class="avalaible-course-mycourses-link" asp-area="Student" asp-controller="Courses" asp-action="MyCourses">
+        <span aria-hidden="true">←</span> Back to My Courses
+    </a>
     <h1 class="available-courses-title">@ViewData["Title"]</h1>
 
     @* GET keeps search and filter values in the URL so links can be shared and bookmarked. *@
