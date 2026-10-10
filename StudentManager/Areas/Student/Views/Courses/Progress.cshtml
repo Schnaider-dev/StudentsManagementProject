@@ -24,19 +24,31 @@
 
     <section class="summary-section" aria-label="Course summary">
         <article class="summary-card">
-            <h3>Total assignments</h3>
+            <div class="summary-card-heading">
+                <h3>Total assignments</h3>
+                <svg class="metric-icon" aria-hidden="true"><use href="#icon-clipboard"></use></svg>
+            </div>
             <p class="summary-value">@Model.TotalAssignments</p>
         </article>
         <article class="summary-card">
-            <h3>Submitted</h3>
+            <div class="summary-card-heading">
+                <h3>Submitted</h3>
+                <svg class="metric-icon" aria-hidden="true"><use href="#icon-upload"></use></svg>
+            </div>
             <p class="summary-value">@Model.SubmittedAssignments</p>
         </article>
         <article class="summary-card">
-            <h3>Graded</h3>
+            <div class="summary-card-heading">
+                <h3>Graded</h3>
+                <svg class="metric-icon" aria-hidden="true"><use href="#icon-check"></use></svg>
+            </div>
             <p class="summary-value">@Model.GradedAssignments</p>
         </article>
         <article class="summary-card">
-            <h3>Average score</h3>
+            <div class="summary-card-heading">
+                <h3>Average score</h3>
+                <svg class="metric-icon" aria-hidden="true"><use href="#icon-chart"></use></svg>
+            </div>
             @if (Model.AveragePercentage is decimal average)
             {
                 <p class="summary-value">@average.ToString("0.##")<span>%</span></p>
@@ -52,7 +64,10 @@
         <div class="section-heading">
             <div>
                 <p class="section-eyebrow">Your work</p>
-                <h2 id="progress-heading">Assignment progress</h2>
+                <h2 id="progress-heading" class="heading-with-icon">
+                    <svg class="heading-icon" aria-hidden="true"><use href="#icon-chart"></use></svg>
+                    Assignment progress
+                </h2>
             </div>
         </div>
         @{
@@ -75,7 +90,10 @@
             <div class="section-heading">
                 <div>
                     <p class="section-eyebrow">Coursework</p>
-                    <h2 id="assignments-heading">Assignments</h2>
+                    <h2 id="assignments-heading" class="heading-with-icon">
+                        <svg class="heading-icon" aria-hidden="true"><use href="#icon-clipboard"></use></svg>
+                        Assignments
+                    </h2>
                 </div>
             </div>
             <div class="assignments-table-scroll">

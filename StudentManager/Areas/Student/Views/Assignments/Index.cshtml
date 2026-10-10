@@ -25,19 +25,31 @@
     <section class="assignment-summary" aria-label="Assignment summary">
         <article class="assignment-summary-card">
             <span class="assignment-summary-value">@Model.Assignments.Count</span>
-            <span class="assignment-summary-label">Total assignments</span>
+            <span class="assignment-summary-label">
+                <svg class="metric-icon" aria-hidden="true"><use href="#icon-clipboard"></use></svg>
+                Total assignments
+            </span>
         </article>
         <article class="assignment-summary-card">
             <span class="assignment-summary-value">@pendingCount</span>
-            <span class="assignment-summary-label">To submit</span>
+            <span class="assignment-summary-label">
+                <svg class="metric-icon" aria-hidden="true"><use href="#icon-clock"></use></svg>
+                To submit
+            </span>
         </article>
         <article class="assignment-summary-card">
             <span class="assignment-summary-value">@submittedCount</span>
-            <span class="assignment-summary-label">Submitted</span>
+            <span class="assignment-summary-label">
+                <svg class="metric-icon" aria-hidden="true"><use href="#icon-upload"></use></svg>
+                Submitted
+            </span>
         </article>
         <article class="assignment-summary-card">
             <span class="assignment-summary-value">@gradedCount</span>
-            <span class="assignment-summary-label">Graded</span>
+            <span class="assignment-summary-label">
+                <svg class="metric-icon" aria-hidden="true"><use href="#icon-check"></use></svg>
+                Graded
+            </span>
         </article>
     </section>
 

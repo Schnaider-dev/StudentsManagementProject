@@ -46,6 +46,55 @@
   margin: 0;
 }
 
+.app-icon-library {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.metric-icon {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  padding: 0.4rem;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-primary) 9%, var(--color-surface));
+  color: var(--color-primary);
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.heading-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.heading-icon {
+  width: 1.35rem;
+  height: 1.35rem;
+  flex: 0 0 auto;
+  color: var(--color-primary);
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.heading-icon-success {
+  color: var(--color-success);
+}
+
+.heading-icon-muted {
+  color: var(--color-muted);
+}
+
 body.role-teacher {
   --color-primary: var(--color-teacher);
   --bs-link-color-rgb: 43, 76, 126;
