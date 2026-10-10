@@ -17,15 +17,24 @@
     <section class="summary-cards" aria-label="Your learning summary">
         <article class="dashboard-stat-card">
             <p class="dashboard-stat-value">@Model.ActiveCourseCount</p>
-            <h2>Active courses</h2>
+            <div class="dashboard-stat-heading">
+                <h2>Active courses</h2>
+                <svg class="metric-icon" aria-hidden="true"><use href="#icon-book"></use></svg>
+            </div>
         </article>
         <article class="dashboard-stat-card">
             <p class="dashboard-stat-value">@Model.PendingAssignmentCount</p>
-            <h2>Pending assignments</h2>
+            <div class="dashboard-stat-heading">
+                <h2>Pending assignments</h2>
+                <svg class="metric-icon" aria-hidden="true"><use href="#icon-clock"></use></svg>
+            </div>
         </article>
         <article class="dashboard-stat-card">
             <p class="dashboard-stat-value">@Model.GradedAssignmentCount</p>
-            <h2>Graded assignments</h2>
+            <div class="dashboard-stat-heading">
+                <h2>Graded assignments</h2>
+                <svg class="metric-icon" aria-hidden="true"><use href="#icon-check"></use></svg>
+            </div>
         </article>
         <article class="dashboard-stat-card">
             @if (Model.OverallAveragePercentage is decimal average)
@@ -36,7 +45,10 @@
             {
                 <p class="dashboard-stat-value dashboard-stat-empty">Not graded yet</p>
             }
-            <h2>Overall score</h2>
+            <div class="dashboard-stat-heading">
+                <h2>Overall score</h2>
+                <svg class="metric-icon" aria-hidden="true"><use href="#icon-chart"></use></svg>
+            </div>
         </article>
     </section>
 

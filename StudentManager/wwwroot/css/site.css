@@ -46,6 +46,55 @@
   margin: 0;
 }
 
+.app-icon-library {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.metric-icon {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  padding: 0.4rem;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-primary) 9%, var(--color-surface));
+  color: var(--color-primary);
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.heading-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.heading-icon {
+  width: 1.35rem;
+  height: 1.35rem;
+  flex: 0 0 auto;
+  color: var(--color-primary);
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.heading-icon-success {
+  color: var(--color-success);
+}
+
+.heading-icon-muted {
+  color: var(--color-muted);
+}
+
 body.role-teacher {
   --color-primary: var(--color-teacher);
   --bs-link-color-rgb: 43, 76, 126;
@@ -161,6 +210,39 @@ body.role-guest .app-header {
 .app-main {
   flex: 1;
   padding-block: 2rem 3rem;
+}
+
+/* ************************** Flash Message **************** */
+.app-flash {
+  width: min(var(--content-width), calc(100% - 2rem));
+  margin: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: 0 2px 8px rgb(28 36 48 / 6%);
+}
+
+.app-flash.alert-success {
+  border-left-color: var(--color-success);
+  background: color-mix(in srgb, var(--color-success) 7%, var(--color-surface));
+}
+
+.app-flash.alert-danger {
+  border-left-color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 6%, var(--color-surface));
+}
+
+.app-flash .btn-close {
+  flex: 0 0 auto;
+  padding: 0.3rem;
 }
 
 /* ---------- Подвал ---------- */

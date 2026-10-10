@@ -2,9 +2,11 @@
     // Текущие область, контроллер и действие — нужны, чтобы подсветить активный пункт меню
     var currentArea = ViewContext.RouteData.Values["area"]?.ToString();
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var successMessage = TempData["SuccessMessage"] as string;
+    var errorMessage = TempData["ErrorMessage"] as string;
 
     string NavClass(string area, string controller, string? relatedController = null) =>
-        currentArea == area && currentController == controller || currentController == relatedController
+        currentArea == area && currentController == controller || (currentController is not null && currentController == relatedController)
             ? "nav-link active"
             : "nav-link";
 
@@ -33,6 +35,54 @@
 </head>
 
 <body class="@roleClass">
+    <svg class="app-icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <symbol id="icon-book" viewBox="0 0 24 24">
+            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z" />
+            <path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20M8 7h8M8 10h6" />
+        </symbol>
+        <symbol id="icon-clock" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v5l3 2" />
+        </symbol>
+        <symbol id="icon-check" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9" />
+            <path d="m8 12 2.5 2.5L16.5 9" />
+        </symbol>
+        <symbol id="icon-chart" viewBox="0 0 24 24">
+            <path d="M4 19V5M4 19h17" />
+            <path d="m7 15 4-4 3 2 5-6" />
+            <path d="M16 7h3v3" />
+        </symbol>
+        <symbol id="icon-clipboard" viewBox="0 0 24 24">
+            <rect x="5" y="5" width="14" height="16" rx="2" />
+            <path d="M9 5.5V4h6v1.5M8 10h8M8 14h8M8 18h5" />
+        </symbol>
+        <symbol id="icon-upload" viewBox="0 0 24 24">
+            <path d="M12 15V3m0 0L8 7m4-4 4 4" />
+            <path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" />
+        </symbol>
+        <symbol id="icon-award" viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="5" />
+            <path d="m8.5 12-1 9 4.5-2.5 4.5 2.5-1-9" />
+            <path d="m10 8 1.3 1.3L14 6.8" />
+        </symbol>
+        <symbol id="icon-message-check" viewBox="0 0 24 24">
+            <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l1.6-3.2A7.5 7.5 0 1 1 20 11.5Z" />
+            <path d="m9 11.5 2 2 4-4" />
+        </symbol>
+        <symbol id="icon-message-clock" viewBox="0 0 24 24">
+            <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l1.6-3.2A7.5 7.5 0 1 1 20 11.5Z" />
+            <path d="M12.5 8.5v3l2 1" />
+        </symbol>
+        <symbol id="icon-info" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 11v5M12 8h.01" />
+        </symbol>
+        <symbol id="icon-calendar" viewBox="0 0 24 24">
+            <rect x="3" y="5" width="18" height="16" rx="2" />
+            <path d="M16 3v4M8 3v4M3 10h18" />
+        </symbol>
+    </svg>
     <a class="skip-link" href="#main-content">Skip to content</a>
 
     <header class="app-header">
@@ -85,6 +135,22 @@
     </header>
 
     <main id="main-content" class="container app-main" role="main">
+        @if (!string.IsNullOrWhiteSpace(successMessage))
+        {
+            <div class="alert alert-success alert-dismissible fade show app-flash"
+                 role="status" data-flash-message>
+                <span>@successMessage</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss message"></button>
+            </div>
+        }
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="alert alert-danger alert-dismissible fade show app-flash"
+                 role="alert" data-flash-message>
+                <span>@errorMessage</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss message"></button>
+            </div>
+        }
         @RenderBody()
     </main>
 

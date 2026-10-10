@@ -43,7 +43,10 @@
             <section class="assignment-detail-panel" aria-labelledby="instructions-heading">
                 <div class="assignment-detail-panel-heading">
                     <p class="assignments-eyebrow">Assignment</p>
-                    <h2 id="instructions-heading">Instructions</h2>
+                    <h2 id="instructions-heading" class="heading-with-icon">
+                        <svg class="heading-icon" aria-hidden="true"><use href="#icon-book"></use></svg>
+                        Instructions
+                    </h2>
                 </div>
                 <div class="assignment-description">
                     @if (string.IsNullOrWhiteSpace(Model.Description))
@@ -62,7 +65,21 @@
                 <section class="assignment-detail-panel assignment-feedback" aria-labelledby="feedback-heading">
                     <div class="assignment-detail-panel-heading">
                         <p class="assignments-eyebrow">Instructor</p>
-                        <h2 id="feedback-heading">Instructor feedback</h2>
+                        <h2 id="feedback-heading" class="heading-with-icon">
+                            @if (!string.IsNullOrWhiteSpace(Model.Feedback) && Model.IsGraded)
+                            {
+                                <svg class="heading-icon heading-icon-success" aria-hidden="true">
+                                    <use href="#icon-message-check"></use>
+                                </svg>
+                            }
+                            else
+                            {
+                                <svg class="heading-icon heading-icon-muted" aria-hidden="true">
+                                    <use href="#icon-message-clock"></use>
+                                </svg>
+                            }
+                            Instructor feedback
+                        </h2>
                     </div>
                     @if (Model.IsGraded && !string.IsNullOrWhiteSpace(Model.Feedback))
                     {
@@ -78,12 +95,39 @@
                     }
                 </section>
             }
+            else if (!isSubmitted)
+            {
+                <section class="assignment-detail-panel assignment-feedback" aria-labelledby="feedback-heading">
+                    <div class="assignment-detail-panel-heading">
+                        <p class="assignments-eyebrow">Instructor</p>
+                        <h2 id="feedback-heading" class="heading-with-icon">
+                            @if (!string.IsNullOrWhiteSpace(Model.Feedback) && Model.IsGraded)
+                            {
+                                <svg class="heading-icon heading-icon-success" aria-hidden="true">
+                                    <use href="#icon-message-check"></use>
+                                </svg>
+                            }
+                            else
+                            {
+                                <svg class="heading-icon heading-icon-muted" aria-hidden="true">
+                                    <use href="#icon-message-clock"></use>
+                                </svg>
+                            }
+                            Instructor feedback
+                        </h2>
+                    </div>
+                    <p>Submit your work to receive feedback here after your instructor has reviewed it.</p>
+                </section>
+            }
 
         </div>
         <aside class="assignment-detail-sidebar">
             <section class="assignment-detail-panel" aria-labelledby="details-heading">
                 <div class="assignment-detail-panel-heading">
-                    <h2 id="details-heading">Details</h2>
+                    <h2 id="details-heading" class="heading-with-icon">
+                        <svg class="heading-icon" aria-hidden="true"><use href="#icon-calendar"></use></svg>
+                        Details
+                    </h2>
                 </div>
                 <dl class="assignment-facts">
                     <div>
@@ -120,7 +164,12 @@
             </section>
 
             <section class="assignment-detail-panel assignment-next-step" aria-labelledby="next-step-heading">
-                <h2 id="next-step-heading">Your submission</h2>
+                <h2 id="next-step-heading" class="heading-with-icon">
+                    <svg class="heading-icon" aria-hidden="true">
+                        <use href="@(isSubmitted ? "#icon-upload" : "#icon-clipboard")"></use>
+                    </svg>
+                    Your submission
+                </h2>
                 @if (Model.IsGraded && Model.SubmissionId is int gradedSubmissionId)
                 {
                     <p>This assignment has been graded.</p>
