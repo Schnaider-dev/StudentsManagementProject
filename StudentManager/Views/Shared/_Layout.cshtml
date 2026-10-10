@@ -6,7 +6,7 @@
     var errorMessage = TempData["ErrorMessage"] as string;
 
     string NavClass(string area, string controller, string? relatedController = null) =>
-        currentArea == area && currentController == controller || currentController == relatedController
+        currentArea == area && currentController == controller || (currentController is not null && currentController == relatedController)
             ? "nav-link active"
             : "nav-link";
 
