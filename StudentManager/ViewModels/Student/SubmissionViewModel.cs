@@ -11,7 +11,7 @@ public class SubmissionViewModel
 
     public string AssignmentTitle { get; set; } = string.Empty;
 
-    [Required]
+    [Required(ErrorMessage = "Please enter your submission before continuing.")]
     [StringLength(5000)]
     [Display(Name = "Submission Content")]
     public string Content { get; set; } = string.Empty;
