@@ -233,8 +233,10 @@ body.role-guest .app-header {
 }
 
 .app-flash.alert-success {
-  border-left-color: var(--color-success);
-  background: color-mix(in srgb, var(--color-success) 7%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-primary) 28%, var(--color-border));
+  border-left-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 7%, var(--color-surface));
+  color: var(--color-primary);
 }
 
 .app-flash.alert-danger {
