@@ -22,7 +22,7 @@
     <section class="submission-form-panel" aria-labelledby="submission-content-heading">
         <div class="submission-panel-heading">
             <p class="submission-eyebrow">Your work</p>
-            <h2 id="submission-content-heading">Submission content</h2>
+            <h2 id="submission-content-heading">@Html.DisplayNameFor(model => model.Content)</h2>
         </div>
 
         <form method="post" asp-area="Student" asp-controller="Submissions" asp-action="Create"
@@ -32,7 +32,7 @@
             <div asp-validation-summary="ModelOnly" class="submission-validation-summary" role="alert"></div>
 
             <label asp-for="Content" class="submission-content-label">
-                @Html.DisplayNameFor(model => model.Content)
+                Your response
                 <span>Required · up to 5,000 characters</span>
             </label>
             <textarea asp-for="Content" class="submission-content-input" rows="12"
