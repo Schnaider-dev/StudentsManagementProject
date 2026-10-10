@@ -163,8 +163,9 @@ body.role-guest .app-header {
   padding-block: 2rem 3rem;
 }
 
+/* ************************** Flash Message **************** */
 .app-flash {
-  width: min(900px, calc(100% - 2rem));
+  width: min(var(--content-width), calc(100% - 2rem));
   margin: auto;
   display: flex;
   align-items: flex-start;

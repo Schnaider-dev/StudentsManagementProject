@@ -1,4 +1,3 @@
-
 @* UserManager looks up the identity record for the signed-in browser user. *@
 @inject UserManager<ApplicationUser> UserManager
 @* The controller passes the enrolled courses as this view's model. *@
@@ -13,6 +12,8 @@
     <link rel="stylesheet" href="~/css/mycourses.css" asp-append-version="true" />
 }
 
+
+
 @* Keep the page title and the route to the available-course catalog together. *@
 <div class="courses-page-heading">
     <div class="courses-page-title">
@@ -21,75 +22,97 @@
         </a>
         <h1>@ViewData["Title"]</h1>
     </div>
-    <a asp-area="Student" asp-controller="Courses" asp-action="Available" class="courses-browse-link">
-        Browse courses <span aria-hidden="true">→</span>
-    </a>
-</div>
-
-@* Bootstrap's accordion behavior is enabled by these classes and data-bs attributes below. *@
-<div class="courses-list accordion" id="myCoursesAccordion">
-    @* Render one collapsible accordion item for each enrolled course. *@
-    @foreach (var course in Model)
+    @if(Model.Count() != 0)
     {
-        <div class="course-card accordion-item">
-            <div class="course-header accordion-header" id="heading-@course.CourseId">
-                <h2>
-                    @* data-bs-target connects this button to the matching panel ID. *@
-                    <button class="accordion-button collapsed" data-bs-toggle="collapse" type="button"
-                            data-bs-target="#collapse-@course.CourseId" aria-expanded="false"
-                            aria-controls="collapse-@course.CourseId">
-                        (@course.Code) @course.Name
-                    </button>
-                </h2>
-            </div>
-            @* The matching course ID makes each panel target unique; data-bs-parent allows one open panel. *@
-            <div id="collapse-@course.CourseId" class="accordion-collapse collapse"
-                 aria-labelledby="heading-@course.CourseId" data-bs-parent="#myCoursesAccordion">
-                <div class="accordion-body">
-                    <div class="left-side ">
-                        <p><strong>Teacher:</strong>
-                            @course.TeacherName
-                        </p>
-                        <p><strong>Description:</strong> @course.Description</p>
-                        <p><strong>Assignment(s):</strong> @course.AssignmentCount</p>
-                        <p><strong>Enrolled:</strong> @course.EnrolledAt.ToString("MMMM dd, yyyy")</p>
-                    </div>
-                    <div class="view-details">
-                        <a asp-area="Student" asp-controller="Courses" asp-action="Progress"
-                           asp-route-courseId="@course.CourseId">View progress</a>
-                        <a asp-area="Student" asp-controller="Assignments" asp-action="Index"
-                           asp-route-courseId="@course.CourseId">View assignments</a>
-                        <button type="button" class="course-drop-button"
-                                data-dialog-id="dialogBox-@course.CourseId">Drop course</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        <dialog class="course-drop-dialog" id="dialogBox-@course.CourseId"
-                aria-labelledby="drop-dialog-title-@course.CourseId">
-            <div class="course-drop-dialog-content">
-                <p class="course-drop-dialog-eyebrow">Course enrollment</p>
-                <h2 id="drop-dialog-title-@course.CourseId">Drop this course?</h2>
-                <p class="course-drop-dialog-course">
-                    <strong>@course.Code</strong> &middot; @course.Name
-                </p>
-                <p class="course-drop-dialog-message">
-                    Dropping this course will remove it from your course list. This action cannot be undone.
-                </p>
-            </div>
-            <div class="dialog-footer">
-                <button type="button" class="cancel-dialog">Keep course</button>
-                <form method="post" asp-area="Student" asp-controller="Courses" asp-action="Drop"
-                      asp-route-courseId="@course.CourseId">
-                    <button type="submit" class="course-drop-confirm-button">Drop course</button>
-                </form>
-            </div>
-        </dialog>
-        }
+        <a asp-area="Student" asp-controller="Courses" asp-action="Available" class="courses-browse-link">
+            Browse courses <span aria-hidden="true">→</span>
+        </a>
+    }
+    
 </div>
 
-
-@section Scripts {
-    <script src="~/js/mycourses.js" defer></script>
+@if (Model.Count == 0)
+{
+    <section class="courses-empty-state" aria-labelledby="courses-empty-state-title">
+        <span class="courses-empty-state-mark" aria-hidden="true">+</span>
+        <p class="courses-empty-state-eyebrow">Your learning journey</p>
+        <h2 id="courses-empty-state-title">Your next course is waiting</h2>
+        <p>You’re not enrolled in any courses yet. Explore the course catalog to find one that interests you.</p>
+        <a asp-area="Student" asp-controller="Courses" asp-action="Available"
+           class="courses-empty-state-link">
+            Explore available courses <span aria-hidden="true">→</span>
+        </a>
+    </section>
 }
+else
+{
+    @* Bootstrap's accordion behavior is enabled by these classes and data-bs attributes below. *@
+    <div class="courses-list accordion" id="myCoursesAccordion">
+        @* Render one collapsible accordion item for each enrolled course. *@
+        @foreach (var course in Model)
+        {
+            <div class="course-card accordion-item">
+                <div class="course-header accordion-header" id="heading-@course.CourseId">
+                    <h2>
+                        @* data-bs-target connects this button to the matching panel ID. *@
+                        <button class="accordion-button collapsed" data-bs-toggle="collapse" type="button"
+                                data-bs-target="#collapse-@course.CourseId" aria-expanded="false"
+                                aria-controls="collapse-@course.CourseId">
+                            (@course.Code) @course.Name
+                        </button>
+                    </h2>
+                </div>
+                @* The matching course ID makes each panel target unique; data-bs-parent allows one open panel. *@
+                <div id="collapse-@course.CourseId" class="accordion-collapse collapse"
+                     aria-labelledby="heading-@course.CourseId" data-bs-parent="#myCoursesAccordion">
+                    <div class="accordion-body">
+                        <div class="left-side ">
+                            <p><strong>Teacher:</strong>
+                                @course.TeacherName
+                            </p>
+                            <p><strong>Description:</strong> @course.Description</p>
+                            <p><strong>Assignment(s):</strong> @course.AssignmentCount</p>
+                            <p><strong>Enrolled:</strong> @course.EnrolledAt.ToString("MMMM dd, yyyy")</p>
+                        </div>
+                        <div class="view-details">
+                            <a asp-area="Student" asp-controller="Courses" asp-action="Progress"
+                               asp-route-courseId="@course.CourseId">View progress</a>
+                            <a asp-area="Student" asp-controller="Assignments" asp-action="Index"
+                               asp-route-courseId="@course.CourseId">View assignments</a>
+                            <button type="button" class="course-drop-button" data-dialog-id="dialogBox-@course.CourseId">Drop
+                                course</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <dialog class="course-drop-dialog" id="dialogBox-@course.CourseId"
+                        aria-labelledby="drop-dialog-title-@course.CourseId">
+                    <div class="course-drop-dialog-content">
+                        <p class="course-drop-dialog-eyebrow">Course enrollment</p>
+                        <h2 id="drop-dialog-title-@course.CourseId">Drop this course?</h2>
+                        <p class="course-drop-dialog-course">
+                            <strong>@course.Code</strong> &middot; @course.Name
+                        </p>
+                        <p class="course-drop-dialog-message">
+                            Dropping this course will remove it from your course list. This action cannot be undone.
+                        </p>
+                    </div>
+                    <div class="dialog-footer">
+                        <button type="button" class="cancel-dialog">Keep course</button>
+                        <form method="post" asp-area="Student" asp-controller="Courses" asp-action="Drop"
+                              asp-route-courseId="@course.CourseId">
+                            <button type="submit" class="course-drop-confirm-button">Drop course</button>
+                        </form>
+                    </div>
+                </dialog>
+            }
+        </div>
+    }
+
+
+
+
+    @section Scripts {
+        <script src="~/js/mycourses.js" defer></script>
+    }
