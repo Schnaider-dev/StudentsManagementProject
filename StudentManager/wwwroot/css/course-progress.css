@@ -183,6 +183,37 @@
   overflow-x: auto;
 }
 
+.progress-empty-state {
+  display: flex;
+  min-height: 12rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border: 1px dashed var(--color-border-darker);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-primary) 3%, var(--color-surface));
+  text-align: center;
+}
+
+.progress-empty-state .heading-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.progress-empty-state h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.progress-empty-state p {
+  max-width: 30rem;
+  margin: 0;
+  color: var(--color-muted);
+}
+
 .assignments-table {
   width: 100%;
   border-collapse: collapse;

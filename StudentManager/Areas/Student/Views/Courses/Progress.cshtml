@@ -11,8 +11,7 @@
 <div class="course-progress-page">
     <div class="course-progress-header">
         <div>
-            <a class="course-progress-back-link" asp-area="Student" asp-controller="Courses"
-               asp-action="MyCourses">
+            <a class="course-progress-back-link" asp-area="Student" asp-controller="Courses" asp-action="MyCourses">
                 <span aria-hidden="true">←</span> Back to My Courses
             </a>
             <p class="course-progress-eyebrow">@Model.CourseCode</p>
@@ -26,28 +25,36 @@
         <article class="summary-card">
             <div class="summary-card-heading">
                 <h3>Total assignments</h3>
-                <svg class="metric-icon" aria-hidden="true"><use href="#icon-clipboard"></use></svg>
+                <svg class="metric-icon" aria-hidden="true">
+                    <use href="#icon-clipboard"></use>
+                </svg>
             </div>
             <p class="summary-value">@Model.TotalAssignments</p>
         </article>
         <article class="summary-card">
             <div class="summary-card-heading">
                 <h3>Submitted</h3>
-                <svg class="metric-icon" aria-hidden="true"><use href="#icon-upload"></use></svg>
+                <svg class="metric-icon" aria-hidden="true">
+                    <use href="#icon-upload"></use>
+                </svg>
             </div>
             <p class="summary-value">@Model.SubmittedAssignments</p>
         </article>
         <article class="summary-card">
             <div class="summary-card-heading">
                 <h3>Graded</h3>
-                <svg class="metric-icon" aria-hidden="true"><use href="#icon-check"></use></svg>
+                <svg class="metric-icon" aria-hidden="true">
+                    <use href="#icon-check"></use>
+                </svg>
             </div>
             <p class="summary-value">@Model.GradedAssignments</p>
         </article>
         <article class="summary-card">
             <div class="summary-card-heading">
                 <h3>Average score</h3>
-                <svg class="metric-icon" aria-hidden="true"><use href="#icon-chart"></use></svg>
+                <svg class="metric-icon" aria-hidden="true">
+                    <use href="#icon-chart"></use>
+                </svg>
             </div>
             @if (Model.AveragePercentage is decimal average)
             {
@@ -65,7 +72,9 @@
             <div>
                 <p class="section-eyebrow">Your work</p>
                 <h2 id="progress-heading" class="heading-with-icon">
-                    <svg class="heading-icon" aria-hidden="true"><use href="#icon-chart"></use></svg>
+                    <svg class="heading-icon" aria-hidden="true">
+                        <use href="#icon-chart"></use>
+                    </svg>
                     Assignment progress
                 </h2>
             </div>
@@ -82,7 +91,7 @@
         <div class="progress-legend">
             <span><span class="legend-dot legend-dot-submitted"></span>@Model.SubmittedAssignments submitted</span>
             <span><span class="legend-dot legend-dot-pending"></span>@(Model.TotalAssignments -
-                                Model.SubmittedAssignments) pending</span>
+                                                Model.SubmittedAssignments) pending</span>
             </div>
         </section>
 
@@ -91,47 +100,63 @@
                 <div>
                     <p class="section-eyebrow">Coursework</p>
                     <h2 id="assignments-heading" class="heading-with-icon">
-                        <svg class="heading-icon" aria-hidden="true"><use href="#icon-clipboard"></use></svg>
+                        <svg class="heading-icon" aria-hidden="true">
+                            <use href="#icon-clipboard"></use>
+                        </svg>
                         Assignments
                     </h2>
                 </div>
             </div>
-            <div class="assignments-table-scroll">
-                <table class="assignments-table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Assignment</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Grade</th>
-                            <th scope="col">Due date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var assignment in Model.Assignments)
-                        {
-                            var statusClass = assignment.Status switch
-                            {
-                                "Graded" => "status-graded",
-                                "Submitted" => "status-submitted",
-                                _ => "status-pending"
-                            };
-
+            @if (Model.Assignments.Count == 0)
+            {
+                <div class="progress-empty-state">
+                    <svg class="heading-icon" aria-hidden="true">
+                        <use href="#icon-clipboard"></use>
+                    </svg>
+                    <h3>No assignments yet</h3>
+                    <p>There are no assignments for this course right now. Check back later for coursework from your instructor.
+                    </p>
+                </div>
+            }
+            else
+            {
+                <div class="assignments-table-scroll">
+                    <table class="assignments-table">
+                        <thead>
                             <tr>
-                                <td data-label="Assignment">
-                                    <a asp-area="Student" asp-controller="Assignments" asp-action="Details"
-                                       asp-route-id="@assignment.AssignmentId">
-                                        @assignment.Title
-                                    </a>
-                                </td>
-                                <td data-label="Status">
-                                    <span class="assignment-status @statusClass">@assignment.Status</span>
-                                </td>
-                                <td data-label="Grade">@assignment.Grade</td>
-                                <td data-label="Due date">@assignment.DueDate.ToString("MMM dd, yyyy")</td>
+                                <th scope="col">Assignment</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Grade</th>
+                                <th scope="col">Due date</th>
                             </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var assignment in Model.Assignments)
+                            {
+                                var statusClass = assignment.Status switch
+                                {
+                                    "Graded" => "status-graded",
+                                    "Submitted" => "status-submitted",
+                                    _ => "status-pending"
+                                };
+
+                                <tr>
+                                    <td data-label="Assignment">
+                                        <a asp-area="Student" asp-controller="Assignments" asp-action="Details"
+                                           asp-route-id="@assignment.AssignmentId">
+                                            @assignment.Title
+                                        </a>
+                                    </td>
+                                    <td data-label="Status">
+                                        <span class="assignment-status @statusClass">@assignment.Status</span>
+                                    </td>
+                                    <td data-label="Grade">@assignment.Grade</td>
+                                    <td data-label="Due date">@assignment.DueDate.ToString("MMM dd, yyyy")</td>
+                                </tr>
                             }
                         </tbody>
                     </table>
                 </div>
-            </section>
-        </div>
+            }
+        </section>
+    </div>
