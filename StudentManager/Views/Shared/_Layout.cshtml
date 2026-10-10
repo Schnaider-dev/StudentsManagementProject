@@ -2,6 +2,8 @@
     // Текущие область, контроллер и действие — нужны, чтобы подсветить активный пункт меню
     var currentArea = ViewContext.RouteData.Values["area"]?.ToString();
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var successMessage = TempData["SuccessMessage"] as string;
+    var errorMessage = TempData["ErrorMessage"] as string;
 
     string NavClass(string area, string controller, string? relatedController = null) =>
         currentArea == area && currentController == controller || currentController == relatedController
@@ -85,6 +87,22 @@
     </header>
 
     <main id="main-content" class="container app-main" role="main">
+        @if (!string.IsNullOrWhiteSpace(successMessage))
+        {
+            <div class="alert alert-success alert-dismissible fade show app-flash"
+                 role="status" data-flash-message>
+                <span>@successMessage</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss message"></button>
+            </div>
+        }
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="alert alert-danger alert-dismissible fade show app-flash"
+                 role="alert" data-flash-message>
+                <span>@errorMessage</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss message"></button>
+            </div>
+        }
         @RenderBody()
     </main>
 

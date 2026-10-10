@@ -59,15 +59,37 @@
                            asp-route-courseId="@course.CourseId">View progress</a>
                         <a asp-area="Student" asp-controller="Assignments" asp-action="Index"
                            asp-route-courseId="@course.CourseId">View assignments</a>
-                            <form asp-area="Student" asp-controller="Courses" asp-action="Drop" @* courseId binds to Drop(int courseId); the server also checks the signed-in student. *@
-                                  asp-route-courseId="@course.CourseId" method="post">
-                                <button type="submit" class="course-drop-button">Drop course</button>
-                            </form>
-                        </div>
+                        <button type="button" class="course-drop-button"
+                                data-dialog-id="dialogBox-@course.CourseId">Drop course</button>
                     </div>
-               
                 </div>
-
             </div>
+
+        </div>
+        <dialog class="course-drop-dialog" id="dialogBox-@course.CourseId"
+                aria-labelledby="drop-dialog-title-@course.CourseId">
+            <div class="course-drop-dialog-content">
+                <p class="course-drop-dialog-eyebrow">Course enrollment</p>
+                <h2 id="drop-dialog-title-@course.CourseId">Drop this course?</h2>
+                <p class="course-drop-dialog-course">
+                    <strong>@course.Code</strong> &middot; @course.Name
+                </p>
+                <p class="course-drop-dialog-message">
+                    Dropping this course will remove it from your course list. This action cannot be undone.
+                </p>
+            </div>
+            <div class="dialog-footer">
+                <button type="button" class="cancel-dialog">Keep course</button>
+                <form method="post" asp-area="Student" asp-controller="Courses" asp-action="Drop"
+                      asp-route-courseId="@course.CourseId">
+                    <button type="submit" class="course-drop-confirm-button">Drop course</button>
+                </form>
+            </div>
+        </dialog>
         }
-    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/mycourses.js" defer></script>
+}
