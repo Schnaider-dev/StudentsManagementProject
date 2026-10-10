@@ -15,7 +15,7 @@ public class Submission
 
     public ApplicationUser Student { get; set; } = null!;
 
-    [Required]
+    [Required(ErrorMessage = "Please enter your submission before continuing.")]
     [StringLength(5000)]
     [Display(Name = "Submission Content")]
     public string Content { get; set; } = string.Empty;

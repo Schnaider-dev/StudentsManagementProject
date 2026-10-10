@@ -13,11 +13,6 @@
     <a asp-action="Create" asp-route-courseId="@Model.CourseId" class="btn btn-primary">Create assignment</a>
 </div>
 
-@if (TempData["SuccessMessage"] is string successMessage)
-{
-    <div class="alert alert-success" role="status">@successMessage</div>
-}
-
 @if (Model.Assignments.Count == 0)
 {
     <div class="alert alert-info" role="status">
