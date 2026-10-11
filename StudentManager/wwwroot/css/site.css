@@ -279,6 +279,26 @@ body.role-guest .app-header {
   font-weight: 600;
 }
 
+/* Контурная кнопка — в цвете роли, а не в синем Bootstrap (он не проходит контраст на нашем фоне) */
+.btn-outline-primary {
+  --bs-btn-color: var(--color-primary);
+  --bs-btn-border-color: var(--color-primary);
+  --bs-btn-hover-bg: var(--color-primary);
+  --bs-btn-hover-border-color: var(--color-primary);
+  --bs-btn-active-bg: var(--color-primary);
+  --bs-btn-active-border-color: var(--color-primary);
+}
+
+/* Серый Bootstrap (#6c757d) на нашем фоне не проходит контраст 4.5:1 — берём наш более тёмный */
+.btn-outline-secondary {
+  --bs-btn-color: var(--color-muted);
+  --bs-btn-border-color: var(--color-muted);
+  --bs-btn-hover-bg: var(--color-muted);
+  --bs-btn-hover-border-color: var(--color-muted);
+  --bs-btn-active-bg: var(--color-muted);
+  --bs-btn-active-border-color: var(--color-muted);
+}
+
 /* ---------- Доступность ---------- */
 
 /* Видимый фокус при навигации с клавиатуры */
