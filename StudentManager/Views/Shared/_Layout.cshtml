@@ -21,6 +21,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+          content="StudentManager helps students follow their courses, assignments and grades, and helps teachers run their courses." />
     <title>@ViewData["Title"] - StudentManager</title>
     <script type="importmap"></script>
 
@@ -30,7 +32,6 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/StudentManager.styles.css" asp-append-version="true" />
     @RenderSection("Styles", required:false)
 </head>
 
@@ -81,6 +82,10 @@
         <symbol id="icon-calendar" viewBox="0 0 24 24">
             <rect x="3" y="5" width="18" height="16" rx="2" />
             <path d="M16 3v4M8 3v4M3 10h18" />
+        </symbol>
+        <symbol id="icon-users" viewBox="0 0 24 24">
+            <circle cx="9" cy="8" r="3.5" />
+            <path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.2a6.5 6.5 0 0 1 3.5 5.8" />
         </symbol>
     </svg>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -134,7 +139,7 @@
         </nav>
     </header>
 
-    <main id="main-content" class="container app-main" role="main">
+    <main id="main-content" class="container app-main">
         @if (!string.IsNullOrWhiteSpace(successMessage))
         {
             <div class="alert alert-success alert-dismissible fade show app-flash"
@@ -160,7 +165,7 @@
         </div>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @* jQuery нужен только для валидации форм — он подключается в _ValidationScriptsPartial *@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
