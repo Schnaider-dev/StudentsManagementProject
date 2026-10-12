@@ -24,7 +24,8 @@ public class EnrollmentService : IEnrollmentService
         int page,
         int pageSize,
         string? search,
-        string? filter)
+        string? filter,
+        CancellationToken cancellationToken = default)
     {
         // Page numbers start at 1; Math.Max prevents zero or negative page values.
         page = Math.Max(page, 1);
@@ -79,7 +80,7 @@ public class EnrollmentService : IEnrollmentService
         }
 
         // Count after filtering so the page count describes only matching courses.
-        var totalCount = await query.CountAsync();
+        var totalCount = await query.CountAsync(cancellationToken);
 
         // Ceiling rounds a partial final page up; for example, 11 results at 10 per page
         // require 2 pages. A zero-result search correctly has 0 pages.
@@ -107,7 +108,7 @@ public class EnrollmentService : IEnrollmentService
                      course.Teacher.LastName).Trim()
             })
             // ToListAsync runs the composed query and returns its results.
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         // Bundle the current results with the information the view needs to draw pagination.
         return new AvailableCoursesPageViewModel
@@ -123,7 +124,9 @@ public class EnrollmentService : IEnrollmentService
     }
 
     public async Task<IReadOnlyList<MyCourseViewModel>>
-        GetStudentCoursesAsync(string studentId)
+        GetStudentCoursesAsync(
+            string studentId,
+            CancellationToken cancellationToken = default)
     {
         // Start from enrollment records so each result represents one of this student's courses.
         return await _context.Enrollments
@@ -152,12 +155,13 @@ public class EnrollmentService : IEnrollmentService
                         assignment => assignment.IsActive)
             })
             // Execute the database query and return the full enrolled-course list.
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<bool> EnrollAsync(
         int courseId,
-        string studentId)
+        string studentId,
+        CancellationToken cancellationToken = default)
     {
         // Reject invalid input before querying the database.
         if (courseId <= 0 || string.IsNullOrWhiteSpace(studentId))
@@ -168,7 +172,8 @@ public class EnrollmentService : IEnrollmentService
         // Do not create an enrollment for a missing or inactive course.
         var courseExists = await _context.Courses.AnyAsync(course =>
             course.CourseId == courseId &&
-            course.IsActive);
+            course.IsActive,
+            cancellationToken);
 
         if (!courseExists)
         {
@@ -179,7 +184,8 @@ public class EnrollmentService : IEnrollmentService
         var enrollment =
             await _context.Enrollments.FirstOrDefaultAsync(item =>
                 item.CourseId == courseId &&
-                item.StudentId == studentId);
+                item.StudentId == studentId,
+                cancellationToken);
 
         if (enrollment is null)
         {
@@ -210,7 +216,7 @@ public class EnrollmentService : IEnrollmentService
         }
 
         // Persist either the new enrollment or the reactivated record.
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         // true tells the controller the enrollment operation succeeded.
         return true;
@@ -218,7 +224,8 @@ public class EnrollmentService : IEnrollmentService
 
     public async Task<bool> DropAsync(
         int courseId,
-        string studentId)
+        string studentId,
+        CancellationToken cancellationToken = default)
     {
         // Reject invalid input before querying the database.
         if (courseId <= 0 || string.IsNullOrWhiteSpace(studentId))
@@ -231,7 +238,8 @@ public class EnrollmentService : IEnrollmentService
             await _context.Enrollments.FirstOrDefaultAsync(item =>
                 item.CourseId == courseId &&
                 item.StudentId == studentId &&
-                item.Status == EnrollmentStatus.Active);
+                item.Status == EnrollmentStatus.Active,
+                cancellationToken);
 
         if (enrollment is null)
         {
@@ -243,7 +251,7 @@ public class EnrollmentService : IEnrollmentService
         enrollment.DroppedAt = DateTime.UtcNow;
 
         // Save the status change to the database.
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         // true tells the controller the drop operation succeeded.
         return true;

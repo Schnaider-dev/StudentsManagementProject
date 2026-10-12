@@ -10,7 +10,8 @@ public interface IProgressService
 
     Task<CourseProgressViewModel?> GetCourseProgressAsync(
         int courseId,
-        string studentId);
+        string studentId,
+        CancellationToken cancellationToken = default);
 
     Task<TeacherDashboardViewModel> GetTeacherDashboardAsync(
         string teacherId);

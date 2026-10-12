@@ -1,0 +1,47 @@
+@baseUrl = http://localhost:5219
+
+# Sign in to the app first so the API requests can use the authenticated session.
+
+### Get the first page of available courses for the signed-in student
+GET {{baseUrl}}/api/student/courses?page=1&search=&filter=
+
+### Get the signed-in student's enrolled courses
+GET {{baseUrl}}/api/student/courses/enrolled
+
+### Get the signed-in student's progress for a course
+GET {{baseUrl}}/api/student/courses/1/progress
+
+### Enroll the signed-in student in a course
+POST {{baseUrl}}/api/student/courses/1/enrollment
+
+### Drop the signed-in student's course enrollment
+DELETE {{baseUrl}}/api/student/courses/1/enrollment
+
+### List the signed-in teacher's active courses
+GET {{baseUrl}}/api/teacher/courses
+
+### Get details for one of the signed-in teacher's courses
+GET {{baseUrl}}/api/teacher/courses/1
+
+### Create a course for the signed-in teacher
+POST {{baseUrl}}/api/teacher/courses
+Content-Type: application/json
+
+{
+  "code": "BIO-210",
+  "name": "Human Biology",
+  "description": "An introduction to human biology."
+}
+
+### Update a course owned by the signed-in teacher
+PUT {{baseUrl}}/api/teacher/courses/1
+Content-Type: application/json
+
+{
+  "code": "BIO-210",
+  "name": "Human Biology and Health",
+  "description": "An updated introduction to human biology."
+}
+
+### Archive a course owned by the signed-in teacher
+DELETE {{baseUrl}}/api/teacher/courses/1

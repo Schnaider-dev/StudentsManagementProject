@@ -14,19 +14,24 @@ public interface IEnrollmentService
         int pageSize,
         // Search is the entered text; filter selects which course field to search.
         string? search,
-        string? filter);
+        string? filter,
+        CancellationToken cancellationToken = default);
 
     // Returns all active courses currently enrolled by this student.
     Task<IReadOnlyList<MyCourseViewModel>>
-        GetStudentCoursesAsync(string studentId);
+        GetStudentCoursesAsync(
+            string studentId,
+            CancellationToken cancellationToken = default);
 
     // Attempts to enroll this student in a course; false means it was not allowed or failed.
     Task<bool> EnrollAsync(
         int courseId,
-        string studentId);
+        string studentId,
+        CancellationToken cancellationToken = default);
 
     // Attempts to drop this student's active course enrollment.
     Task<bool> DropAsync(
         int courseId,
-        string studentId);
+        string studentId,
+        CancellationToken cancellationToken = default);
 }

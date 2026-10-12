@@ -111,7 +111,8 @@ public class ProgressService : IProgressService
     public async Task<CourseProgressViewModel?>
         GetCourseProgressAsync(
             int courseId,
-            string studentId)
+            string studentId,
+            CancellationToken cancellationToken = default)
     {
         var course = await _context.Courses
             .AsNoTracking()
@@ -130,7 +131,7 @@ public class ProgressService : IProgressService
                 TeacherFirstName = item.Teacher.FirstName,
                 TeacherLastName = item.Teacher.LastName
             })
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (course is null)
         {
@@ -147,7 +148,7 @@ public class ProgressService : IProgressService
                     submission.StudentId == studentId))
                 .ThenInclude(submission => submission.Grade)
             .OrderBy(assignment => assignment.DueDate)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         var assignmentModels = assignments
             .Select(assignment =>
