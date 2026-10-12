@@ -2,6 +2,23 @@
 
 StudentManager is a web application for managing courses and coursework. Students can enroll in courses, submit assignments, and track grades. Teachers can create courses and assignments, review submissions, and grade student work.
 
+## Target audience
+
+StudentManager is intended for two audiences in a school or other learning setting:
+
+- **Students** who need a single place to find courses, manage enrollment, keep track of assignment deadlines, submit work, and follow grades and feedback.
+- **Teachers** who need to organize their courses, publish assignments, monitor student enrollment and progress, and assess submitted work.
+
+The application provides separate student and teacher experiences, with pages and actions appropriate to each account role.
+
+## Project goals
+
+- Make course and coursework information easy for students and teachers to find.
+- Let students manage course enrollment, review upcoming work, submit assignments, and understand their progress through grades and feedback.
+- Let teachers create and maintain courses and assignments, review submissions, and record grades and feedback.
+- Keep each user's schoolwork scoped to their account and role.
+- Provide a responsive, consistent interface that supports common course and coursework tasks.
+
 ## Requirements
 
 - .NET 10 SDK
