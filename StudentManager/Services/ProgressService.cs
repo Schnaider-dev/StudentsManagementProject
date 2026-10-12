@@ -155,6 +155,11 @@ public class ProgressService : IProgressService
                 var submission =
                     assignment.Submissions.SingleOrDefault();
                 var grade = submission?.Grade;
+                var percentage = grade is null
+                    ? null
+                    : CalculatePercentage(
+                        grade.Score,
+                        assignment.MaxPoints);
 
                 return new AssignmentProgressViewModel
                 {
@@ -165,12 +170,8 @@ public class ProgressService : IProgressService
                     IsSubmitted = submission is not null,
                     IsGraded = grade is not null,
                     Score = grade?.Score,
-                    Percentage = grade is null
-                        ? null
-                        : CalculatePercentage(
-                            grade.Score,
-                            assignment.MaxPoints),
-                    Grade = ToGradeLetter(grade?.Score),
+                    Percentage = percentage,
+                    Grade = ToGradeLetter(percentage),
                     Status = ShowStatus(submission is not null, grade is not null),
                     Feedback = grade?.Feedback
                 };
@@ -366,9 +367,14 @@ public class ProgressService : IProgressService
             2);
     }
 
-    private static string? ToGradeLetter(decimal? percentage)
+    private static string ToGradeLetter(decimal? percentage)
     {
-        var grade = percentage switch
+        if (percentage is null)
+        {
+            return "-";
+        }
+
+        var grade = percentage.Value switch
         {
             >= 97 => "A+",
             >= 93 => "A",
