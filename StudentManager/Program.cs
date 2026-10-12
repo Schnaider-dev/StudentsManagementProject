@@ -42,7 +42,15 @@ builder.Services
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddControllersWithViews();
+// Blazor Web App using static server-side rendering with enhanced navigation and forms.
+// No interactive render mode is enabled, so each request gets its own scoped DbContext.
+builder.Services.AddRazorComponents();
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CurrentUserService>();
+builder.Services.AddScoped<FlashService>();
+
+// The Identity UI (login, register, account management) is still served as Razor Pages.
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
@@ -58,9 +66,12 @@ if (app.Environment.IsDevelopment())
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
 }
+
+// Unknown URLs render the Blazor NotFound page.
+app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 
 app.UseHttpsRedirection();
 app.UseRouting();
@@ -69,17 +80,14 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Antiforgery must run after authentication/authorization and before the endpoints.
+app.UseAntiforgery();
+
+app.UseMiddleware<FlashMiddleware>();
+
 app.MapStaticAssets();
 
-app.MapControllerRoute(
-        name: "areas",
-        pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
-app.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+app.MapRazorComponents<StudentManager.Components.App>();
 
 app.MapRazorPages();
 

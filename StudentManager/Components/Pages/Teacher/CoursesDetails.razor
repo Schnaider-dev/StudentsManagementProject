@@ -1,0 +1,125 @@
+@page "/Teacher/Courses/Details/{Id:int}"
+@attribute [Authorize(Roles = "Teacher")]
+@inject ICourseService CourseService
+@inject CurrentUserService CurrentUser
+@inject NavigationManager Navigation
+
+<PageTitle>@(course?.Name ?? "Course") - StudentManager</PageTitle>
+
+@if (course is not null)
+{
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+        <div>
+            <a href="/Teacher/Courses" class="text-decoration-none">&larr; My courses</a>
+            <h1 class="mt-2">@course.Name</h1>
+            <p class="text-muted mb-0">@course.Code</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/Teacher/Courses/Edit/@course.CourseId" class="btn btn-outline-secondary">Edit course</a>
+            <a href="/Teacher/Courses/Delete/@course.CourseId" class="btn btn-outline-danger">Archive course</a>
+        </div>
+    </div>
+
+    <section class="mb-4" aria-labelledby="course-details-heading">
+        <h2 id="course-details-heading" class="h4">Course details</h2>
+        <dl class="row">
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(course.Description) ? "No description provided." : course.Description)</dd>
+            <dt class="col-sm-3">Created</dt>
+            <dd class="col-sm-9"><time datetime="@course.CreatedAt.ToString("O")">@course.CreatedAt.ToLocalTime().ToString("g")</time></dd>
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9">@(course.IsActive ? "Active" : "Archived")</dd>
+        </dl>
+    </section>
+
+    <section class="mb-5" aria-labelledby="students-heading">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 id="students-heading" class="h4 mb-0">Students <span class="text-muted">(@course.Enrollments.Count)</span></h2>
+            <a href="/Teacher/Students/@course.CourseId" class="btn btn-sm btn-outline-primary">View students</a>
+        </div>
+        @if (course.Enrollments.Count == 0)
+        {
+            <p class="text-muted">No students are enrolled in this course.</p>
+        }
+        else
+        {
+            <ul class="list-group">
+                @foreach (var enrollment in course.Enrollments.OrderBy(item => item.Student.LastName).ThenBy(item => item.Student.FirstName).Take(5))
+                {
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>@enrollment.Student.FirstName @enrollment.Student.LastName</span>
+                        <span class="text-muted">@enrollment.Student.Email</span>
+                    </li>
+                }
+            </ul>
+            @if (course.Enrollments.Count > 5)
+            {
+                <p class="text-muted mt-2">Showing the first 5 students.</p>
+            }
+        }
+    </section>
+
+    <section aria-labelledby="assignments-heading">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 id="assignments-heading" class="h4 mb-0">Assignments <span class="text-muted">(@course.Assignments.Count(item => item.IsActive))</span></h2>
+            @if (course.IsActive)
+            {
+                <a href="/Teacher/Assignments/Create/@course.CourseId" class="btn btn-sm btn-primary">Create assignment</a>
+            }
+        </div>
+        @if (!course.Assignments.Any(item => item.IsActive))
+        {
+            <p class="text-muted">There are no active assignments for this course.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col">Assignment</th>
+                            <th scope="col">Due</th>
+                            <th scope="col">Submissions</th>
+                            <th scope="col"><span class="visually-hidden">Actions</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var assignment in course.Assignments.Where(item => item.IsActive).OrderBy(item => item.DueDate))
+                        {
+                            <tr>
+                                <td><a href="/Teacher/Assignments/Details/@assignment.AssignmentId">@assignment.Title</a></td>
+                                <td><time datetime="@assignment.DueDate.ToString("O")">@assignment.DueDate.ToLocalTime().ToString("g")</time></td>
+                                <td>@assignment.Submissions.Count</td>
+                                <td><a href="/Teacher/Grades/@assignment.AssignmentId" class="btn btn-sm btn-outline-primary">Review submissions</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Course? course;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var teacherId = await CurrentUser.GetUserIdAsync();
+
+        if (teacherId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        course = await CourseService.GetTeacherCourseAsync(Id, teacherId);
+
+        if (course is null)
+        {
+            Navigation.NotFound();
+        }
+    }
+}

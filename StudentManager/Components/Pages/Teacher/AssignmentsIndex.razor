@@ -1,0 +1,90 @@
+@page "/Teacher/Assignments/{CourseId:int}"
+@attribute [Authorize(Roles = "Teacher")]
+@inject ICourseService CourseService
+@inject IAssignmentService AssignmentService
+@inject CurrentUserService CurrentUser
+@inject NavigationManager Navigation
+
+<PageTitle>@(course?.Code) Assignments - StudentManager</PageTitle>
+
+@if (course is not null && assignments is not null)
+{
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+        <div>
+            <a href="/Teacher/Courses/Details/@course.CourseId" class="text-decoration-none">&larr; @course.Name</a>
+            <h1 class="mt-2">Assignments</h1>
+            <p class="text-muted mb-0">@course.Code — @course.Name</p>
+        </div>
+        <a href="/Teacher/Assignments/Create/@course.CourseId" class="btn btn-primary">Create assignment</a>
+    </div>
+
+    @if (assignments.Count == 0)
+    {
+        <div class="alert alert-info" role="status">
+            This course has no active assignments yet.
+            <a href="/Teacher/Assignments/Create/@course.CourseId" class="alert-link">Create an assignment</a>.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col">Assignment</th>
+                        <th scope="col">Due</th>
+                        <th scope="col">Points</th>
+                        <th scope="col">Submissions</th>
+                        <th scope="col">Graded</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var assignment in assignments)
+                    {
+                        <tr>
+                            <td><a href="/Teacher/Assignments/Details/@assignment.AssignmentId">@assignment.Title</a></td>
+                            <td><time datetime="@assignment.DueDate.ToString("O")">@assignment.DueDate.ToLocalTime().ToString("g")</time></td>
+                            <td>@assignment.MaxPoints</td>
+                            <td>@assignment.Submissions.Count</td>
+                            <td>@assignment.Submissions.Count(submission => submission.Grade != null)</td>
+                            <td class="text-nowrap">
+                                <a href="/Teacher/Grades/@assignment.AssignmentId" class="btn btn-sm btn-outline-primary">Grades</a>
+                                <a href="/Teacher/Assignments/Edit/@assignment.AssignmentId" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                <a href="/Teacher/Assignments/Delete/@assignment.AssignmentId" class="btn btn-sm btn-outline-danger">Archive</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public int CourseId { get; set; }
+
+    private Course? course;
+    private IReadOnlyList<Assignment>? assignments;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var teacherId = await CurrentUser.GetUserIdAsync();
+
+        if (teacherId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        course = await CourseService.GetTeacherCourseAsync(CourseId, teacherId);
+
+        if (course is null)
+        {
+            Navigation.NotFound();
+            return;
+        }
+
+        assignments = await AssignmentService.GetCourseAssignmentsAsync(CourseId, teacherId);
+    }
+}

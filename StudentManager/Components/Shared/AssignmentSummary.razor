@@ -1,0 +1,57 @@
+<section class="assignment-summary" aria-label="Assignment summary">
+    <article class="assignment-summary-card">
+        <span class="assignment-summary-value">@Total</span>
+        <span class="assignment-summary-label">
+            <svg class="metric-icon" aria-hidden="true"><use href="#icon-clipboard"></use></svg>
+            Total assignments
+        </span>
+    </article>
+    <article class="assignment-summary-card">
+        <span class="assignment-summary-value">@Pending</span>
+        <span class="assignment-summary-label">
+            <svg class="metric-icon" aria-hidden="true"><use href="#icon-clock"></use></svg>
+            To submit
+        </span>
+    </article>
+    <article class="assignment-summary-card">
+        <span class="assignment-summary-value">@Submitted</span>
+        <span class="assignment-summary-label">
+            <svg class="metric-icon" aria-hidden="true"><use href="#icon-upload"></use></svg>
+            Submitted
+        </span>
+    </article>
+    <article class="assignment-summary-card">
+        <span class="assignment-summary-value">@Graded</span>
+        <span class="assignment-summary-label">
+            <svg class="metric-icon" aria-hidden="true"><use href="#icon-check"></use></svg>
+            Graded
+        </span>
+    </article>
+</section>
+
+@code {
+    [Parameter] public int Total { get; set; }
+    [Parameter] public int Pending { get; set; }
+    [Parameter] public int Submitted { get; set; }
+    [Parameter] public int Graded { get; set; }
+
+    /// <summary>Label and CSS class for an assignment's status badge.</summary>
+    public static (string Text, string CssClass) Status(StudentAssignmentViewModel assignment)
+    {
+        var isOverdue = !assignment.SubmissionId.HasValue && assignment.DueDate < DateTime.Now;
+
+        if (assignment.IsGraded)
+        {
+            return ("Graded", "assignment-status-graded");
+        }
+
+        if (assignment.SubmissionId.HasValue)
+        {
+            return ("Submitted", "assignment-status-submitted");
+        }
+
+        return isOverdue
+            ? ("Overdue", "assignment-status-overdue")
+            : ("To submit", "assignment-status-pending");
+    }
+}

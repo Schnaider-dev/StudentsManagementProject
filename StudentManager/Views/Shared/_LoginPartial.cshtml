@@ -22,14 +22,13 @@
         }
 
         <li class="nav-item">
-            <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index" title="Account settings">
+            <a class="nav-link" href="/Identity/Account/Manage" title="Account settings">
                 @(currentUser is null ? User.Identity?.Name : $"{currentUser.FirstName} {currentUser.LastName}")
             </a>
         </li>
 
         <li class="nav-item">
-            <form asp-area="Identity" asp-page="/Account/Logout"
-                  asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+            <form method="post" action="/Identity/Account/Logout?returnUrl=%2F" asp-antiforgery="true">
                 <button type="submit" class="nav-link btn btn-link">Log out</button>
             </form>
         </li>
@@ -37,10 +36,10 @@
     else
     {
         <li class="nav-item">
-            <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Log in</a>
+            <a class="nav-link" href="/Identity/Account/Login">Log in</a>
         </li>
         <li class="nav-item">
-            <a class="btn btn-primary btn-sm px-3" asp-area="Identity" asp-page="/Account/Register">Create account</a>
+            <a class="btn btn-primary btn-sm px-3" href="/Identity/Account/Register">Create account</a>
         </li>
     }
 </ul>

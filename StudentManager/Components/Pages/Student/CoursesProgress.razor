@@ -1,0 +1,171 @@
+@page "/Student/Courses/Progress/{CourseId:int}"
+@attribute [Authorize(Roles = "Student")]
+@inject IProgressService ProgressService
+@inject CurrentUserService CurrentUser
+@inject NavigationManager Navigation
+
+<PageTitle>Course Progress - StudentManager</PageTitle>
+
+<HeadContent>
+    <link rel="stylesheet" href="css/course-progress.css" />
+</HeadContent>
+
+@if (model is not null)
+{
+    var submittedRatio = model.TotalAssignments == 0
+        ? 0
+        : model.SubmittedAssignments * 100 / model.TotalAssignments;
+
+    <div class="course-progress-page">
+        <div class="course-progress-header">
+            <div>
+                <a class="course-progress-back-link" href="/Student/Courses/MyCourses">
+                    <span aria-hidden="true">←</span> Back to My Courses
+                </a>
+                <p class="course-progress-eyebrow">@model.CourseCode</p>
+                <h1>Course Progress</h1>
+                <h2>@model.CourseName</h2>
+                <p class="course-progress-teacher">Instructor: @model.TeacherName</p>
+            </div>
+        </div>
+
+        <section class="summary-section" aria-label="Course summary">
+            <article class="summary-card">
+                <div class="summary-card-heading">
+                    <h3>Total assignments</h3>
+                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-clipboard"></use></svg>
+                </div>
+                <p class="summary-value">@model.TotalAssignments</p>
+            </article>
+            <article class="summary-card">
+                <div class="summary-card-heading">
+                    <h3>Submitted</h3>
+                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-upload"></use></svg>
+                </div>
+                <p class="summary-value">@model.SubmittedAssignments</p>
+            </article>
+            <article class="summary-card">
+                <div class="summary-card-heading">
+                    <h3>Graded</h3>
+                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-check"></use></svg>
+                </div>
+                <p class="summary-value">@model.GradedAssignments</p>
+            </article>
+            <article class="summary-card">
+                <div class="summary-card-heading">
+                    <h3>Average score</h3>
+                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-chart"></use></svg>
+                </div>
+                @if (model.AveragePercentage is decimal average)
+                {
+                    <p class="summary-value">@average.ToString("0.##")<span>%</span></p>
+                }
+                else
+                {
+                    <p class="summary-value summary-value-empty">Not graded yet</p>
+                }
+            </article>
+        </section>
+
+        <section class="progress-section" aria-labelledby="progress-heading">
+            <div class="section-heading">
+                <div>
+                    <p class="section-eyebrow">Your work</p>
+                    <h2 id="progress-heading" class="heading-with-icon">
+                        <svg class="heading-icon" aria-hidden="true"><use href="#icon-chart"></use></svg>
+                        Assignment progress
+                    </h2>
+                </div>
+            </div>
+            <div class="submission-progress-track" role="progressbar" aria-label="Assignments submitted" aria-valuemin="0"
+                 aria-valuemax="100" aria-valuenow="@submittedRatio">
+                <div class="submission-progress-fill" style="width: @(submittedRatio)%"></div>
+            </div>
+            <div class="progress-legend">
+                <span><span class="legend-dot legend-dot-submitted"></span>@model.SubmittedAssignments submitted</span>
+                <span><span class="legend-dot legend-dot-pending"></span>@(model.TotalAssignments - model.SubmittedAssignments) pending</span>
+            </div>
+        </section>
+
+        <section class="assignments-section" aria-labelledby="assignments-heading">
+            <div class="section-heading">
+                <div>
+                    <p class="section-eyebrow">Coursework</p>
+                    <h2 id="assignments-heading" class="heading-with-icon">
+                        <svg class="heading-icon" aria-hidden="true"><use href="#icon-clipboard"></use></svg>
+                        Assignments
+                    </h2>
+                </div>
+            </div>
+            @if (model.Assignments.Count == 0)
+            {
+                <div class="progress-empty-state">
+                    <svg class="heading-icon" aria-hidden="true"><use href="#icon-clipboard"></use></svg>
+                    <h3>No assignments yet</h3>
+                    <p>There are no assignments for this course right now. Check back later for coursework from your instructor.</p>
+                </div>
+            }
+            else
+            {
+                <div class="assignments-table-scroll">
+                    <table class="assignments-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Assignment</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Grade</th>
+                                <th scope="col">Due date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var assignment in model.Assignments)
+                            {
+                                var statusClass = assignment.Status switch
+                                {
+                                    "Graded" => "status-graded",
+                                    "Submitted" => "status-submitted",
+                                    _ => "status-pending"
+                                };
+
+                                <tr>
+                                    <td data-label="Assignment">
+                                        <a href="/Student/Assignments/Details/@assignment.AssignmentId">@assignment.Title</a>
+                                    </td>
+                                    <td data-label="Status">
+                                        <span class="assignment-status @statusClass">@assignment.Status</span>
+                                    </td>
+                                    <td data-label="Grade">@assignment.Grade</td>
+                                    <td data-label="Due date">@assignment.DueDate.ToString("MMM dd, yyyy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+    </div>
+}
+
+@code {
+    [Parameter] public int CourseId { get; set; }
+
+    private CourseProgressViewModel? model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var studentId = await CurrentUser.GetUserIdAsync();
+
+        if (studentId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        model = await ProgressService.GetCourseProgressAsync(CourseId, studentId);
+
+        if (model is null)
+        {
+            Navigation.NotFound();
+        }
+    }
+}

@@ -1,0 +1,10 @@
+@inject NavigationManager Navigation
+
+@code {
+    // Identity's login page is a Razor Page, so a full (non-enhanced) navigation is required.
+    protected override void OnInitialized()
+    {
+        var returnUrl = Uri.EscapeDataString("/" + Navigation.ToBaseRelativePath(Navigation.Uri));
+        Navigation.NavigateTo($"/Identity/Account/Login?returnUrl={returnUrl}", forceLoad: true);
+    }
+}

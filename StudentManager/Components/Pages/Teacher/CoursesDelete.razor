@@ -1,0 +1,76 @@
+@page "/Teacher/Courses/Delete/{Id:int}"
+@attribute [Authorize(Roles = "Teacher")]
+@inject ICourseService CourseService
+@inject CurrentUserService CurrentUser
+@inject FlashService Flash
+@inject NavigationManager Navigation
+
+<PageTitle>Archive Course - StudentManager</PageTitle>
+
+@if (course is not null)
+{
+    <h1>Archive course</h1>
+    <div class="alert alert-warning mt-3" role="alert">
+        <p>Archive <strong>@course.Code — @course.Name</strong>?</p>
+        <p class="mb-0">The course and its assignments will no longer be active. Existing student records will be retained.</p>
+    </div>
+
+    <dl class="row">
+        <dt class="col-sm-3">Students</dt>
+        <dd class="col-sm-9">@course.Enrollments.Count</dd>
+        <dt class="col-sm-3">Assignments</dt>
+        <dd class="col-sm-9">@course.Assignments.Count</dd>
+    </dl>
+
+    <form method="post" @formname="archive-course" @onsubmit="ArchiveAsync" data-enhance>
+        <AntiforgeryToken />
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">Archive course</button>
+            <a href="/Teacher/Courses/Details/@course.CourseId" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Course? course;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var teacherId = await CurrentUser.GetUserIdAsync();
+
+        if (teacherId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        course = await CourseService.GetTeacherCourseAsync(Id, teacherId);
+
+        if (course is null)
+        {
+            Navigation.NotFound();
+        }
+    }
+
+    private async Task ArchiveAsync()
+    {
+        var teacherId = await CurrentUser.GetUserIdAsync();
+
+        if (teacherId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        if (!await CourseService.ArchiveCourseAsync(Id, teacherId))
+        {
+            Navigation.NotFound();
+            return;
+        }
+
+        Flash.Success("Course was archived successfully.");
+        Navigation.NavigateTo("/Teacher/Courses");
+    }
+}

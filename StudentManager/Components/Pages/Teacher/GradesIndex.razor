@@ -1,0 +1,88 @@
+@page "/Teacher/Grades/{AssignmentId:int}"
+@attribute [Authorize(Roles = "Teacher")]
+@inject IGradingService GradingService
+@inject CurrentUserService CurrentUser
+@inject NavigationManager Navigation
+
+<PageTitle>Grades — @model?.AssignmentTitle - StudentManager</PageTitle>
+
+@if (model is not null)
+{
+    <div class="mb-4">
+        <a href="/Teacher/Assignments/@model.CourseId" class="text-decoration-none">&larr; @model.CourseCode assignments</a>
+        <h1 class="mt-2">Submissions</h1>
+        <p class="text-muted mb-0">@model.AssignmentTitle · @model.CourseCode · Maximum @model.MaxPoints points</p>
+    </div>
+
+    @if (model.Submissions.Count == 0)
+    {
+        <div class="alert alert-info" role="status">No submissions have been received for this assignment.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col">Student</th>
+                        <th scope="col">Student number</th>
+                        <th scope="col">Submitted</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Score</th>
+                        <th scope="col">Feedback</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var submission in model.Submissions)
+                    {
+                        <tr>
+                            <td>@submission.StudentName</td>
+                            <td>@(string.IsNullOrWhiteSpace(submission.StudentNumber) ? "—" : submission.StudentNumber)</td>
+                            <td><time datetime="@submission.SubmittedAt.ToString("O")">@submission.SubmittedAt.ToLocalTime().ToString("g")</time></td>
+                            <td>
+                                @if (submission.IsLate)
+                                {
+                                    <span class="badge text-bg-warning">Late</span>
+                                }
+                                else
+                                {
+                                    <span>On time</span>
+                                }
+                            </td>
+                            <td>@(submission.Score.HasValue ? $"{submission.Score.Value} / {model.MaxPoints}" : "—")</td>
+                            <td>@(string.IsNullOrWhiteSpace(submission.Feedback) ? "—" : submission.Feedback)</td>
+                            <td>
+                                <a href="/Teacher/Grades/Edit/@submission.SubmissionId" class="btn btn-sm btn-primary">@(submission.IsGraded ? "Edit grade" : "Grade")</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public int AssignmentId { get; set; }
+
+    private GradingListViewModel? model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var teacherId = await CurrentUser.GetUserIdAsync();
+
+        if (teacherId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        model = await GradingService.GetAssignmentSubmissionsAsync(AssignmentId, teacherId);
+
+        if (model is null)
+        {
+            Navigation.NotFound();
+        }
+    }
+}

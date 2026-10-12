@@ -1,0 +1,119 @@
+@page "/Student/Assignments/Index/{CourseId:int}"
+@attribute [Authorize(Roles = "Student")]
+@inject ISubmissionService SubmissionService
+@inject CurrentUserService CurrentUser
+@inject NavigationManager Navigation
+
+<PageTitle>Assignments - StudentManager</PageTitle>
+
+<HeadContent>
+    <link rel="stylesheet" href="css/student-assignments.css" />
+</HeadContent>
+
+@if (model is not null)
+{
+    var submittedCount = model.Assignments.Count(assignment => assignment.SubmissionId.HasValue);
+    var gradedCount = model.Assignments.Count(assignment => assignment.IsGraded);
+    var pendingCount = model.Assignments.Count - submittedCount;
+
+    <div class="student-assignments-page">
+        <div class="student-assignments-header">
+            <a class="assignments-back-link" href="/Student/Courses/Progress/@model.CourseId">
+                <span aria-hidden="true">←</span> Back to course progress
+            </a>
+            <p class="assignments-eyebrow">@model.CourseCode</p>
+            <h1>@model.CourseName</h1>
+            <p class="assignments-subtitle">Assignments and your submission progress for this course.</p>
+        </div>
+
+        <AssignmentSummary Total="model.Assignments.Count" Pending="pendingCount" Submitted="submittedCount" Graded="gradedCount" />
+
+        <section class="assignment-list-section" aria-labelledby="assignment-list-heading">
+            <div class="assignment-list-heading">
+                <div>
+                    <p class="assignments-eyebrow">Coursework</p>
+                    <h2 id="assignment-list-heading">Your assignments</h2>
+                </div>
+                <span class="assignment-list-count">@model.Assignments.Count assignment(s)</span>
+            </div>
+
+            @if (model.Assignments.Count == 0)
+            {
+                <div class="assignment-empty-state">
+                    <h3>No assignments yet</h3>
+                    <p>There are no active assignments for this course right now.</p>
+                </div>
+            }
+            else
+            {
+                <div class="student-assignment-list">
+                    @foreach (var assignment in model.Assignments)
+                    {
+                        var (statusText, statusClass) = AssignmentSummary.Status(assignment);
+
+                        <article class="student-assignment-card">
+                            <div class="student-assignment-main">
+                                <div class="student-assignment-title-row">
+                                    <h3>
+                                        <a href="/Student/Assignments/Details/@assignment.AssignmentId">@assignment.Title</a>
+                                    </h3>
+                                    <span class="assignment-status @statusClass">@statusText</span>
+                                </div>
+                                <p class="student-assignment-description">
+                                    @(string.IsNullOrWhiteSpace(assignment.Description)
+                                        ? "No assignment description provided."
+                                        : assignment.Description)
+                                </p>
+                                <div class="student-assignment-meta">
+                                    <span>
+                                        <strong>Due</strong>
+                                        <time datetime="@assignment.DueDate.ToString("O")">
+                                            @assignment.DueDate.ToLocalTime().ToString("MMM d, yyyy")
+                                        </time>
+                                    </span>
+                                    <span><strong>Points</strong> @assignment.MaxPoints.ToString("0.##")</span>
+                                    @if (assignment.SubmittedAt is DateTime submittedAt)
+                                    {
+                                        <span>
+                                            <strong>Submitted</strong>
+                                            <time datetime="@submittedAt.ToString("O")">
+                                                @submittedAt.ToLocalTime().ToString("MMM d, yyyy")
+                                            </time>
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                            <a class="assignment-card-action" href="/Student/Assignments/Details/@assignment.AssignmentId">
+                                View details <span aria-hidden="true">→</span>
+                            </a>
+                        </article>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+}
+
+@code {
+    [Parameter] public int CourseId { get; set; }
+
+    private CourseAssignmentsViewModel? model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var studentId = await CurrentUser.GetUserIdAsync();
+
+        if (studentId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        model = await SubmissionService.GetCourseAssignmentsAsync(CourseId, studentId);
+
+        if (model is null)
+        {
+            Navigation.NotFound();
+        }
+    }
+}

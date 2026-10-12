@@ -1,0 +1,76 @@
+@page "/Teacher/Assignments/Delete/{Id:int}"
+@attribute [Authorize(Roles = "Teacher")]
+@inject IAssignmentService AssignmentService
+@inject CurrentUserService CurrentUser
+@inject FlashService Flash
+@inject NavigationManager Navigation
+
+<PageTitle>Archive Assignment - StudentManager</PageTitle>
+
+@if (assignment is not null)
+{
+    <h1>Archive assignment</h1>
+    <p class="text-muted">@assignment.Course.Code — @assignment.Course.Name</p>
+    <div class="alert alert-warning mt-3" role="alert">
+        <p>Archive <strong>@assignment.Title</strong>?</p>
+        <p class="mb-0">Students will no longer be able to work on this assignment. Existing submissions and grades will be retained.</p>
+    </div>
+
+    <dl class="row">
+        <dt class="col-sm-3">Due date</dt>
+        <dd class="col-sm-9"><time datetime="@assignment.DueDate.ToString("O")">@assignment.DueDate.ToLocalTime().ToString("g")</time></dd>
+        <dt class="col-sm-3">Submissions</dt>
+        <dd class="col-sm-9">@assignment.Submissions.Count</dd>
+    </dl>
+
+    <form method="post" @formname="archive-assignment" @onsubmit="ArchiveAsync" data-enhance>
+        <AntiforgeryToken />
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">Archive assignment</button>
+            <a href="/Teacher/Assignments/Details/@assignment.AssignmentId" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Assignment? assignment;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var teacherId = await CurrentUser.GetUserIdAsync();
+
+        if (teacherId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        assignment = await AssignmentService.GetTeacherAssignmentAsync(Id, teacherId);
+
+        if (assignment is null)
+        {
+            Navigation.NotFound();
+        }
+    }
+
+    private async Task ArchiveAsync()
+    {
+        var teacherId = await CurrentUser.GetUserIdAsync();
+
+        if (teacherId is null || assignment is null)
+        {
+            return;
+        }
+
+        if (!await AssignmentService.ArchiveAssignmentAsync(Id, teacherId))
+        {
+            Navigation.NotFound();
+            return;
+        }
+
+        Flash.Success("Assignment was archived successfully.");
+        Navigation.NavigateTo($"/Teacher/Assignments/{assignment.CourseId}");
+    }
+}

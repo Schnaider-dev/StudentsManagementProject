@@ -1,0 +1,114 @@
+@page "/Teacher/Grades/Edit/{SubmissionId:int}"
+@attribute [Authorize(Roles = "Teacher")]
+@inject IGradingService GradingService
+@inject CurrentUserService CurrentUser
+@inject FlashService Flash
+@inject NavigationManager Navigation
+
+<PageTitle>Edit Grade - StudentManager</PageTitle>
+
+@if (display is not null)
+{
+    <div class="mb-4">
+        <a href="/Teacher/Grades/@display.AssignmentId" class="text-decoration-none">&larr; Back to submissions</a>
+        <h1 class="mt-2">@(display.GradeId.HasValue ? "Edit grade" : "Grade submission")</h1>
+        <p class="text-muted mb-0">@display.StudentName · @display.AssignmentTitle</p>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <p class="mb-0">Maximum score: <strong>@display.MaxPoints</strong> points</p>
+        </div>
+    </div>
+
+    <EditForm Model="Model" FormName="edit-grade" OnValidSubmit="SubmitAsync" Enhance>
+        <DataAnnotationsValidator />
+        <div class="mb-3">
+            <label for="grade-score" class="form-label">Score</label>
+            <div class="input-group">
+                <InputNumber id="grade-score" min="0" max="@display.MaxPoints" step="0.01" class="form-control" @bind-Value="Model.Score" />
+                <span class="input-group-text">/ @display.MaxPoints</span>
+            </div>
+            <ValidationMessage For="() => Model.Score" class="text-danger" />
+            @if (errorMessage is not null)
+            {
+                <div class="text-danger" role="alert">@errorMessage</div>
+            }
+        </div>
+        <div class="mb-3">
+            <label for="grade-feedback" class="form-label">Feedback</label>
+            <InputTextArea id="grade-feedback" class="form-control" rows="5" @bind-Value="Model.Feedback" />
+            <ValidationMessage For="() => Model.Feedback" class="text-danger" />
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Save grade</button>
+            <a href="/Teacher/Grades/@display.AssignmentId" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int SubmissionId { get; set; }
+
+    [SupplyParameterFromForm]
+    private GradeEditViewModel Model { get; set; } = default!;
+
+    // Read-only details (student, assignment, maximum) are always reloaded from the database.
+    private GradeEditViewModel? display;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var teacherId = await CurrentUser.GetUserIdAsync();
+
+        if (teacherId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        display = await GradingService.GetGradeFormAsync(SubmissionId, teacherId);
+
+        if (display is null)
+        {
+            Navigation.NotFound();
+            return;
+        }
+
+        Model ??= display;
+        // Ids come from the route and database, so they are in place before validation runs.
+        Model.SubmissionId = SubmissionId;
+        Model.GradeId = display.GradeId;
+        Model.AssignmentId = display.AssignmentId;
+    }
+
+    private async Task SubmitAsync()
+    {
+        var teacherId = await CurrentUser.GetUserIdAsync();
+
+        if (teacherId is null || display is null)
+        {
+            return;
+        }
+
+        Model.SubmissionId = SubmissionId;
+        Model.GradeId = display.GradeId;
+        Model.AssignmentId = display.AssignmentId;
+
+        try
+        {
+            if (!await GradingService.SaveGradeAsync(Model, teacherId))
+            {
+                Navigation.NotFound();
+                return;
+            }
+
+            Flash.Success("Grade saved successfully.");
+            Navigation.NavigateTo($"/Teacher/Grades/{display.AssignmentId}");
+        }
+        catch (InvalidOperationException exception)
+        {
+            errorMessage = exception.Message;
+        }
+    }
+}

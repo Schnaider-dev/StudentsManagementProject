@@ -1,0 +1,104 @@
+@page "/Teacher/Assignments/Create/{CourseId:int}"
+@attribute [Authorize(Roles = "Teacher")]
+@inject ICourseService CourseService
+@inject IAssignmentService AssignmentService
+@inject CurrentUserService CurrentUser
+@inject FlashService Flash
+@inject NavigationManager Navigation
+
+<PageTitle>Create Assignment - StudentManager</PageTitle>
+
+<h1>Create assignment</h1>
+<p class="text-muted">For @courseName</p>
+
+<EditForm Model="Model" FormName="create-assignment" OnValidSubmit="SubmitAsync" Enhance class="mt-4">
+    <DataAnnotationsValidator />
+    @if (errorMessage is not null)
+    {
+        <div class="text-danger" role="alert">@errorMessage</div>
+    }
+    <div class="mb-3">
+        <label for="assignment-title" class="form-label">Title</label>
+        <InputText id="assignment-title" class="form-control" @bind-Value="Model.Title" />
+        <ValidationMessage For="() => Model.Title" class="text-danger" />
+    </div>
+    <div class="mb-3">
+        <label for="assignment-description" class="form-label">Description</label>
+        <InputTextArea id="assignment-description" class="form-control" rows="5" @bind-Value="Model.Description" />
+        <ValidationMessage For="() => Model.Description" class="text-danger" />
+    </div>
+    <div class="mb-3">
+        <label for="assignment-due" class="form-label">Due Date</label>
+        <InputDate id="assignment-due" Type="InputDateType.DateTimeLocal" step="1" class="form-control" @bind-Value="Model.DueDate" />
+        <ValidationMessage For="() => Model.DueDate" class="text-danger" />
+    </div>
+    <div class="mb-3">
+        <label for="assignment-points" class="form-label">Maximum Points</label>
+        <InputNumber id="assignment-points" step="0.01" class="form-control" @bind-Value="Model.MaxPoints" />
+        <ValidationMessage For="() => Model.MaxPoints" class="text-danger" />
+    </div>
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Create assignment</button>
+        <a href="/Teacher/Assignments/@CourseId" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter] public int CourseId { get; set; }
+
+    [SupplyParameterFromForm]
+    private AssignmentCreateViewModel Model { get; set; } = default!;
+
+    private string courseName = "Course";
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var teacherId = await CurrentUser.GetUserIdAsync();
+
+        if (teacherId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        var course = await CourseService.GetTeacherCourseAsync(CourseId, teacherId);
+
+        if (course is null || !course.IsActive)
+        {
+            Navigation.NotFound();
+            return;
+        }
+
+        courseName = course.Name;
+        Model ??= new AssignmentCreateViewModel();
+        // Ids come from the route, so they are in place before validation runs.
+        Model.CourseId = course.CourseId;
+    }
+
+    private async Task SubmitAsync()
+    {
+        var teacherId = await CurrentUser.GetUserIdAsync();
+
+        if (teacherId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        // The course always comes from the route, never from posted data.
+        Model.CourseId = CourseId;
+
+        try
+        {
+            var assignment = await AssignmentService.CreateAssignmentAsync(Model, teacherId);
+
+            Flash.Success("Assignment was created successfully.");
+            Navigation.NavigateTo($"/Teacher/Assignments/Details/{assignment.AssignmentId}");
+        }
+        catch (InvalidOperationException exception)
+        {
+            errorMessage = exception.Message;
+        }
+    }
+}

@@ -1,0 +1,124 @@
+@page "/Student/Submissions/Edit/{Id:int}"
+@attribute [Authorize(Roles = "Student")]
+@inject ISubmissionService SubmissionService
+@inject CurrentUserService CurrentUser
+@inject FlashService Flash
+@inject NavigationManager Navigation
+
+<PageTitle>Edit Submission - StudentManager</PageTitle>
+
+<HeadContent>
+    <link rel="stylesheet" href="css/submission-form.css" />
+</HeadContent>
+
+@if (Model is not null)
+{
+    <div class="submission-form-page">
+        <div class="submission-form-header">
+            <a class="submission-back-link" href="/Student/Assignments/Details/@Model.AssignmentId">
+                <span aria-hidden="true">←</span> Back to assignment
+            </a>
+            <p class="submission-eyebrow">Update your work</p>
+            <h1>@Model.AssignmentTitle</h1>
+            <p class="submission-intro">Make your changes below. Graded submissions cannot be edited.</p>
+        </div>
+
+        <section class="submission-form-panel" aria-labelledby="submission-content-heading">
+            <div class="submission-panel-heading">
+                <p class="submission-eyebrow">Your work</p>
+                <h2 id="submission-content-heading">Edit submission</h2>
+            </div>
+
+            <EditForm Model="Model" FormName="submission-edit" OnValidSubmit="SubmitAsync" Enhance class="submission-form">
+                <DataAnnotationsValidator />
+
+                @if (error is not null)
+                {
+                    <div class="submission-validation-summary" role="alert">@error</div>
+                }
+
+                <label for="content" class="submission-content-label">
+                    Your response
+                    <span>Required · up to 5,000 characters</span>
+                </label>
+                <InputTextArea id="content" @bind-Value="Model.Content" class="submission-content-input" rows="12"
+                               placeholder="Enter your assignment response here..." autocomplete="off" />
+                <ValidationMessage For="() => Model.Content" class="submission-field-error" />
+
+                <p class="submission-form-note">
+                    Your updated response will replace the current submission. You can edit it again until it is graded.
+                </p>
+
+                <div class="submission-form-actions">
+                    <a class="submission-cancel-action" href="/Student/Assignments/Details/@Model.AssignmentId">Cancel</a>
+                    <button type="submit" class="submission-submit-action">
+                        Save changes <span aria-hidden="true">→</span>
+                    </button>
+                </div>
+            </EditForm>
+        </section>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private SubmissionViewModel Model { get; set; } = default!;
+
+    private string? studentId;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        studentId = await CurrentUser.GetUserIdAsync();
+
+        if (studentId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        var submission = await SubmissionService.GetSubmissionAsync(Id, studentId);
+
+        if (submission is null)
+        {
+            Navigation.NotFound();
+            return;
+        }
+
+        if (submission.Grade is not null)
+        {
+            Flash.Error("A graded submission cannot be edited.");
+            Navigation.NavigateTo($"/Student/Submissions/Details/{submission.SubmissionId}");
+            return;
+        }
+
+        // On a postback the bound form values are kept; only fill the fixed fields.
+        Model ??= new SubmissionViewModel { Content = submission.Content };
+        Model.SubmissionId = submission.SubmissionId;
+        Model.AssignmentId = submission.AssignmentId;
+        Model.AssignmentTitle = submission.Assignment.Title;
+    }
+
+    private async Task SubmitAsync()
+    {
+        try
+        {
+            var updated = await SubmissionService.UpdateSubmissionAsync(Model, studentId!);
+
+            if (!updated)
+            {
+                Navigation.NotFound();
+                return;
+            }
+
+            Flash.Success("Submission updated successfully.");
+            Navigation.NavigateTo($"/Student/Submissions/Details/{Id}");
+        }
+        catch (InvalidOperationException exception)
+        {
+            error = exception.Message;
+        }
+    }
+}

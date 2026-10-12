@@ -1,12 +1,13 @@
-document.querySelectorAll(".course-drop-button").forEach(button => {
-    button.addEventListener("click", () => {
-        const dialog = document.getElementById(button.dataset.dialogId);
-        dialog.showModal();
-    })
-})
+// Delegated listeners keep the drop dialogs working after Blazor enhanced navigation replaces the DOM.
+document.addEventListener("click", (event) => {
+    const dropButton = event.target.closest(".course-drop-button");
+    if (dropButton) {
+        document.getElementById(dropButton.dataset.dialogId)?.showModal();
+        return;
+    }
 
-document.querySelectorAll(".cancel-dialog").forEach(button => {
-    button.addEventListener("click", () => {
-        button.closest("dialog").close();
-    })
-})
+    const cancelButton = event.target.closest(".cancel-dialog");
+    if (cancelButton) {
+        cancelButton.closest("dialog")?.close();
+    }
+});

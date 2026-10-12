@@ -1,0 +1,115 @@
+@page "/Student/Submissions/Create/{AssignmentId:int}"
+@attribute [Authorize(Roles = "Student")]
+@inject ISubmissionService SubmissionService
+@inject CurrentUserService CurrentUser
+@inject FlashService Flash
+@inject NavigationManager Navigation
+
+<PageTitle>Submit Assignment - StudentManager</PageTitle>
+
+<HeadContent>
+    <link rel="stylesheet" href="css/submission-form.css" />
+</HeadContent>
+
+@if (Model is not null)
+{
+    <div class="submission-form-page">
+        <div class="submission-form-header">
+            <a class="submission-back-link" href="/Student/Assignments/Details/@AssignmentId">
+                <span aria-hidden="true">←</span> Back to assignment
+            </a>
+            <p class="submission-eyebrow">Assignment submission</p>
+            <h1>@Model.AssignmentTitle</h1>
+            <p class="submission-intro">Write your response below, then review it before submitting.</p>
+        </div>
+
+        <section class="submission-form-panel" aria-labelledby="submission-content-heading">
+            <div class="submission-panel-heading">
+                <p class="submission-eyebrow">Your work</p>
+                <h2 id="submission-content-heading">Content</h2>
+            </div>
+
+            <EditForm Model="Model" FormName="submission-create" OnValidSubmit="SubmitAsync" Enhance class="submission-form">
+                <DataAnnotationsValidator />
+
+                @if (error is not null)
+                {
+                    <div class="submission-validation-summary" role="alert">@error</div>
+                }
+
+                <label for="content" class="submission-content-label">
+                    Your response
+                    <span>Required · up to 5,000 characters</span>
+                </label>
+                <InputTextArea id="content" @bind-Value="Model.Content" class="submission-content-input" rows="12"
+                               placeholder="Enter your assignment response here..." autocomplete="off" />
+                <ValidationMessage For="() => Model.Content" class="submission-field-error" />
+
+                <p class="submission-form-note">
+                    Make sure your response is complete before submitting. You can edit it later if it has not been graded.
+                </p>
+
+                <div class="submission-form-actions">
+                    <a class="submission-cancel-action" href="/Student/Assignments/Details/@AssignmentId">Cancel</a>
+                    <button type="submit" class="submission-submit-action">
+                        Submit assignment <span aria-hidden="true">→</span>
+                    </button>
+                </div>
+            </EditForm>
+        </section>
+    </div>
+}
+
+@code {
+    [Parameter] public int AssignmentId { get; set; }
+
+    [SupplyParameterFromForm]
+    private SubmissionViewModel Model { get; set; } = default!;
+
+    private string? studentId;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        studentId = await CurrentUser.GetUserIdAsync();
+
+        if (studentId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        var assignment = await SubmissionService.GetAssignmentAsync(AssignmentId, studentId);
+
+        if (assignment is null)
+        {
+            Navigation.NotFound();
+            return;
+        }
+
+        // A student can only submit once; send them to the existing submission.
+        if (assignment.SubmissionId.HasValue)
+        {
+            Navigation.NavigateTo($"/Student/Submissions/Details/{assignment.SubmissionId.Value}");
+            return;
+        }
+
+        Model ??= new SubmissionViewModel();
+        Model.AssignmentId = assignment.AssignmentId;
+        Model.AssignmentTitle = assignment.Title;
+    }
+
+    private async Task SubmitAsync()
+    {
+        try
+        {
+            var submission = await SubmissionService.CreateSubmissionAsync(Model, studentId!);
+            Flash.Success("Assignment submitted successfully.");
+            Navigation.NavigateTo($"/Student/Submissions/Details/{submission.SubmissionId}");
+        }
+        catch (InvalidOperationException exception)
+        {
+            error = exception.Message;
+        }
+    }
+}

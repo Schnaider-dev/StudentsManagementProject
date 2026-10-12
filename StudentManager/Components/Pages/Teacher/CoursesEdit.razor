@@ -1,0 +1,109 @@
+@page "/Teacher/Courses/Edit/{Id:int}"
+@attribute [Authorize(Roles = "Teacher")]
+@inject ICourseService CourseService
+@inject CurrentUserService CurrentUser
+@inject FlashService Flash
+@inject NavigationManager Navigation
+
+<PageTitle>Edit Course - StudentManager</PageTitle>
+
+<h1>Edit course</h1>
+<p class="text-muted">Update the course details.</p>
+
+<EditForm Model="Model" FormName="edit-course" OnValidSubmit="SubmitAsync" Enhance class="mt-4">
+    <DataAnnotationsValidator />
+    @if (errorMessage is not null)
+    {
+        <div class="text-danger" role="alert">@errorMessage</div>
+    }
+    <div class="mb-3">
+        <label for="course-code" class="form-label">Course Code</label>
+        <InputText id="course-code" class="form-control" autocomplete="off" @bind-Value="Model.Code" />
+        <ValidationMessage For="() => Model.Code" class="text-danger" />
+    </div>
+    <div class="mb-3">
+        <label for="course-name" class="form-label">Course Name</label>
+        <InputText id="course-name" class="form-control" @bind-Value="Model.Name" />
+        <ValidationMessage For="() => Model.Name" class="text-danger" />
+    </div>
+    <div class="mb-3">
+        <label for="course-description" class="form-label">Description</label>
+        <InputTextArea id="course-description" class="form-control" rows="4" @bind-Value="Model.Description" />
+        <ValidationMessage For="() => Model.Description" class="text-danger" />
+    </div>
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Save changes</button>
+        <a href="/Teacher/Courses/Details/@Id" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private CourseEditViewModel Model { get; set; } = default!;
+
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Model is not null)
+        {
+            return;
+        }
+
+        var teacherId = await CurrentUser.GetUserIdAsync();
+
+        if (teacherId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        var course = await CourseService.GetTeacherCourseAsync(Id, teacherId);
+
+        if (course is null)
+        {
+            Navigation.NotFound();
+            return;
+        }
+
+        Model = new CourseEditViewModel
+        {
+            CourseId = course.CourseId,
+            Code = course.Code,
+            Name = course.Name,
+            Description = course.Description
+        };
+    }
+
+    private async Task SubmitAsync()
+    {
+        var teacherId = await CurrentUser.GetUserIdAsync();
+
+        if (teacherId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        // The id always comes from the route, never from posted data.
+        Model.CourseId = Id;
+
+        try
+        {
+            if (!await CourseService.UpdateCourseAsync(Model, teacherId))
+            {
+                Navigation.NotFound();
+                return;
+            }
+
+            Flash.Success("Course was updated successfully.");
+            Navigation.NavigateTo($"/Teacher/Courses/Details/{Id}");
+        }
+        catch (InvalidOperationException exception)
+        {
+            errorMessage = exception.Message;
+        }
+    }
+}

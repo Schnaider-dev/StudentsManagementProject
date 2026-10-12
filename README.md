@@ -1,6 +1,6 @@
 # StudentManager
 
-StudentManager is a web application for managing courses and coursework. Students can enroll in courses, submit assignments, and track grades. Teachers can create courses and assignments, review submissions, and grade student work.
+StudentManager is a .NET Blazor Web App for managing courses and coursework. Students can enroll in courses, submit assignments, and track grades. Teachers can create courses and assignments, review submissions, and grade student work.
 
 ## Target audience
 
@@ -86,10 +86,13 @@ The default SQLite connection is configured in `StudentManager/appsettings.json`
 ## Project structure
 
 - `StudentManager/Areas/Identity` — registration and login pages
-- `StudentManager/Areas/Student` — student pages, controllers, and views
-- `StudentManager/Areas/Teacher` — teacher pages, controllers, and views
+- `StudentManager/Areas/Identity` — registration and login pages (ASP.NET Core Identity Razor Pages)
+- `StudentManager/Components` — the Blazor Web App UI (static server-side rendering with enhanced navigation and forms):
+  - `App.razor`, `Routes.razor`, and `Layout/MainLayout.razor` — application shell, routing, and navigation
+  - `Pages/Student` — student pages (dashboard, courses, assignments, submissions)
+  - `Pages/Teacher` — teacher pages (dashboard, courses, assignments, grading, students)
 - `StudentManager/Data` — EF Core database context, migrations, and development seed data
-- `StudentManager/Services` — course, enrollment, assignment, submission, grading, and progress logic
+- `StudentManager/Services` — course, enrollment, assignment, submission, grading, and progress logic, plus the current-user and flash-message helpers used by the Blazor pages
 - `StudentManager/wwwroot` — application styles, scripts, and static assets
 
 ## Tests and deployment

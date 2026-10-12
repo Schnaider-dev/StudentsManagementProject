@@ -95,7 +95,7 @@
   color: var(--color-muted);
 }
 
-body.role-teacher {
+.role-teacher {
   --color-primary: var(--color-teacher);
   --bs-link-color-rgb: 43, 76, 126;
   --bs-link-hover-color-rgb: 30, 54, 92;
@@ -120,6 +120,13 @@ body {
   flex-direction: column;
   min-height: 100vh;
   line-height: 1.55;
+}
+
+/* Blazor layout wrapper; carries the role class and keeps the footer at the bottom */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
 }
 
 h1,
@@ -154,7 +161,7 @@ h3 {
 }
 
 
-body.role-guest .app-header {
+.role-guest .app-header {
   border-top-color: var(--color-border);
 }
 

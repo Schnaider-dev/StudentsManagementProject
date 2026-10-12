@@ -1,0 +1,160 @@
+@page "/Student/Courses/Available"
+@attribute [Authorize(Roles = "Student")]
+@inject IEnrollmentService EnrollmentService
+@inject CurrentUserService CurrentUser
+@inject FlashService Flash
+@inject NavigationManager Navigation
+
+<PageTitle>Available Courses - StudentManager</PageTitle>
+
+<HeadContent>
+    <link rel="stylesheet" href="css/available-courses.css" />
+</HeadContent>
+
+@if (model is not null)
+{
+    <div class="available-courses-page">
+        <a class="avalaible-course-mycourses-link" href="/Student/Courses/MyCourses">
+            <span aria-hidden="true">&larr;</span> Back to My Courses
+        </a>
+        <h1 class="available-courses-title">Available Courses</h1>
+
+        @* GET keeps search and filter in the URL so results can be bookmarked. *@
+        <form action="/Student/Courses/Available" class="course-search-form" method="get">
+            <label class="available-visually-hidden" for="course-search">Search courses</label>
+            <input id="course-search" type="search" name="search" value="@model.Search" class="course-search-input"
+                   placeholder="Search courses..." />
+            <label class="available-visually-hidden" for="course-filter">Search field</label>
+            <select id="course-filter" name="filter" class="course-search-filter">
+                <option value="" selected="@(model.Filter is null)">All fields</option>
+                <option value="code" selected="@(model.Filter == "code")">By Code</option>
+                <option value="name" selected="@(model.Filter == "name")">By Name</option>
+                <option value="teacher" selected="@(model.Filter == "teacher")">By Teacher</option>
+            </select>
+            <button type="submit" class="course-action-button">Search</button>
+        </form>
+
+        <p class="available-courses-count" aria-live="polite">
+            Showing @model.Courses.Count of @model.TotalCount available courses
+        </p>
+
+        @if (model.Courses.Count == 0)
+        {
+            <section class="available-courses-empty" aria-live="polite">
+                <p>No available courses match your search.</p>
+                <a class="course-action-button course-return-link"
+                   href="@(string.IsNullOrWhiteSpace(model.Search) ? "/Student/Courses/MyCourses" : "/Student/Courses/Available")">Go Back</a>
+            </section>
+        }
+        else
+        {
+            <div class="available-course-list">
+                @foreach (var course in model.Courses)
+                {
+                    <article class="available-course-card">
+                        <div class="available-course-details">
+                            <div class="available-course-copy">
+                                <h2 class="available-course-name">(@course.Code) @course.Name</h2>
+                                <p class="available-course-teacher">Taught by: <strong>@course.TeacherName</strong></p>
+                                <p class="available-course-description">@course.Description</p>
+                            </div>
+                            <form method="post" @formname="@($"enroll-{course.CourseId}")" @onsubmit="() => EnrollAsync(course.CourseId)" data-enhance>
+                                <AntiforgeryToken />
+                                <button type="submit" class="course-action-button">Enroll</button>
+                            </form>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+
+        @if (model.TotalPages > 1)
+        {
+            // Show at most five numbered pages, shifted left near the end.
+            var lastPage = Math.Min(model.TotalPages, Math.Max(1, model.CurrentPage - 2) + 4);
+            var firstPage = Math.Max(1, lastPage - 4);
+
+            <nav aria-label="Course pages" class="course-pagination">
+                <ul class="course-pagination-list">
+                    <li class="course-pagination-item @(model.HasPreviousPage ? "" : "is-disabled")">
+                        @if (model.HasPreviousPage)
+                        {
+                            <a class="course-page-link" href="@PageUrl(model.CurrentPage - 1)" aria-label="Previous page">Previous</a>
+                        }
+                        else
+                        {
+                            <span class="course-page-link" aria-disabled="true">Previous</span>
+                        }
+                    </li>
+
+                    @for (var pageNumber = firstPage; pageNumber <= lastPage; pageNumber++)
+                    {
+                        <li class="course-pagination-item @(pageNumber == model.CurrentPage ? "is-current" : "")">
+                            <a class="course-page-link" href="@PageUrl(pageNumber)"
+                               aria-current="@(pageNumber == model.CurrentPage ? "page" : null)">@pageNumber</a>
+                        </li>
+                    }
+
+                    <li class="course-pagination-item @(model.HasNextPage ? "" : "is-disabled")">
+                        @if (model.HasNextPage)
+                        {
+                            <a class="course-page-link" href="@PageUrl(model.CurrentPage + 1)" aria-label="Next page">Next</a>
+                        }
+                        else
+                        {
+                            <span class="course-page-link" aria-disabled="true">Next</span>
+                        }
+                    </li>
+                </ul>
+            </nav>
+        }
+    </div>
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "page")] private int? PageNumber { get; set; }
+    [SupplyParameterFromQuery(Name = "search")] private string? Search { get; set; }
+    [SupplyParameterFromQuery(Name = "filter")] private string? Filter { get; set; }
+
+    private AvailableCoursesPageViewModel? model;
+    private string? studentId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        studentId = await CurrentUser.GetUserIdAsync();
+
+        if (studentId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        model = await EnrollmentService.GetAvailableCoursesAsync(
+            studentId, PageNumber ?? 1, pageSize: 10, Search, Filter);
+    }
+
+    private string PageUrl(int page) =>
+        Navigation.GetUriWithQueryParameters("/Student/Courses/Available", new Dictionary<string, object?>
+        {
+            ["page"] = page,
+            ["search"] = model!.Search,
+            ["filter"] = model.Filter
+        });
+
+    private async Task EnrollAsync(int courseId)
+    {
+        // The enrolling student comes from the signed-in account, never from posted data.
+        var enrolled = await EnrollmentService.EnrollAsync(courseId, studentId!);
+
+        if (enrolled)
+        {
+            Flash.Success("You enrolled in the course successfully.");
+        }
+        else
+        {
+            Flash.Error("The course is unavailable or you are already enrolled.");
+        }
+
+        Navigation.NavigateTo("/Student/Courses/Available");
+    }
+}

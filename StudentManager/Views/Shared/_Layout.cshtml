@@ -1,16 +1,13 @@
 @{
-    // Текущие область, контроллер и действие — нужны, чтобы подсветить активный пункт меню
-    var currentArea = ViewContext.RouteData.Values["area"]?.ToString();
-    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
-    var successMessage = TempData["SuccessMessage"] as string;
-    var errorMessage = TempData["ErrorMessage"] as string;
+    // The Blazor pages use Components/Layout/MainLayout.razor; this layout only serves the Identity Razor Pages.
+    var path = Context.Request.Path.Value ?? string.Empty;
 
-    string NavClass(string area, string controller, string? relatedController = null) =>
-        currentArea == area && currentController == controller || (currentController is not null && currentController == relatedController)
+    string NavClass(params string[] prefixes) =>
+        prefixes.Any(prefix => path.StartsWith("/" + prefix, StringComparison.OrdinalIgnoreCase))
             ? "nav-link active"
             : "nav-link";
 
-    // Роль определяет цвет полосы над шапкой
+    // The role decides the colour of the strip above the header
     var roleClass = User.IsInRole("Teacher") ? "role-teacher"
                   : User.IsInRole("Student") ? "role-student"
                   : "role-guest";
@@ -93,7 +90,7 @@
     <header class="app-header">
         <nav class="navbar navbar-expand-md">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <a class="navbar-brand" href="/">
                     StudentManager
                 </a>
 
@@ -107,28 +104,22 @@
                         @if (User.IsInRole("Student"))
                         {
                             <li class="nav-item">
-                                <a class="@NavClass("Student","Dashboard")" asp-area="Student"
-                                   asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                                <a class="@NavClass("Student/Dashboard")" href="/Student/Dashboard">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Student", "Courses")" asp-area="Student"
-                                   asp-controller="Courses" asp-action="MyCourses">My courses</a>
+                                <a class="@NavClass("Student/Courses")" href="/Student/Courses/MyCourses">My courses</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Student","Assignments", "Submissions")" asp-area="Student"
-                                   asp-controller="Assignments" asp-action="All">Assignments</a>
+                                <a class="@NavClass("Student/Assignments", "Student/Submissions")" href="/Student/Assignments/All">Assignments</a>
                             </li>
                         }
                         else if (User.IsInRole("Teacher"))
                         {
-                            @* Задания, оценки и студенты открываются со страницы курса — им нужен id курса *@
                             <li class="nav-item">
-                                <a class="@NavClass("Teacher", "Dashboard")" asp-area="Teacher"
-                                   asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                                <a class="@NavClass("Teacher/Dashboard")" href="/Teacher/Dashboard">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Teacher", "Courses")" asp-area="Teacher"
-                                   asp-controller="Courses" asp-action="Index">My courses</a>
+                                <a class="@NavClass("Teacher/Courses")" href="/Teacher/Courses">My courses</a>
                             </li>
                         }
                     </ul>
@@ -140,22 +131,6 @@
     </header>
 
     <main id="main-content" class="container app-main">
-        @if (!string.IsNullOrWhiteSpace(successMessage))
-        {
-            <div class="alert alert-success alert-dismissible fade show app-flash"
-                 role="status" data-flash-message>
-                <span>@successMessage</span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss message"></button>
-            </div>
-        }
-        @if (!string.IsNullOrWhiteSpace(errorMessage))
-        {
-            <div class="alert alert-danger alert-dismissible fade show app-flash"
-                 role="alert" data-flash-message>
-                <span>@errorMessage</span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss message"></button>
-            </div>
-        }
         @RenderBody()
     </main>
 

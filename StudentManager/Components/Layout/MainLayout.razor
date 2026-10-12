@@ -1,0 +1,133 @@
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
+@inject FlashService Flash
+
+<div class="app-shell @roleClass">
+    <IconSprite />
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="app-header">
+        <nav class="navbar navbar-expand-md" aria-label="Main navigation">
+            <div class="container">
+                <a class="navbar-brand" href="/">StudentManager</a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                        aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav me-auto">
+                        @if (isStudent)
+                        {
+                            <li class="nav-item">
+                                <a class="@NavClass("Student/Dashboard")" href="/Student/Dashboard">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="@NavClass("Student/Courses")" href="/Student/Courses/MyCourses">My courses</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="@NavClass("Student/Assignments", "Student/Submissions")" href="/Student/Assignments/All">Assignments</a>
+                            </li>
+                        }
+                        else if (isTeacher)
+                        {
+                            <li class="nav-item">
+                                <a class="@NavClass("Teacher/Dashboard")" href="/Teacher/Dashboard">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="@NavClass("Teacher/Courses")" href="/Teacher/Courses">My courses</a>
+                            </li>
+                        }
+                    </ul>
+
+                    <ul class="navbar-nav align-items-md-center gap-md-2">
+                        @if (isSignedIn)
+                        {
+                            @if (role is not null)
+                            {
+                                <li class="nav-item"><span class="role-pill">@role</span></li>
+                            }
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Identity/Account/Manage" title="Account settings">@displayName</a>
+                            </li>
+                            <li class="nav-item">
+                                <form method="post" action="/Identity/Account/Logout?returnUrl=%2F">
+                                    <AntiforgeryToken />
+                                    <button type="submit" class="nav-link btn btn-link">Log out</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Identity/Account/Login">Log in</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-primary btn-sm px-3" href="/Identity/Account/Register">Create account</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content" class="container app-main">
+        @if (Flash.Current is { } flash)
+        {
+            <div class="alert @(flash.Kind == FlashKind.Success ? "alert-success" : "alert-danger") alert-dismissible fade show app-flash"
+                 role="@(flash.Kind == FlashKind.Success ? "status" : "alert")" data-flash-message>
+                <span>@flash.Message</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss message"></button>
+            </div>
+        }
+        @Body
+    </main>
+
+    <footer class="app-footer">
+        <div class="container">
+            &copy; @DateTime.Now.Year StudentManager
+        </div>
+    </footer>
+</div>
+
+@code {
+    private bool isSignedIn;
+    private bool isStudent;
+    private bool isTeacher;
+    private string? role;
+    private string displayName = string.Empty;
+    private string roleClass = "role-guest";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+
+        isSignedIn = user.Identity?.IsAuthenticated == true;
+        isStudent = user.IsInRole("Student");
+        isTeacher = user.IsInRole("Teacher");
+        role = isTeacher ? "Teacher" : isStudent ? "Student" : null;
+        roleClass = isTeacher ? "role-teacher" : isStudent ? "role-student" : "role-guest";
+
+        if (isSignedIn)
+        {
+            var appUser = await UserManager.GetUserAsync(user);
+            displayName = appUser is null
+                ? user.Identity?.Name ?? string.Empty
+                : $"{appUser.FirstName} {appUser.LastName}";
+        }
+    }
+
+    // Highlights a nav link when the current URL starts with one of the given path prefixes.
+    private string NavClass(params string[] prefixes)
+    {
+        var path = "/" + Navigation.ToBaseRelativePath(Navigation.Uri);
+
+        return prefixes.Any(prefix => path.StartsWith("/" + prefix, StringComparison.OrdinalIgnoreCase))
+            ? "nav-link active"
+            : "nav-link";
+    }
+}

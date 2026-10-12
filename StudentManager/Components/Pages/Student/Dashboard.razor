@@ -1,0 +1,193 @@
+@page "/Student/Dashboard"
+@attribute [Authorize(Roles = "Student")]
+@inject IProgressService ProgressService
+@inject CurrentUserService CurrentUser
+@inject NavigationManager Navigation
+
+<PageTitle>My Dashboard - StudentManager</PageTitle>
+
+<HeadContent>
+    <link rel="stylesheet" href="css/dashboard.css" />
+</HeadContent>
+
+@if (model is not null)
+{
+    <header class="dashboard-page-heading">
+        <h1>My Dashboard</h1>
+    </header>
+
+    <div class="dashboard-container">
+        <section class="summary-cards" aria-label="Your learning summary">
+            <article class="dashboard-stat-card">
+                <p class="dashboard-stat-value">@model.ActiveCourseCount</p>
+                <div class="dashboard-stat-heading">
+                    <h2>Active courses</h2>
+                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-book"></use></svg>
+                </div>
+            </article>
+            <article class="dashboard-stat-card">
+                <p class="dashboard-stat-value">@model.PendingAssignmentCount</p>
+                <div class="dashboard-stat-heading">
+                    <h2>Pending assignments</h2>
+                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-clock"></use></svg>
+                </div>
+            </article>
+            <article class="dashboard-stat-card">
+                <p class="dashboard-stat-value">@model.GradedAssignmentCount</p>
+                <div class="dashboard-stat-heading">
+                    <h2>Graded assignments</h2>
+                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-check"></use></svg>
+                </div>
+            </article>
+            <article class="dashboard-stat-card">
+                @if (model.OverallAveragePercentage is decimal average)
+                {
+                    <p class="dashboard-stat-value">@average.ToString("0.##")%</p>
+                }
+                else
+                {
+                    <p class="dashboard-stat-value dashboard-stat-empty">Not graded yet</p>
+                }
+                <div class="dashboard-stat-heading">
+                    <h2>Overall score</h2>
+                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-chart"></use></svg>
+                </div>
+            </article>
+        </section>
+
+        <section class="dashboard-content">
+            <section class="dashboard-panel courses-section">
+                <header class="dashboard-panel-heading">
+                    <div>
+                        <p class="dashboard-section-label">Your learning</p>
+                        <h2>My courses</h2>
+                    </div>
+                    @if (model.ActiveCourseCount > 0)
+                    {
+                        <a class="dashboard-panel-link" href="/Student/Courses/MyCourses">All courses <span aria-hidden="true">→</span></a>
+                    }
+                </header>
+
+                @if (model.ActiveCourses is { Count: > 0 })
+                {
+                    <ul class="course-preview-list">
+                        @foreach (var course in model.ActiveCourses)
+                        {
+                            <li>
+                                <a class="course-preview-card" href="/Student/Courses/Progress/@course.CourseId">
+                                    <span class="course-preview-code">@course.Code</span>
+                                    <span class="course-preview-name">@course.Name</span>
+                                    <span class="course-preview-action" aria-hidden="true">View progress →</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                    @if (model.ActiveCourseCount > model.ActiveCourses.Count)
+                    {
+                        <p class="dashboard-preview-note">
+                            Showing @model.ActiveCourses.Count of @model.ActiveCourseCount courses.
+                        </p>
+                    }
+                }
+                else
+                {
+                    <div class="dashboard-empty-state">
+                        <p>You are not enrolled in any active courses yet.</p>
+                        <a class="dashboard-panel-link" href="/Student/Courses/Available">Browse available courses <span aria-hidden="true">→</span></a>
+                    </div>
+                }
+            </section>
+
+            <section class="dashboard-panel assignment-section">
+                <header class="dashboard-panel-heading">
+                    <div>
+                        <p class="dashboard-section-label">Coming up</p>
+                        <h2>Pending assignments</h2>
+                    </div>
+                    @if (model.PendingAssignmentCount > 0)
+                    {
+                        <a class="dashboard-panel-link" href="/Student/Assignments/All">All assignments <span aria-hidden="true">→</span></a>
+                    }
+                </header>
+
+                @if (model.PendingAssignments is { Count: > 0 })
+                {
+                    <div class="assignment-table-scroll">
+                        <table class="assignment-preview-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Assignment</th>
+                                    <th scope="col">Due date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var assignment in model.PendingAssignments)
+                                {
+                                    var daysUntilDue = (assignment.DueDate.Date - DateTime.Today).Days;
+                                    var dueDateClass = daysUntilDue < 0
+                                        ? "is-overdue"
+                                        : daysUntilDue <= 3
+                                            ? "is-due-soon"
+                                            : string.Empty;
+                                    var dueDateLabel = daysUntilDue < 0
+                                        ? "Overdue"
+                                        : daysUntilDue == 0
+                                            ? "Due today"
+                                            : daysUntilDue <= 3
+                                                ? "Due soon"
+                                                : string.Empty;
+
+                                    <tr>
+                                        <td data-label="Assignment">
+                                            <a class="assignment-preview-title" href="/Student/Assignments/Details/@assignment.AssignmentId">@assignment.Title</a>
+                                        </td>
+                                        <td data-label="Due date">
+                                            <span class="assignment-due-date @dueDateClass">
+                                                @assignment.DueDate.ToString("MMM dd, yyyy")
+                                            </span>
+                                            @if (!string.IsNullOrEmpty(dueDateLabel))
+                                            {
+                                                <span class="assignment-due-label @dueDateClass">@dueDateLabel</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    @if (model.PendingAssignmentCount > model.PendingAssignments.Count)
+                    {
+                        <p class="dashboard-preview-note">
+                            Showing the next @model.PendingAssignments.Count of @model.PendingAssignmentCount assignments.
+                            <a href="/Student/Courses/MyCourses">Browse all courses</a>
+                            to see their assignments.
+                        </p>
+                    }
+                }
+                else
+                {
+                    <div class="dashboard-empty-state">
+                        <p>You are all caught up—there are no pending assignments.</p>
+                    </div>
+                }
+            </section>
+        </section>
+    </div>
+}
+
+@code {
+    private StudentDashboardViewModel? model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var studentId = await CurrentUser.GetUserIdAsync();
+
+        if (studentId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        model = await ProgressService.GetStudentDashboardAsync(studentId);
+    }
+}

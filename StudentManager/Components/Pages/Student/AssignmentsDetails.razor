@@ -1,0 +1,186 @@
+@page "/Student/Assignments/Details/{Id:int}"
+@attribute [Authorize(Roles = "Student")]
+@inject ISubmissionService SubmissionService
+@inject CurrentUserService CurrentUser
+@inject NavigationManager Navigation
+
+<PageTitle>@(model?.Title ?? "Assignment") - StudentManager</PageTitle>
+
+<HeadContent>
+    <link rel="stylesheet" href="css/student-assignments.css" />
+</HeadContent>
+
+@if (model is not null)
+{
+    var isSubmitted = model.SubmissionId.HasValue;
+    var isOverdue = !isSubmitted && model.DueDate < DateTime.Now;
+    var (statusText, statusClass) = AssignmentSummary.Status(model);
+
+    <div class="student-assignments-page assignment-details-page">
+        <div class="student-assignments-header assignment-details-header">
+            <a class="assignments-back-link" href="/Student/Assignments/Index/@model.CourseId">
+                <span aria-hidden="true">←</span> Back to @model.CourseCode assignments
+            </a>
+            <p class="assignments-eyebrow">@model.CourseCode · @model.CourseName</p>
+            <div class="assignment-details-title-row">
+                <h1>@model.Title</h1>
+                <span class="assignment-status @statusClass">@statusText</span>
+            </div>
+            <p class="assignments-subtitle">Review the assignment instructions, due date, and your submission.</p>
+        </div>
+
+        <div class="assignment-details-layout">
+            <div>
+                <section class="assignment-detail-panel" aria-labelledby="instructions-heading">
+                    <div class="assignment-detail-panel-heading">
+                        <p class="assignments-eyebrow">Assignment</p>
+                        <h2 id="instructions-heading" class="heading-with-icon">
+                            <svg class="heading-icon" aria-hidden="true"><use href="#icon-book"></use></svg>
+                            Instructions
+                        </h2>
+                    </div>
+                    <div class="assignment-description">
+                        @if (string.IsNullOrWhiteSpace(model.Description))
+                        {
+                            <p>No additional instructions were provided for this assignment.</p>
+                        }
+                        else
+                        {
+                            <p>@model.Description</p>
+                        }
+                    </div>
+                </section>
+
+                <section class="assignment-detail-panel assignment-feedback" aria-labelledby="feedback-heading">
+                    <div class="assignment-detail-panel-heading">
+                        <p class="assignments-eyebrow">Instructor</p>
+                        <h2 id="feedback-heading" class="heading-with-icon">
+                            @if (!string.IsNullOrWhiteSpace(model.Feedback) && model.IsGraded)
+                            {
+                                <svg class="heading-icon heading-icon-success" aria-hidden="true"><use href="#icon-message-check"></use></svg>
+                            }
+                            else
+                            {
+                                <svg class="heading-icon heading-icon-muted" aria-hidden="true"><use href="#icon-message-clock"></use></svg>
+                            }
+                            Instructor feedback
+                        </h2>
+                    </div>
+                    @if (!isSubmitted)
+                    {
+                        <p>Submit your work to receive feedback here after your instructor has reviewed it.</p>
+                    }
+                    else if (model.IsGraded && !string.IsNullOrWhiteSpace(model.Feedback))
+                    {
+                        <p>@model.Feedback</p>
+                    }
+                    else if (model.IsGraded)
+                    {
+                        <p>Your submission has been graded. No written feedback was provided.</p>
+                    }
+                    else
+                    {
+                        <p>Your submission is awaiting review. Feedback will appear here once it has been graded.</p>
+                    }
+                </section>
+            </div>
+            <aside class="assignment-detail-sidebar">
+                <section class="assignment-detail-panel" aria-labelledby="details-heading">
+                    <div class="assignment-detail-panel-heading">
+                        <h2 id="details-heading" class="heading-with-icon">
+                            <svg class="heading-icon" aria-hidden="true"><use href="#icon-calendar"></use></svg>
+                            Details
+                        </h2>
+                    </div>
+                    <dl class="assignment-facts">
+                        <div>
+                            <dt>Due date</dt>
+                            <dd>
+                                <time datetime="@model.DueDate.ToString("O")">
+                                    @model.DueDate.ToLocalTime().ToString("MMMM d, yyyy")
+                                </time>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Maximum points</dt>
+                            <dd>@model.MaxPoints.ToString("0.##")</dd>
+                        </div>
+                        @if (model.SubmittedAt is DateTime submittedAt)
+                        {
+                            <div>
+                                <dt>Submitted</dt>
+                                <dd>
+                                    <time datetime="@submittedAt.ToString("O")">
+                                        @submittedAt.ToLocalTime().ToString("MMMM d, yyyy 'at' h:mm tt")
+                                    </time>
+                                </dd>
+                            </div>
+                        }
+                        @if (model.IsGraded && model.Score is decimal score)
+                        {
+                            <div>
+                                <dt>Score</dt>
+                                <dd class="assignment-score">@score.ToString("0.##") / @model.MaxPoints.ToString("0.##")</dd>
+                            </div>
+                        }
+                    </dl>
+                </section>
+
+                <section class="assignment-detail-panel assignment-next-step" aria-labelledby="next-step-heading">
+                    <h2 id="next-step-heading" class="heading-with-icon">
+                        <svg class="heading-icon" aria-hidden="true">
+                            <use href="@(isSubmitted ? "#icon-upload" : "#icon-clipboard")"></use>
+                        </svg>
+                        Your submission
+                    </h2>
+                    @if (model.IsGraded && model.SubmissionId is int gradedSubmissionId)
+                    {
+                        <p>This assignment has been graded.</p>
+                        <a class="assignment-primary-action" href="/Student/Submissions/Details/@gradedSubmissionId">View your submission</a>
+                    }
+                    else if (model.SubmissionId is int submissionId)
+                    {
+                        <p>Your work has been submitted and is awaiting a grade.</p>
+                        <div class="assignment-action-group">
+                            <a class="assignment-primary-action" href="/Student/Submissions/Details/@submissionId">View submission</a>
+                            <a class="assignment-secondary-action" href="/Student/Submissions/Edit/@submissionId">Edit submission</a>
+                        </div>
+                    }
+                    else
+                    {
+                        <p>
+                            @(isOverdue
+                                ? "This assignment is past its due date, but you can still submit your work."
+                                : "You have not submitted this assignment yet.")
+                        </p>
+                        <a class="assignment-primary-action" href="/Student/Submissions/Create/@model.AssignmentId">Submit assignment</a>
+                    }
+                </section>
+            </aside>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private StudentAssignmentViewModel? model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var studentId = await CurrentUser.GetUserIdAsync();
+
+        if (studentId is null)
+        {
+            Navigation.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            return;
+        }
+
+        model = await SubmissionService.GetAssignmentAsync(Id, studentId);
+
+        if (model is null)
+        {
+            Navigation.NotFound();
+        }
+    }
+}
