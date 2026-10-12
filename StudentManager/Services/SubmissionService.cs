@@ -19,6 +19,7 @@ public class SubmissionService : ISubmissionService
     public async Task<IReadOnlyList<StudentAssignmentViewModel>>
         GetAllAssignmentsAsync(string studentId)
     {
+        // Return only work from active courses in which this student is currently enrolled.
         var assignments = await _context.Assignments
             .AsNoTracking()
             .Where(assignment =>
@@ -222,6 +223,7 @@ public class SubmissionService : ISubmissionService
 
         submission.Content = model.Content.Trim();
         submission.UpdatedAt = updatedAt;
+        // An edit made after the deadline makes the latest submission late as well.
         submission.IsLate =
             updatedAt > submission.Assignment.DueDate;
 

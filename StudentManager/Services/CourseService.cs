@@ -19,6 +19,7 @@ public class CourseService : ICourseService
         string teacherId,
         bool includeInactive = false)
     {
+        // Scope every teacher-facing lookup to the signed-in teacher's own records.
         var query = _context.Courses
             .AsNoTracking()
             .Where(course => course.TeacherId == teacherId);
@@ -66,6 +67,7 @@ public class CourseService : ICourseService
         CourseCreateViewModel model,
         string teacherId)
     {
+        // Store course codes in one canonical form so case differences cannot create duplicates.
         var normalizedCode = model.Code.Trim().ToUpperInvariant();
 
         if (await CourseCodeExistsAsync(normalizedCode))
@@ -137,6 +139,7 @@ public class CourseService : ICourseService
             return false;
         }
 
+        // Preserve course and assignment history instead of deleting referenced records.
         course.IsActive = false;
 
         foreach (var assignment in course.Assignments)

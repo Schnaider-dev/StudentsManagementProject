@@ -49,6 +49,7 @@ public class ApplicationDbContext
 
     private static void ConfigureEnrollment(ModelBuilder builder)
     {
+        // Dropped enrollments remain as history, so a student has one reusable row per course.
         builder.Entity<Enrollment>()
             .HasIndex(enrollment => new
             {
@@ -85,6 +86,7 @@ public class ApplicationDbContext
 
     private static void ConfigureSubmission(ModelBuilder builder)
     {
+        // A student's existing submission is updated rather than duplicated.
         builder.Entity<Submission>()
             .HasIndex(submission => new
             {
