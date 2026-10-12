@@ -1,0 +1,123 @@
+@page "/blazor/student/courses"
+@attribute [Authorize(Roles = "Student")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject IEnrollmentService EnrollmentService
+@inject ILogger<MyCourses> Logger
+
+<PageTitle>My Courses - StudentManager</PageTitle>
+
+<div class="courses-page-heading">
+    <div class="courses-page-title">
+        <a class="courses-dashboard-link" href="/blazor/student/dashboard">
+            <span aria-hidden="true">←</span> Back to dashboard
+        </a>
+        <h1>My Courses</h1>
+    </div>
+    <a href="/blazor/student/courses/available" class="courses-browse-link">
+        Browse courses <span aria-hidden="true">→</span>
+    </a>
+</div>
+
+<div class="courses-list">
+    @if (_errorMessage is not null)
+    {
+        <div class="alert alert-danger" role="alert">@_errorMessage</div>
+    }
+    @if (_isLoading)
+    {
+        <p role="status">Loading your courses…</p>
+    }
+    else if (_courses.Count == 0)
+    {
+        <section class="courses-empty-state" aria-labelledby="courses-empty-state-title">
+            <span class="courses-empty-state-mark" aria-hidden="true">+</span>
+            <p class="courses-empty-state-eyebrow">Your learning journey</p>
+            <h2 id="courses-empty-state-title">Your next course is waiting</h2>
+            <p>You’re not enrolled in any courses yet. Explore the course catalog to find one that interests you.</p>
+            <a href="/blazor/student/courses/available" class="courses-empty-state-link">
+                Explore available courses <span aria-hidden="true">→</span>
+            </a>
+        </section>
+    }
+    else
+    {
+        @foreach (var course in _courses)
+        {
+            <EnrolledCourseCard Course="course"
+                                IsDropping="@(_droppingCourseId == course.CourseId)"
+                                OnDrop="DropCourseAsync" />
+        }
+    }
+</div>
+
+@code {
+    private IReadOnlyList<MyCourseViewModel> _courses = Array.Empty<MyCourseViewModel>();
+    private string? _studentId;
+    private string? _errorMessage;
+    private int? _droppingCourseId;
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var principal = (await AuthenticationStateProvider
+            .GetAuthenticationStateAsync()).User;
+        _studentId = UserManager.GetUserId(principal);
+
+        if (_studentId is null)
+        {
+            throw new InvalidOperationException(
+                "The signed-in student account could not be identified.");
+        }
+
+        await LoadCoursesAsync();
+    }
+
+    private async Task LoadCoursesAsync()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            _courses = await EnrollmentService.GetStudentCoursesAsync(_studentId!);
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to load courses for student {StudentId}.", _studentId);
+            _errorMessage = "Your courses couldn't be loaded. Please refresh and try again.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task DropCourseAsync(int courseId)
+    {
+        _droppingCourseId = courseId;
+        _errorMessage = null;
+
+        try
+        {
+            var dropped = await EnrollmentService.DropAsync(courseId, _studentId!);
+            if (!dropped)
+            {
+                _errorMessage = "The active enrollment was not found. Refresh your courses and try again.";
+                return;
+            }
+
+            await LoadCoursesAsync();
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to drop course {CourseId} for student {StudentId}.", courseId, _studentId);
+            _errorMessage = "The course couldn't be dropped. Please try again.";
+        }
+        finally
+        {
+            _droppingCourseId = null;
+        }
+    }
+}

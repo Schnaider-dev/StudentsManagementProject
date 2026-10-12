@@ -1,0 +1,121 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JSRuntime
+
+<div class="course-card accordion-item">
+    <div class="course-header accordion-header">
+        <h2>
+            <button type="button"
+                    class="accordion-button @(_isExpanded ? "" : "collapsed")"
+                    aria-expanded="@_isExpanded"
+                    @onclick="ToggleExpanded">
+                (@Course.Code) @Course.Name
+            </button>
+        </h2>
+    </div>
+
+    @if (_isExpanded)
+    {
+        <div class="accordion-collapse collapse show">
+            <div class="accordion-body">
+                <div class="left-side">
+                    <p><strong>Teacher:</strong> @Course.TeacherName</p>
+                    <p>
+                        <strong>Description:</strong>
+                        @(string.IsNullOrWhiteSpace(Course.Description)
+                            ? "No description provided."
+                            : Course.Description)
+                    </p>
+                    <p><strong>Assignments:</strong> @Course.AssignmentCount</p>
+                    <p><strong>Enrolled:</strong> @Course.EnrolledAt.ToString("MMMM dd, yyyy")</p>
+                </div>
+                <div class="view-details">
+                    <a href="@($"/blazor/student/courses/{Course.CourseId}/progress")">View progress</a>
+                    <a href="@($"/blazor/student/courses/{Course.CourseId}/assignments")">View assignments</a>
+                    <button type="button"
+                            class="course-drop-button"
+                            disabled="@IsDropping"
+                            @onclick="OpenDropDialogAsync">
+                        @(IsDropping ? "Dropping…" : "Drop course")
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<dialog @ref="_dropDialog"
+        class="course-drop-dialog"
+        aria-labelledby="@($"drop-dialog-title-{Course.CourseId}")">
+    <div class="course-drop-dialog-content">
+        <p class="course-drop-dialog-eyebrow">Course enrollment</p>
+        <h2 id="@($"drop-dialog-title-{Course.CourseId}")">Drop this course?</h2>
+        <p class="course-drop-dialog-course">
+            <strong>@Course.Code</strong> &middot; @Course.Name
+        </p>
+        <p class="course-drop-dialog-message">
+            Dropping this course will remove it from your course list. This action cannot be undone.
+        </p>
+    </div>
+    <div class="dialog-footer">
+        <button type="button" class="cancel-dialog" @onclick="CloseDropDialogAsync">
+            Keep course
+        </button>
+        <button type="button"
+                class="course-drop-confirm-button"
+                disabled="@IsDropping"
+                @onclick="ConfirmDropAsync">
+            @(IsDropping ? "Dropping…" : "Drop course")
+        </button>
+    </div>
+</dialog>
+
+@code {
+    [Parameter, EditorRequired]
+    public MyCourseViewModel Course { get; set; } = default!;
+
+    [Parameter]
+    public bool IsDropping { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnDrop { get; set; }
+
+    private ElementReference _dropDialog;
+    private IJSObjectReference? _dialogModule;
+    private bool _isExpanded;
+
+    private void ToggleExpanded()
+    {
+        _isExpanded = !_isExpanded;
+    }
+
+    private async Task OpenDropDialogAsync()
+    {
+        _dialogModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+            "import",
+            "./js/course-dialogs.js");
+
+        await _dialogModule.InvokeVoidAsync("show", _dropDialog);
+    }
+
+    private async Task CloseDropDialogAsync()
+    {
+        if (_dialogModule is not null)
+        {
+            await _dialogModule.InvokeVoidAsync("close", _dropDialog);
+        }
+    }
+
+    private async Task ConfirmDropAsync()
+    {
+        await CloseDropDialogAsync();
+        await OnDrop.InvokeAsync(Course.CourseId);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_dialogModule is not null)
+        {
+            await _dialogModule.DisposeAsync();
+        }
+    }
+}

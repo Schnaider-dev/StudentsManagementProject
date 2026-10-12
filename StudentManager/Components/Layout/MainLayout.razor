@@ -23,6 +23,10 @@
             <rect x="5" y="5" width="14" height="16" rx="2" />
             <path d="M9 5.5V4h6v1.5M8 10h8M8 14h8M8 18h5" />
         </symbol>
+        <symbol id="icon-upload" viewBox="0 0 24 24">
+            <path d="M12 15V3m0 0L8 7m4-4 4 4" />
+            <path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" />
+        </symbol>
         <symbol id="icon-message-clock" viewBox="0 0 24 24">
             <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l1.6-3.2A7.5 7.5 0 1 1 20 11.5Z" />
             <path d="M12.5 8.5v3l2 1" />
@@ -40,13 +44,14 @@
                     @if (_roleClass == "role-student")
                     {
                         <a class="nav-link" href="/blazor/student/dashboard">Dashboard</a>
-                        <a class="nav-link" href="/Student/Courses/MyCourses">My courses</a>
-                        <a class="nav-link" href="/Student/Assignments/All">Assignments</a>
+                        <a class="nav-link" href="/blazor/student/courses">My courses</a>
+                        <a class="nav-link" href="/blazor/student/courses/available">Browse courses</a>
+                        <a class="nav-link" href="/blazor/student/assignments">Assignments</a>
                     }
                     else if (_roleClass == "role-teacher")
                     {
                         <a class="nav-link" href="/blazor/teacher/dashboard">Dashboard</a>
-                        <a class="nav-link" href="/Teacher/Courses">My courses</a>
+                        <a class="nav-link" href="/blazor/teacher/courses">My courses</a>
                     }
                 </div>
             </div>

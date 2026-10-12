@@ -189,7 +189,9 @@
   border-radius: var(--available-control-radius);
   background-color: var(--color-surface);
   color: var(--color-primary);
+  font: inherit;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .course-page-link:hover {
@@ -208,6 +210,10 @@
   color: var(--color-muted);
   cursor: not-allowed;
   opacity: 0.55;
+}
+
+.course-pagination-item.is-current .course-page-link {
+  cursor: default;
 }
 
 .available-visually-hidden {

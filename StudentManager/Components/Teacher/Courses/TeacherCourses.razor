@@ -1,0 +1,70 @@
+@page "/blazor/teacher/courses"
+@attribute [Authorize(Roles = "Teacher")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject ICourseService CourseService
+@inject ILogger<TeacherCourses> Logger
+
+<PageTitle>My Courses - StudentManager</PageTitle>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h1>My Courses</h1>
+        <p class="text-muted mb-0">Manage your courses, students, and assignments.</p>
+    </div>
+    <a href="/blazor/teacher/courses/create" class="btn btn-primary">Create course</a>
+</div>
+
+@if (_errorMessage is not null)
+{
+    <div class="alert alert-danger" role="alert">@_errorMessage</div>
+}
+
+@if (_isLoading)
+{
+    <p role="status">Loading your courses…</p>
+}
+else if (_courses.Count == 0)
+{
+    <div class="alert alert-info" role="status">
+        You don't have any active courses yet.
+        <a href="/blazor/teacher/courses/create" class="alert-link">Create your first course</a>.
+    </div>
+}
+else
+{
+    <TeacherCourseTable Courses="_courses" />
+}
+
+@code {
+    private IReadOnlyList<Course> _courses = Array.Empty<Course>();
+    private bool _isLoading = true;
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var principal = (await AuthenticationStateProvider
+                .GetAuthenticationStateAsync()).User;
+            var teacherId = UserManager.GetUserId(principal);
+
+            if (teacherId is null)
+            {
+                throw new InvalidOperationException(
+                    "The signed-in teacher account could not be identified.");
+            }
+
+            _courses = await CourseService.GetTeacherCoursesAsync(teacherId);
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to load the teacher course list.");
+            _errorMessage = "Your courses couldn't be loaded. Please refresh and try again.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

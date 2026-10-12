@@ -1,0 +1,75 @@
+@page "/blazor/teacher/assignments/{AssignmentId:int}/grades"
+@attribute [Authorize(Roles = "Teacher")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject IGradingService GradingService
+@inject ILogger<AssignmentGrades> Logger
+
+<PageTitle>@(_model?.AssignmentTitle ?? "Grades") - StudentManager</PageTitle>
+@if (_error is not null)
+{
+    <div class="alert alert-danger" role="alert">@_error</div>
+}
+else if (_model is null)
+{
+    <p role="status">Loading submissions…</p>
+}
+else
+{
+    <div class="mb-4">
+        <a href="@($"/blazor/teacher/courses/{_model.CourseId}/assignments")" class="text-decoration-none">← @_model.CourseCode assignments</a>
+        <h1 class="mt-2">Submissions</h1>
+        <p class="text-muted mb-0">@_model.AssignmentTitle · @_model.CourseCode · Maximum @_model.MaxPoints.ToString("0.##") points</p>
+    </div>
+    @if (_model.Submissions.Count == 0)
+    {
+        <div class="alert alert-info" role="status">No submissions have been received for this assignment.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead><tr><th>Student</th><th>Student number</th><th>Submitted</th><th>Status</th><th>Score</th><th>Feedback</th><th><span class="visually-hidden">Actions</span></th></tr></thead>
+                <tbody>
+                @foreach (var submission in _model.Submissions)
+                {
+                    <tr>
+                        <td>@submission.StudentName</td>
+                        <td>@(string.IsNullOrWhiteSpace(submission.StudentNumber) ? "—" : submission.StudentNumber)</td>
+                        <td><time datetime="@submission.SubmittedAt.ToString("O")">@submission.SubmittedAt.ToLocalTime().ToString("g")</time></td>
+                        <td>@(submission.IsLate ? "Late" : "On time")</td>
+                        <td>@(submission.Score.HasValue ? $"{submission.Score.Value:0.##} / {_model.MaxPoints:0.##}" : "—")</td>
+                        <td>@(string.IsNullOrWhiteSpace(submission.Feedback) ? "—" : submission.Feedback)</td>
+                        <td><a href="@($"/blazor/teacher/submissions/{submission.SubmissionId}/grade")" class="btn btn-sm btn-primary">@(submission.IsGraded ? "Edit grade" : "Grade")</a></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public int AssignmentId { get; set; }
+    private GradingListViewModel? _model;
+    private string? _error;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var principal = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        var teacherId = UserManager.GetUserId(principal);
+        if (teacherId is null) throw new InvalidOperationException("The signed-in teacher account could not be identified.");
+        _model = null;
+        _error = null;
+        try
+        {
+            _model = await GradingService.GetAssignmentSubmissionsAsync(AssignmentId, teacherId);
+            if (_model is null) _error = "That assignment could not be found.";
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to load submissions for assignment {AssignmentId}.", AssignmentId);
+            _error = "Submissions couldn't be loaded. Please try again.";
+        }
+    }
+}

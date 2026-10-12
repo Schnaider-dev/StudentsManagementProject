@@ -1,0 +1,84 @@
+@page "/blazor/teacher/courses/create"
+@attribute [Authorize(Roles = "Teacher")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject ICourseService CourseService
+@inject NavigationManager NavigationManager
+@inject ILogger<CreateCourse> Logger
+
+<PageTitle>Create Course - StudentManager</PageTitle>
+
+<h1>Create course</h1>
+<p class="text-muted">Add a course to your teaching workspace.</p>
+
+<EditForm Model="_model" OnValidSubmit="CreateAsync" FormName="create-course" class="mt-4">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="text-danger" role="alert" />
+
+    @if (_errorMessage is not null)
+    {
+        <div class="alert alert-danger" role="alert">@_errorMessage</div>
+    }
+
+    <CourseFormFields Code="_model.Code"
+                      CodeChanged="@(value => _model.Code = value)"
+                      CodeExpression="@(() => _model.Code)"
+                      Name="_model.Name"
+                      NameChanged="@(value => _model.Name = value)"
+                      NameExpression="@(() => _model.Name)"
+                      Description="_model.Description"
+                      DescriptionChanged="SetDescription" />
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary" disabled="@_isSaving">
+            @(_isSaving ? "Creating…" : "Create course")
+        </button>
+        <a href="/blazor/teacher/courses" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</EditForm>
+
+@code {
+    private readonly CourseCreateViewModel _model = new();
+    private string? _errorMessage;
+    private bool _isSaving;
+
+    private void SetDescription(ChangeEventArgs args)
+    {
+        _model.Description = args.Value?.ToString();
+    }
+
+    private async Task CreateAsync()
+    {
+        _isSaving = true;
+        _errorMessage = null;
+
+        try
+        {
+            var principal = (await AuthenticationStateProvider
+                .GetAuthenticationStateAsync()).User;
+            var teacherId = UserManager.GetUserId(principal);
+
+            if (teacherId is null)
+            {
+                throw new InvalidOperationException(
+                    "The signed-in teacher account could not be identified.");
+            }
+
+            var course = await CourseService.CreateCourseAsync(_model, teacherId);
+            NavigationManager.NavigateTo($"/blazor/teacher/courses/{course.CourseId}");
+        }
+        catch (InvalidOperationException exception)
+        {
+            _errorMessage = exception.Message;
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to create a course for the signed-in teacher.");
+            _errorMessage = "The course couldn't be created. Please try again.";
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+}

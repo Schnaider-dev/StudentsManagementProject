@@ -1,0 +1,95 @@
+@page "/blazor/teacher/assignments/{AssignmentId:int}"
+@attribute [Authorize(Roles = "Teacher")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject IAssignmentService AssignmentService
+@inject ILogger<TeacherAssignmentDetails> Logger
+
+<PageTitle>@(_assignment?.Title ?? "Assignment") - StudentManager</PageTitle>
+@if (_error is not null)
+{
+    <div class="alert alert-danger" role="alert">@_error</div>
+}
+else if (_assignment is null)
+{
+    <p role="status">Loading assignment…</p>
+}
+else
+{
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+        <div>
+            <a href="@($"/blazor/teacher/courses/{_assignment.CourseId}/assignments")" class="text-decoration-none">← @_assignment.Course.Name assignments</a>
+            <h1 class="mt-2">@_assignment.Title</h1>
+            <p class="text-muted mb-0">@_assignment.Course.Code — @_assignment.Course.Name</p>
+        </div>
+        <div class="d-flex gap-2">
+            @if (_assignment.IsActive)
+            {
+                <a href="@($"/blazor/teacher/assignments/{AssignmentId}/edit")" class="btn btn-outline-secondary">Edit</a>
+            }
+            <a href="@($"/blazor/teacher/assignments/{AssignmentId}/grades")" class="btn btn-primary">Review submissions</a>
+            @if (_assignment.IsActive)
+            {
+                <a href="@($"/blazor/teacher/assignments/{AssignmentId}/archive")" class="btn btn-outline-danger">Archive</a>
+            }
+        </div>
+    </div>
+    <section class="mb-4" aria-labelledby="assignment-detail-heading">
+        <h2 id="assignment-detail-heading" class="h4">Assignment details</h2>
+        <dl class="row">
+            <dt class="col-sm-3">Description</dt><dd class="col-sm-9">@(string.IsNullOrWhiteSpace(_assignment.Description) ? "No description provided." : _assignment.Description)</dd>
+            <dt class="col-sm-3">Due date</dt><dd class="col-sm-9"><time datetime="@_assignment.DueDate.ToString("O")">@_assignment.DueDate.ToLocalTime().ToString("f")</time></dd>
+            <dt class="col-sm-3">Maximum points</dt><dd class="col-sm-9">@_assignment.MaxPoints.ToString("0.##")</dd>
+            <dt class="col-sm-3">Status</dt><dd class="col-sm-9">@(_assignment.IsActive ? "Active" : "Archived")</dd>
+        </dl>
+    </section>
+    <section aria-labelledby="submissions-heading">
+        <h2 id="submissions-heading" class="h4">Submissions <span class="text-muted">(@_assignment.Submissions.Count)</span></h2>
+        @if (_assignment.Submissions.Count == 0)
+        {
+            <p class="text-muted">No submissions have been received.</p>
+        }
+        else
+        {
+            <div class="table-responsive"><table class="table table-striped align-middle">
+                <thead><tr><th>Student</th><th>Submitted</th><th>Status</th><th>Grade</th></tr></thead>
+                <tbody>
+                @foreach (var submission in _assignment.Submissions.OrderBy(item => item.Student.LastName).ThenBy(item => item.Student.FirstName))
+                {
+                    <tr>
+                        <td>@submission.Student.FirstName @submission.Student.LastName</td>
+                        <td><time datetime="@submission.SubmittedAt.ToString("O")">@submission.SubmittedAt.ToLocalTime().ToString("g")</time></td>
+                        <td>@(submission.IsLate ? "Late" : "On time")</td>
+                        <td>@(submission.Grade is null ? "Not graded" : $"{submission.Grade.Score:0.##} / {_assignment.MaxPoints:0.##}")</td>
+                    </tr>
+                }
+                </tbody>
+            </table></div>
+        }
+    </section>
+}
+
+@code {
+    [Parameter] public int AssignmentId { get; set; }
+    private Assignment? _assignment;
+    private string? _error;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var principal = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        var teacherId = UserManager.GetUserId(principal);
+        if (teacherId is null) throw new InvalidOperationException("The signed-in teacher account could not be identified.");
+        _assignment = null;
+        _error = null;
+        try
+        {
+            _assignment = await AssignmentService.GetTeacherAssignmentAsync(AssignmentId, teacherId);
+            if (_assignment is null) _error = "That assignment could not be found.";
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to load assignment {AssignmentId} for teacher {TeacherId}.", AssignmentId, teacherId);
+            _error = "Assignment details couldn't be loaded. Please try again.";
+        }
+    }
+}

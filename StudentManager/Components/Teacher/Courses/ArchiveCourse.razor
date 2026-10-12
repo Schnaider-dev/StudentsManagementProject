@@ -1,0 +1,151 @@
+@page "/blazor/teacher/courses/{CourseId:int}/archive"
+@attribute [Authorize(Roles = "Teacher")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject ICourseService CourseService
+@inject NavigationManager NavigationManager
+@inject ILogger<ArchiveCourse> Logger
+
+<PageTitle>Archive Course - StudentManager</PageTitle>
+
+<h1>Archive course</h1>
+
+@if (_isLoading)
+{
+    <p role="status">Loading course…</p>
+}
+else if (_course is not null)
+{
+    @if (_errorMessage is not null)
+    {
+        <div class="alert alert-danger" role="alert">@_errorMessage</div>
+    }
+
+    @if (_course.IsActive)
+    {
+        <div class="alert alert-warning mt-3" role="alert">
+            <p>Archive <strong>@_course.Code — @_course.Name</strong>?</p>
+            <p class="mb-0">
+                The course and its assignments will no longer be active.
+                Existing student records will be retained.
+            </p>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info mt-3" role="status">
+            This course is already archived.
+        </div>
+    }
+
+    <dl class="row">
+        <dt class="col-sm-3">Students</dt>
+        <dd class="col-sm-9">@_course.Enrollments.Count</dd>
+        <dt class="col-sm-3">Assignments</dt>
+        <dd class="col-sm-9">@_course.Assignments.Count</dd>
+    </dl>
+
+    <div class="d-flex gap-2">
+        @if (_course.IsActive)
+        {
+            <button type="button" class="btn btn-danger" disabled="@_isArchiving"
+                    @onclick="ArchiveAsync">
+                @(_isArchiving ? "Archiving…" : "Archive course")
+            </button>
+        }
+        <a href="@($"/blazor/teacher/courses/{_course.CourseId}")"
+           class="btn btn-outline-secondary">Cancel</a>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger" role="alert">@_errorMessage</div>
+    <a href="/blazor/teacher/courses">Back to my courses</a>
+}
+
+@code {
+    [Parameter]
+    public int CourseId { get; set; }
+
+    private Course? _course;
+    private string? _errorMessage;
+    private bool _isLoading = true;
+    private bool _isArchiving;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _isLoading = true;
+        _course = null;
+        _errorMessage = null;
+
+        try
+        {
+            var principal = (await AuthenticationStateProvider
+                .GetAuthenticationStateAsync()).User;
+            var teacherId = UserManager.GetUserId(principal);
+
+            if (teacherId is null)
+            {
+                throw new InvalidOperationException(
+                    "The signed-in teacher account could not be identified.");
+            }
+
+            _course = await CourseService.GetTeacherCourseAsync(CourseId, teacherId);
+            if (_course is null)
+            {
+                _errorMessage = "That course could not be found.";
+            }
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to load course {CourseId} for archiving.", CourseId);
+            _errorMessage = "The course couldn't be loaded. Please try again.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task ArchiveAsync()
+    {
+        if (_course is null || !_course.IsActive)
+        {
+            return;
+        }
+
+        _isArchiving = true;
+        _errorMessage = null;
+
+        try
+        {
+            var principal = (await AuthenticationStateProvider
+                .GetAuthenticationStateAsync()).User;
+            var teacherId = UserManager.GetUserId(principal);
+
+            if (teacherId is null)
+            {
+                throw new InvalidOperationException(
+                    "The signed-in teacher account could not be identified.");
+            }
+
+            var archived = await CourseService.ArchiveCourseAsync(CourseId, teacherId);
+            if (!archived)
+            {
+                _errorMessage = "That course could not be found.";
+                return;
+            }
+
+            NavigationManager.NavigateTo("/blazor/teacher/courses");
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to archive course {CourseId}.", CourseId);
+            _errorMessage = "The course couldn't be archived. Please try again.";
+        }
+        finally
+        {
+            _isArchiving = false;
+        }
+    }
+}

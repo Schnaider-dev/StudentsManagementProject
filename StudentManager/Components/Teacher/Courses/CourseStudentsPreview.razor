@@ -1,0 +1,39 @@
+<section class="mb-5" aria-labelledby="students-heading">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 id="students-heading" class="h4 mb-0">
+            Students <span class="text-muted">(@Course.Enrollments.Count)</span>
+        </h2>
+        <a href="@($"/Teacher/Students?courseId={Course.CourseId}")"
+           class="btn btn-sm btn-outline-primary">View students</a>
+    </div>
+
+    @if (Course.Enrollments.Count == 0)
+    {
+        <p class="text-muted">No students are enrolled in this course.</p>
+    }
+    else
+    {
+        <ul class="list-group">
+            @foreach (var enrollment in Course.Enrollments
+                .OrderBy(item => item.Student.LastName)
+                .ThenBy(item => item.Student.FirstName)
+                .Take(5))
+            {
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>@enrollment.Student.FirstName @enrollment.Student.LastName</span>
+                    <span class="text-muted">@enrollment.Student.Email</span>
+                </li>
+            }
+        </ul>
+
+        @if (Course.Enrollments.Count > 5)
+        {
+            <p class="text-muted mt-2">Showing the first 5 students.</p>
+        }
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public Course Course { get; set; } = default!;
+}

@@ -1,0 +1,32 @@
+<div class="submission-form-page">
+    <section class="submission-form-panel" aria-labelledby="submission-content-heading">
+        <div class="submission-panel-heading">
+            <p class="submission-eyebrow">Your work</p>
+            <h2 id="submission-content-heading">@Heading</h2>
+        </div>
+        <div class="submission-form">
+            <ValidationSummary class="submission-validation-summary" />
+            <label for="submission-content" class="submission-content-label">
+                Your response <span>Required · up to 5,000 characters</span>
+            </label>
+            <InputTextArea id="submission-content" @bind-Value="Model.Content" class="submission-content-input"
+                           rows="12" placeholder="Enter your assignment response here..." autocomplete="off" />
+            <ValidationMessage For="() => Model.Content" class="submission-field-error" />
+            <p class="submission-form-note">@HelpText</p>
+            <div class="submission-form-actions">
+                <a class="submission-cancel-action" href="@($"/blazor/student/assignments/{Model.AssignmentId}")">Cancel</a>
+                <button type="submit" class="submission-submit-action" disabled="@IsSaving">
+                    @(IsSaving ? "Saving…" : ButtonText) <span aria-hidden="true">→</span>
+                </button>
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public SubmissionViewModel Model { get; set; } = default!;
+    [Parameter] public bool IsSaving { get; set; }
+    [Parameter] public string Heading { get; set; } = "Your response";
+    [Parameter] public string ButtonText { get; set; } = "Submit assignment";
+    [Parameter] public string HelpText { get; set; } = "Review your response before submitting.";
+}

@@ -1,16 +1,16 @@
 <section class="dashboard-panel">
-    <header class="dashboard-panel-heading">
+    <div class="dashboard-panel-heading">
         <div>
             <p class="dashboard-section-label">Your teaching</p>
             <h2>Courses</h2>
         </div>
         @if (ActiveCourseCount > 0)
         {
-            <a class="dashboard-panel-link" href="/Teacher/Courses">
+            <a class="dashboard-panel-link" href="/blazor/teacher/courses">
                 All courses <span aria-hidden="true">→</span>
             </a>
         }
-    </header>
+    </div>
     <div class="dashboard-empty-state">
         @if (ActiveCourseCount > 0)
         {
@@ -20,7 +20,7 @@
         {
             <p>You don't have any active courses yet.</p>
         }
-        <a class="btn btn-primary" href="/Teacher/Courses/Create">Create course</a>
+        <a class="btn btn-primary" href="/blazor/teacher/courses/create">Create course</a>
     </div>
 </section>
 

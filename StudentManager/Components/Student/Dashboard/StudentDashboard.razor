@@ -6,9 +6,9 @@
 
 <PageTitle>My Dashboard - StudentManager</PageTitle>
 
-<header class="dashboard-page-heading">
+<div class="dashboard-page-heading">
     <h1>My Dashboard</h1>
-</header>
+</div>
 
 <div class="dashboard-container">
     @if (_model is null)
@@ -35,35 +35,35 @@
 
         <section class="dashboard-content">
             <section class="dashboard-panel courses-section">
-                <header class="dashboard-panel-heading">
+                <div class="dashboard-panel-heading">
                     <div>
                         <p class="dashboard-section-label">Your learning</p>
                         <h2>My courses</h2>
                     </div>
                     @if (_model.ActiveCourseCount > 0)
                     {
-                        <a class="dashboard-panel-link" href="/Student/Courses/MyCourses">
+                        <a class="dashboard-panel-link" href="/blazor/student/courses">
                             All courses <span aria-hidden="true">→</span>
                         </a>
                     }
-                </header>
+                </div>
                 <CoursePreviewList Courses="_model.ActiveCourses"
                                    TotalCourseCount="_model.ActiveCourseCount" />
             </section>
 
             <section class="dashboard-panel assignment-section">
-                <header class="dashboard-panel-heading">
+                <div class="dashboard-panel-heading">
                     <div>
                         <p class="dashboard-section-label">Coming up</p>
                         <h2>Pending assignments</h2>
                     </div>
                     @if (_model.PendingAssignmentCount > 0)
                     {
-                        <a class="dashboard-panel-link" href="/Student/Assignments/All">
+                        <a class="dashboard-panel-link" href="/blazor/student/assignments">
                             All assignments <span aria-hidden="true">→</span>
                         </a>
                     }
-                </header>
+                </div>
                 <PendingAssignmentTable Assignments="_model.PendingAssignments"
                                         TotalAssignmentCount="_model.PendingAssignmentCount" />
             </section>

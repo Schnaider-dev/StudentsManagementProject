@@ -1,0 +1,55 @@
+<div class="mb-3">
+    <label for="course-code" class="form-label">Course Code</label>
+    <InputText id="course-code"
+               class="form-control"
+               autocomplete="off"
+               Value="Code"
+               ValueChanged="CodeChanged"
+               ValueExpression="CodeExpression" />
+    <ValidationMessage TValue="string" For="CodeExpression" class="text-danger" />
+</div>
+
+<div class="mb-3">
+    <label for="course-name" class="form-label">Course Name</label>
+    <InputText id="course-name"
+               class="form-control"
+               Value="Name"
+               ValueChanged="NameChanged"
+               ValueExpression="NameExpression" />
+    <ValidationMessage TValue="string" For="NameExpression" class="text-danger" />
+</div>
+
+<div class="mb-3">
+    <label for="course-description" class="form-label">Description</label>
+    <textarea id="course-description"
+              class="form-control"
+              rows="4"
+              value="@Description"
+              @onchange="DescriptionChanged"></textarea>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Code { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public EventCallback<string> CodeChanged { get; set; }
+
+    [Parameter, EditorRequired]
+    public Expression<Func<string>> CodeExpression { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string Name { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public EventCallback<string> NameChanged { get; set; }
+
+    [Parameter, EditorRequired]
+    public Expression<Func<string>> NameExpression { get; set; } = default!;
+
+    [Parameter]
+    public string? Description { get; set; }
+
+    [Parameter]
+    public EventCallback<ChangeEventArgs> DescriptionChanged { get; set; }
+}
