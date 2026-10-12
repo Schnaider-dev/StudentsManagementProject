@@ -1,0 +1,38 @@
+@if (Courses is { Count: > 0 })
+{
+    <ul class="course-preview-list">
+        @foreach (var course in Courses)
+        {
+            <li>
+                <a class="course-preview-card" href="@($"/Student/Courses/Progress?courseId={course.CourseId}")">
+                    <span class="course-preview-code">@course.Code</span>
+                    <span class="course-preview-name">@course.Name</span>
+                    <span class="course-preview-action" aria-hidden="true">View progress →</span>
+                </a>
+            </li>
+        }
+    </ul>
+    @if (TotalCourseCount > Courses.Count)
+    {
+        <p class="dashboard-preview-note">
+            Showing @Courses.Count of @TotalCourseCount courses.
+        </p>
+    }
+}
+else
+{
+    <div class="dashboard-empty-state">
+        <p>You are not enrolled in any active courses yet.</p>
+        <a class="dashboard-panel-link" href="/Student/Courses/Available">
+            Browse available courses <span aria-hidden="true">→</span>
+        </a>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public IReadOnlyList<Course>? Courses { get; set; }
+
+    [Parameter]
+    public int TotalCourseCount { get; set; }
+}

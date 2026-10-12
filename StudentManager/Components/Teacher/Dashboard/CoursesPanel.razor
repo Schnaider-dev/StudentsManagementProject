@@ -1,0 +1,30 @@
+<section class="dashboard-panel">
+    <header class="dashboard-panel-heading">
+        <div>
+            <p class="dashboard-section-label">Your teaching</p>
+            <h2>Courses</h2>
+        </div>
+        @if (ActiveCourseCount > 0)
+        {
+            <a class="dashboard-panel-link" href="/Teacher/Courses">
+                All courses <span aria-hidden="true">→</span>
+            </a>
+        }
+    </header>
+    <div class="dashboard-empty-state">
+        @if (ActiveCourseCount > 0)
+        {
+            <p>Manage your courses, their students, and assignments, or start a new course.</p>
+        }
+        else
+        {
+            <p>You don't have any active courses yet.</p>
+        }
+        <a class="btn btn-primary" href="/Teacher/Courses/Create">Create course</a>
+    </div>
+</section>
+
+@code {
+    [Parameter]
+    public int ActiveCourseCount { get; set; }
+}

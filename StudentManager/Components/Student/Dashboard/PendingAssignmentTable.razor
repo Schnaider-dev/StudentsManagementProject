@@ -1,0 +1,71 @@
+@if (Assignments is { Count: > 0 })
+{
+    <div class="assignment-table-scroll">
+        <table class="assignment-preview-table">
+            <thead>
+                <tr>
+                    <th scope="col">Assignment</th>
+                    <th scope="col">Due date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var assignment in Assignments)
+                {
+                    var daysUntilDue = (assignment.DueDate.Date - DateTime.Today).Days;
+                    var dueDateClass = daysUntilDue < 0
+                        ? "is-overdue"
+                        : daysUntilDue <= 3
+                            ? "is-due-soon"
+                            : string.Empty;
+                    var dueDateLabel = daysUntilDue < 0
+                        ? "Overdue"
+                        : daysUntilDue == 0
+                            ? "Due today"
+                            : daysUntilDue <= 3
+                                ? "Due soon"
+                                : string.Empty;
+
+                    <tr>
+                        <td data-label="Assignment">
+                            <a class="assignment-preview-title"
+                               href="@($"/Student/Assignments/Details/{assignment.AssignmentId}")">
+                                @assignment.Title
+                            </a>
+                        </td>
+                        <td data-label="Due date">
+                            <span class="assignment-due-date @dueDateClass">
+                                @assignment.DueDate.ToString("MMM dd, yyyy")
+                            </span>
+                            @if (!string.IsNullOrEmpty(dueDateLabel))
+                            {
+                                <span class="assignment-due-label @dueDateClass">@dueDateLabel</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (TotalAssignmentCount > Assignments.Count)
+    {
+        <p class="dashboard-preview-note">
+            Showing the next @Assignments.Count of @TotalAssignmentCount assignments.
+            <a href="/Student/Courses/MyCourses">Browse all courses</a>
+            to see their assignments.
+        </p>
+    }
+}
+else
+{
+    <div class="dashboard-empty-state">
+        <p>You are all caught up—there are no pending assignments.</p>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public IReadOnlyList<Assignment>? Assignments { get; set; }
+
+    [Parameter]
+    public int TotalAssignmentCount { get; set; }
+}

@@ -107,8 +107,7 @@
                         @if (User.IsInRole("Student"))
                         {
                             <li class="nav-item">
-                                <a class="@NavClass("Student","Dashboard")" asp-area="Student"
-                                   asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                                <a class="@NavClass("Student","Dashboard")" href="/blazor/student/dashboard">Dashboard</a>
                             </li>
                             <li class="nav-item">
                                 <a class="@NavClass("Student", "Courses")" asp-area="Student"
@@ -123,8 +122,7 @@
                         {
                             @* Задания, оценки и студенты открываются со страницы курса — им нужен id курса *@
                             <li class="nav-item">
-                                <a class="@NavClass("Teacher", "Dashboard")" asp-area="Teacher"
-                                   asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                                <a class="@NavClass("Teacher", "Dashboard")" href="/blazor/teacher/dashboard">Dashboard</a>
                             </li>
                             <li class="nav-item">
                                 <a class="@NavClass("Teacher", "Courses")" asp-area="Teacher"

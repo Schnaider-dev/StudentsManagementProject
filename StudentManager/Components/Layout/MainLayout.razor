@@ -1,0 +1,78 @@
+@inherits LayoutComponentBase
+
+<div class="blazor-app @_roleClass">
+    <svg class="app-icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <symbol id="icon-book" viewBox="0 0 24 24">
+            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z" />
+            <path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20M8 7h8M8 10h6" />
+        </symbol>
+        <symbol id="icon-clock" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v5l3 2" />
+        </symbol>
+        <symbol id="icon-check" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9" />
+            <path d="m8 12 2.5 2.5L16.5 9" />
+        </symbol>
+        <symbol id="icon-chart" viewBox="0 0 24 24">
+            <path d="M4 19V5M4 19h17" />
+            <path d="m7 15 4-4 3 2 5-6" />
+            <path d="M16 7h3v3" />
+        </symbol>
+        <symbol id="icon-clipboard" viewBox="0 0 24 24">
+            <rect x="5" y="5" width="14" height="16" rx="2" />
+            <path d="M9 5.5V4h6v1.5M8 10h8M8 14h8M8 18h5" />
+        </symbol>
+        <symbol id="icon-message-clock" viewBox="0 0 24 24">
+            <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l1.6-3.2A7.5 7.5 0 1 1 20 11.5Z" />
+            <path d="M12.5 8.5v3l2 1" />
+        </symbol>
+        <symbol id="icon-users" viewBox="0 0 24 24">
+            <circle cx="9" cy="8" r="3.5" />
+            <path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.2a6.5 6.5 0 0 1 3.5 5.8" />
+        </symbol>
+    </svg>
+    <header class="app-header">
+        <nav class="navbar navbar-expand-md">
+            <div class="container">
+                <a class="navbar-brand" href="/">StudentManager</a>
+                <div class="navbar-nav me-auto">
+                    @if (_roleClass == "role-student")
+                    {
+                        <a class="nav-link" href="/blazor/student/dashboard">Dashboard</a>
+                        <a class="nav-link" href="/Student/Courses/MyCourses">My courses</a>
+                        <a class="nav-link" href="/Student/Assignments/All">Assignments</a>
+                    }
+                    else if (_roleClass == "role-teacher")
+                    {
+                        <a class="nav-link" href="/blazor/teacher/dashboard">Dashboard</a>
+                        <a class="nav-link" href="/Teacher/Courses">My courses</a>
+                    }
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main id="main-content" class="container app-main">
+        @Body
+    </main>
+    <footer class="app-footer">
+        <div class="container">&copy; @DateTime.Now.Year StudentManager</div>
+    </footer>
+</div>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
+
+    private string _roleClass = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var user = (await AuthenticationStateTask).User;
+        _roleClass = user.IsInRole("Teacher")
+            ? "role-teacher"
+            : user.IsInRole("Student")
+                ? "role-student"
+                : "role-guest";
+    }
+}

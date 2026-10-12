@@ -1,6 +1,17 @@
 <Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" />
+        <ErrorBoundary>
+            <ChildContent>
+                <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
+                    <NotAuthorized>
+                        <p role="alert">You are not authorized to view this page. <a href="/Identity/Account/Login">Sign in</a></p>
+                    </NotAuthorized>
+                </AuthorizeRouteView>
+            </ChildContent>
+            <ErrorContent>
+                <p role="alert">The page could not be loaded. Refresh and try again.</p>
+            </ErrorContent>
+        </ErrorBoundary>
         <FocusOnNavigate RouteData="routeData" Selector="h1" />
     </Found>
     <NotFound>
