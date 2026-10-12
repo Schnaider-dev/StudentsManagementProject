@@ -92,6 +92,7 @@ namespace StudentManager.Areas.Identity.Pages.Account
                     return RedirectToPage("./Lockout");
                 }
 
+                // Use the same response for an unknown email and a wrong password.
                 ModelState.AddModelError(string.Empty, "Invalid email or password.");
             }
 

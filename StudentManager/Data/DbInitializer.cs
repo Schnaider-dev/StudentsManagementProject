@@ -13,6 +13,7 @@ public static class DbInitializer
     public static async Task SeedRolesAsync(
         IServiceProvider services)
     {
+        // Create only missing roles so startup is safe to repeat.
         using var scope = services.CreateScope();
 
         var roleManager =

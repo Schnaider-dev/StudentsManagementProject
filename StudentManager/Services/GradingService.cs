@@ -20,6 +20,7 @@ public class GradingService : IGradingService
             int assignmentId,
             string teacherId)
     {
+        // Resolve the assignment through its owning course before exposing student work.
         var assignment = await _context.Assignments
             .AsNoTracking()
             .Where(item =>
@@ -131,9 +132,11 @@ public class GradingService : IGradingService
         if (model.GradeId.HasValue &&
             submission.Grade?.GradeId != model.GradeId.Value)
         {
+            // Do not save a form that refers to a different grade record than the one loaded.
             return false;
         }
 
+        // Validate against the assignment's current maximum, not a client-supplied maximum.
         if (model.Score < 0 ||
             model.Score > submission.Assignment.MaxPoints)
         {

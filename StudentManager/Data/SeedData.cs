@@ -11,6 +11,7 @@ public static class SeedData
 
     public static async Task SeedAsync(IServiceProvider services)
     {
+        // Each record is checked before insertion so restarting Development does not duplicate fixtures.
         using var scope = services.CreateScope();
 
         var serviceProvider = scope.ServiceProvider;

@@ -21,6 +21,7 @@ public class AssignmentService : IAssignmentService
             string teacherId,
             bool includeInactive = false)
     {
+        // The course ownership predicate prevents one teacher from querying another's assignments.
         var query = _context.Assignments
             .AsNoTracking()
             .Where(assignment =>
@@ -131,6 +132,7 @@ public class AssignmentService : IAssignmentService
             return false;
         }
 
+        // Keep submissions and grades intact while removing this assignment from active work.
         assignment.IsActive = false;
 
         await _context.SaveChangesAsync();

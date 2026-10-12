@@ -134,6 +134,7 @@ namespace StudentManager.Areas.Identity.Pages.Account
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
+            // Student accounts require an identifier; teacher accounts do not have one.
             if (Input.Role == "Student" &&
     string.IsNullOrWhiteSpace(Input.StudentNumber))
             {
@@ -165,6 +166,7 @@ namespace StudentManager.Areas.Identity.Pages.Account
 
                     if (!roleResult.Succeeded)
                     {
+                        // Avoid leaving an account that was created without its selected role.
                         await _userManager.DeleteAsync(user);
 
                         foreach (var error in roleResult.Errors)
