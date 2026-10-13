@@ -1,4 +1,4 @@
-@page "/blazor/student/submissions/{SubmissionId:int}"
+@page "/student/submissions/{SubmissionId:int}"
 @attribute [Authorize(Roles = "Student")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -19,7 +19,7 @@
     {
         var assignment = _submission.Assignment;
         <div class="submission-details-header">
-            <a class="submission-details-back-link" href="@($"/blazor/student/assignments/{assignment.AssignmentId}")">← Back to assignment</a>
+            <a class="submission-details-back-link" href="@($"/student/assignments/{assignment.AssignmentId}")">← Back to assignment</a>
             <p class="submission-details-eyebrow">@assignment.Course.Code · @assignment.Course.Name</p>
             <div class="submission-details-title-row">
                 <div><p class="submission-details-kicker">Submission receipt</p><h1>@assignment.Title</h1></div>
@@ -60,7 +60,7 @@
             else
             {
                 <p>You can update your response until it has been graded.</p>
-                <a class="submission-details-edit-link" href="@($"/blazor/student/submissions/{SubmissionId}/edit")">Edit submission <span aria-hidden="true">→</span></a>
+                <a class="submission-details-edit-link" href="@($"/student/submissions/{SubmissionId}/edit")">Edit submission <span aria-hidden="true">→</span></a>
             }
         </footer>
     }

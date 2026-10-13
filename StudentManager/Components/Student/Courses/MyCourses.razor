@@ -1,4 +1,4 @@
-@page "/blazor/student/courses"
+@page "/student/courses"
 @attribute [Authorize(Roles = "Student")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -9,12 +9,12 @@
 
 <div class="courses-page-heading">
     <div class="courses-page-title">
-        <a class="courses-dashboard-link" href="/blazor/student/dashboard">
+        <a class="courses-dashboard-link" href="/student/dashboard">
             <span aria-hidden="true">←</span> Back to dashboard
         </a>
         <h1>My Courses</h1>
     </div>
-    <a href="/blazor/student/courses/available" class="courses-browse-link">
+    <a href="/student/courses/available" class="courses-browse-link">
         Browse courses <span aria-hidden="true">→</span>
     </a>
 </div>
@@ -35,7 +35,7 @@
             <p class="courses-empty-state-eyebrow">Your learning journey</p>
             <h2 id="courses-empty-state-title">Your next course is waiting</h2>
             <p>You’re not enrolled in any courses yet. Explore the course catalog to find one that interests you.</p>
-            <a href="/blazor/student/courses/available" class="courses-empty-state-link">
+            <a href="/student/courses/available" class="courses-empty-state-link">
                 Explore available courses <span aria-hidden="true">→</span>
             </a>
         </section>

@@ -1,4 +1,4 @@
-@page "/blazor/student/courses/available"
+@page "/student/courses/available"
 @attribute [Authorize(Roles = "Student")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -8,7 +8,7 @@
 <PageTitle>Available Courses - StudentManager</PageTitle>
 
 <div class="available-courses-page">
-    <a class="avalaible-course-mycourses-link" href="/blazor/student/courses">
+    <a class="avalaible-course-mycourses-link" href="/student/courses">
         <span aria-hidden="true">←</span> Back to My Courses
     </a>
     <h1 class="available-courses-title">Available Courses</h1>
@@ -54,7 +54,7 @@
                 <p>No available courses match your search.</p>
                 @if (string.IsNullOrWhiteSpace(_search))
                 {
-                    <a class="course-action-button course-return-link" href="/blazor/student/courses">
+                    <a class="course-action-button course-return-link" href="/student/courses">
                         Go Back
                     </a>
                 }

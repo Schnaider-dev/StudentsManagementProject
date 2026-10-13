@@ -355,23 +355,81 @@ body.role-guest .app-header {
 /* ---------- Вход и регистрация ---------- */
 
 .auth-card {
-  max-width: 30rem;
+  max-width: 32rem;
   margin-inline: auto;
-  padding: 1.5rem;
+  padding: 1.75rem;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  box-shadow: 0 1rem 2.5rem rgb(28 36 48 / 7%);
 }
 
 @media (min-width: 768px) {
   .auth-card {
-    padding: 2.25rem;
+    padding: 2.5rem;
   }
+}
+
+.auth-card h1 {
+  margin-bottom: 0.5rem;
 }
 
 .auth-lead {
   color: var(--color-muted);
   margin-bottom: 1.5rem;
+}
+
+.identity-main {
+  width: 100%;
+  padding-block: clamp(2rem, 7vh, 5rem);
+}
+
+.auth-card .form-control,
+.auth-card .form-select {
+  border-color: var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.auth-card .form-control:focus,
+.auth-card .form-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+
+.auth-card .btn-primary {
+  margin-top: 0.25rem;
+  border: 0;
+  background: var(--color-primary);
+  font-weight: 600;
+}
+
+.auth-card .btn-primary:hover {
+  filter: brightness(0.92);
+}
+
+.auth-card .validation-summary-errors {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 7%, white);
+  border-radius: var(--radius-sm);
+}
+
+.auth-card .validation-summary-errors ul {
+  margin-bottom: 0;
+}
+
+.home-eyebrow,
+.home-role-label {
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home-eyebrow {
+  margin-bottom: 0.75rem;
 }
 
 /* Сообщения об ошибках под полями */
@@ -429,6 +487,10 @@ body.role-guest .app-header {
 
 .home-role-teacher {
     border-top-color: var(--color-teacher);
+}
+
+.home-role h2 {
+    margin-top: 0.5rem;
 }
 
 .home-role ul {

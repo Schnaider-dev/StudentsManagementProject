@@ -1,4 +1,4 @@
-@page "/blazor/student/submissions/{SubmissionId:int}/edit"
+@page "/student/submissions/{SubmissionId:int}/edit"
 @attribute [Authorize(Roles = "Student")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -19,7 +19,7 @@
     else
     {
         <div class="submission-form-header">
-            <a class="submission-back-link" href="@($"/blazor/student/assignments/{_model.AssignmentId}")">← Back to assignment</a>
+            <a class="submission-back-link" href="@($"/student/assignments/{_model.AssignmentId}")">← Back to assignment</a>
             <p class="submission-eyebrow">Update your work</p>
             <h1>@_model.AssignmentTitle</h1>
             <p class="submission-intro">Make your changes below. Graded submissions cannot be edited.</p>
@@ -81,7 +81,7 @@
                 _error = "This submission is no longer available to edit.";
                 return;
             }
-            Navigation.NavigateTo($"/blazor/student/submissions/{SubmissionId}");
+            Navigation.NavigateTo($"/student/submissions/{SubmissionId}");
         }
         catch (InvalidOperationException exception)
         {

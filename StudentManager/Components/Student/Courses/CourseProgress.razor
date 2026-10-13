@@ -1,4 +1,4 @@
-@page "/blazor/student/courses/{CourseId:int}/progress"
+@page "/student/courses/{CourseId:int}/progress"
 @attribute [Authorize(Roles = "Student")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -20,7 +20,7 @@
     {
         <div class="course-progress-header">
             <div>
-                <a class="course-progress-back-link" href="/blazor/student/courses">
+                <a class="course-progress-back-link" href="/student/courses">
                     <span aria-hidden="true">←</span> Back to My Courses
                 </a>
                 <p class="course-progress-eyebrow">@_model.CourseCode</p>

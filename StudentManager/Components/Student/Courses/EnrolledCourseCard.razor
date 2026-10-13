@@ -29,8 +29,8 @@
                     <p><strong>Enrolled:</strong> @Course.EnrolledAt.ToString("MMMM dd, yyyy")</p>
                 </div>
                 <div class="view-details">
-                    <a href="@($"/blazor/student/courses/{Course.CourseId}/progress")">View progress</a>
-                    <a href="@($"/blazor/student/courses/{Course.CourseId}/assignments")">View assignments</a>
+                    <a href="@($"/student/courses/{Course.CourseId}/progress")">View progress</a>
+                    <a href="@($"/student/courses/{Course.CourseId}/assignments")">View assignments</a>
                     <button type="button"
                             class="course-drop-button"
                             disabled="@IsDropping"

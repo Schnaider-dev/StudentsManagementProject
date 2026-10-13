@@ -1,4 +1,4 @@
-@page "/blazor/teacher/courses/{CourseId:int}"
+@page "/teacher/courses/{CourseId:int}"
 @attribute [Authorize(Roles = "Teacher")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -19,16 +19,16 @@ else
 {
     <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
         <div>
-            <a href="/blazor/teacher/courses" class="text-decoration-none">&larr; My courses</a>
+            <a href="/teacher/courses" class="text-decoration-none">&larr; My courses</a>
             <h1 class="mt-2">@_course.Name</h1>
             <p class="text-muted mb-0">@_course.Code</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="@($"/blazor/teacher/courses/{_course.CourseId}/edit")"
+            <a href="@($"/teacher/courses/{_course.CourseId}/edit")"
                class="btn btn-outline-secondary">Edit course</a>
             @if (_course.IsActive)
             {
-                <a href="@($"/blazor/teacher/courses/{_course.CourseId}/archive")"
+                <a href="@($"/teacher/courses/{_course.CourseId}/archive")"
                    class="btn btn-outline-danger">Archive course</a>
             }
         </div>
@@ -56,7 +56,7 @@ else
 
     <CourseStudentsPreview Course="_course" />
     <p class="mb-3">
-        <a class="btn btn-outline-primary" href="@($"/blazor/teacher/courses/{_course.CourseId}/assignments")">Manage assignments</a>
+        <a class="btn btn-outline-primary" href="@($"/teacher/courses/{_course.CourseId}/assignments")">Manage assignments</a>
     </p>
     <CourseAssignmentsTable Course="_course" />
 }

@@ -1,4 +1,4 @@
-@page "/blazor/teacher/assignments/{AssignmentId:int}/grades"
+@page "/teacher/assignments/{AssignmentId:int}/grades"
 @attribute [Authorize(Roles = "Teacher")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -17,7 +17,7 @@ else if (_model is null)
 else
 {
     <div class="mb-4">
-        <a href="@($"/blazor/teacher/courses/{_model.CourseId}/assignments")" class="text-decoration-none">← @_model.CourseCode assignments</a>
+        <a href="@($"/teacher/courses/{_model.CourseId}/assignments")" class="text-decoration-none">← @_model.CourseCode assignments</a>
         <h1 class="mt-2">Submissions</h1>
         <p class="text-muted mb-0">@_model.AssignmentTitle · @_model.CourseCode · Maximum @_model.MaxPoints.ToString("0.##") points</p>
     </div>
@@ -40,7 +40,7 @@ else
                         <td>@(submission.IsLate ? "Late" : "On time")</td>
                         <td>@(submission.Score.HasValue ? $"{submission.Score.Value:0.##} / {_model.MaxPoints:0.##}" : "—")</td>
                         <td>@(string.IsNullOrWhiteSpace(submission.Feedback) ? "—" : submission.Feedback)</td>
-                        <td><a href="@($"/blazor/teacher/submissions/{submission.SubmissionId}/grade")" class="btn btn-sm btn-primary">@(submission.IsGraded ? "Edit grade" : "Grade")</a></td>
+                        <td><a href="@($"/teacher/submissions/{submission.SubmissionId}/grade")" class="btn btn-sm btn-primary">@(submission.IsGraded ? "Edit grade" : "Grade")</a></td>
                     </tr>
                 }
                 </tbody>

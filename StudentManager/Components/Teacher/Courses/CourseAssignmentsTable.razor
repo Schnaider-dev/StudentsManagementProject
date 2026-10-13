@@ -5,7 +5,7 @@
         </h2>
         @if (Course.IsActive)
         {
-            <a href="@($"/blazor/teacher/courses/{Course.CourseId}/assignments/create")"
+            <a href="@($"/teacher/courses/{Course.CourseId}/assignments/create")"
                class="btn btn-sm btn-primary">Create assignment</a>
         }
     </div>
@@ -31,7 +31,7 @@
                     {
                         <tr>
                             <td>
-                                <a href="@($"/blazor/teacher/assignments/{assignment.AssignmentId}")">
+                                <a href="@($"/teacher/assignments/{assignment.AssignmentId}")">
                                     @assignment.Title
                                 </a>
                             </td>
@@ -42,7 +42,7 @@
                             </td>
                             <td>@assignment.Submissions.Count</td>
                             <td>
-                                <a href="@($"/blazor/teacher/assignments/{assignment.AssignmentId}/grades")"
+                                <a href="@($"/teacher/assignments/{assignment.AssignmentId}/grades")"
                                    class="btn btn-sm btn-outline-primary">Review submissions</a>
                             </td>
                         </tr>

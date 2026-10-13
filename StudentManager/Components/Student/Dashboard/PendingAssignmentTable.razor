@@ -28,7 +28,7 @@
                     <tr>
                         <td data-label="Assignment">
                             <a class="assignment-preview-title"
-                               href="@($"/blazor/student/assignments/{assignment.AssignmentId}")">
+                               href="@($"/student/assignments/{assignment.AssignmentId}")">
                                 @assignment.Title
                             </a>
                         </td>
@@ -50,7 +50,7 @@
     {
         <p class="dashboard-preview-note">
             Showing the next @Assignments.Count of @TotalAssignmentCount assignments.
-            <a href="/blazor/student/courses">Browse all courses</a>
+            <a href="/student/courses">Browse all courses</a>
             to see their assignments.
         </p>
     }

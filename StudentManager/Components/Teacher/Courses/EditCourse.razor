@@ -1,4 +1,4 @@
-@page "/blazor/teacher/courses/{CourseId:int}/edit"
+@page "/teacher/courses/{CourseId:int}/edit"
 @attribute [Authorize(Roles = "Teacher")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -39,7 +39,7 @@ else if (_model is not null)
             <button type="submit" class="btn btn-primary" disabled="@_isSaving">
                 @(_isSaving ? "Saving…" : "Save changes")
             </button>
-            <a href="@($"/blazor/teacher/courses/{CourseId}")"
+            <a href="@($"/teacher/courses/{CourseId}")"
                class="btn btn-outline-secondary">Cancel</a>
         </div>
     </EditForm>
@@ -47,7 +47,7 @@ else if (_model is not null)
 else
 {
     <div class="alert alert-danger" role="alert">@_errorMessage</div>
-    <a href="/blazor/teacher/courses">Back to my courses</a>
+    <a href="/teacher/courses">Back to my courses</a>
 }
 
 @code {
@@ -140,7 +140,7 @@ else
                 return;
             }
 
-            NavigationManager.NavigateTo($"/blazor/teacher/courses/{CourseId}");
+            NavigationManager.NavigateTo($"/teacher/courses/{CourseId}");
         }
         catch (InvalidOperationException exception)
         {

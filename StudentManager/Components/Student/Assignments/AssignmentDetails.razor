@@ -1,4 +1,4 @@
-@page "/blazor/student/assignments/{AssignmentId:int}"
+@page "/student/assignments/{AssignmentId:int}"
 @attribute [Authorize(Roles = "Student")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -18,7 +18,7 @@
     else
     {
         <div class="student-assignments-header">
-            <a class="assignments-back-link" href="/blazor/student/assignments">← All assignments</a>
+            <a class="assignments-back-link" href="/student/assignments">← All assignments</a>
             <p class="assignments-eyebrow">@_assignment.CourseCode · @_assignment.CourseName</p>
             <h1>@_assignment.Title</h1>
             <p class="assignments-subtitle">Due @_assignment.DueDate.ToLocalTime().ToString("f") · @_assignment.MaxPoints.ToString("0.##") points</p>
@@ -41,16 +41,16 @@
             @if (_assignment.SubmissionId is int submissionId)
             {
                 <p>@(_assignment.IsGraded ? "This assignment has been graded." : "Your work has been submitted and is awaiting a grade.")</p>
-                <a class="assignment-primary-action" href="@($"/blazor/student/submissions/{submissionId}")">View submission</a>
+                <a class="assignment-primary-action" href="@($"/student/submissions/{submissionId}")">View submission</a>
                 @if (!_assignment.IsGraded)
                 {
-                    <a class="assignment-secondary-action ms-2" href="@($"/blazor/student/submissions/{submissionId}/edit")">Edit submission</a>
+                    <a class="assignment-secondary-action ms-2" href="@($"/student/submissions/{submissionId}/edit")">Edit submission</a>
                 }
             }
             else
             {
                 <p>@(_assignment.DueDate < DateTime.Now ? "This assignment is past its due date, but you can still submit your work." : "You have not submitted this assignment yet.")</p>
-                <a class="assignment-primary-action" href="@($"/blazor/student/assignments/{_assignment.AssignmentId}/submit")">Submit assignment</a>
+                <a class="assignment-primary-action" href="@($"/student/assignments/{_assignment.AssignmentId}/submit")">Submit assignment</a>
             }
         </section>
     }

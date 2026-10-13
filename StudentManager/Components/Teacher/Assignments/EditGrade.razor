@@ -1,4 +1,4 @@
-@page "/blazor/teacher/submissions/{SubmissionId:int}/grade"
+@page "/teacher/submissions/{SubmissionId:int}/grade"
 @attribute [Authorize(Roles = "Teacher")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -15,7 +15,7 @@
 else
 {
     <div class="mb-4">
-        <a href="@($"/blazor/teacher/assignments/{_model.AssignmentId}/grades")" class="text-decoration-none">← Back to submissions</a>
+        <a href="@($"/teacher/assignments/{_model.AssignmentId}/grades")" class="text-decoration-none">← Back to submissions</a>
         <h1 class="mt-2">@(_model.GradeId.HasValue ? "Edit grade" : "Grade submission")</h1>
         <p class="text-muted mb-0">@_model.StudentName · @_model.AssignmentTitle</p>
     </div>
@@ -38,7 +38,7 @@ else
         </div>
         <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary" disabled="@_saving">@(_saving ? "Saving…" : "Save grade")</button>
-            <a href="@($"/blazor/teacher/assignments/{_model.AssignmentId}/grades")" class="btn btn-outline-secondary">Cancel</a>
+            <a href="@($"/teacher/assignments/{_model.AssignmentId}/grades")" class="btn btn-outline-secondary">Cancel</a>
         </div>
     </EditForm>
 }
@@ -78,7 +78,7 @@ else
         {
             var saved = await GradingService.SaveGradeAsync(_model, _teacherId);
             if (!saved) { _error = "This submission is no longer available to grade."; return; }
-            Navigation.NavigateTo($"/blazor/teacher/assignments/{_model.AssignmentId}/grades");
+            Navigation.NavigateTo($"/teacher/assignments/{_model.AssignmentId}/grades");
         }
         catch (InvalidOperationException exception) { _error = exception.Message; }
         catch (Exception exception)

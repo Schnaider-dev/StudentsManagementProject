@@ -1,4 +1,4 @@
-@page "/blazor/student/dashboard"
+@page "/student/dashboard"
 @attribute [Authorize(Roles = "Student")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -42,7 +42,7 @@
                     </div>
                     @if (_model.ActiveCourseCount > 0)
                     {
-                        <a class="dashboard-panel-link" href="/blazor/student/courses">
+                        <a class="dashboard-panel-link" href="/student/courses">
                             All courses <span aria-hidden="true">→</span>
                         </a>
                     }
@@ -59,7 +59,7 @@
                     </div>
                     @if (_model.PendingAssignmentCount > 0)
                     {
-                        <a class="dashboard-panel-link" href="/blazor/student/assignments">
+                        <a class="dashboard-panel-link" href="/student/assignments">
                             All assignments <span aria-hidden="true">→</span>
                         </a>
                     }

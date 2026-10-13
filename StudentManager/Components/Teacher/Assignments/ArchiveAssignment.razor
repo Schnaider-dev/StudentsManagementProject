@@ -1,4 +1,4 @@
-@page "/blazor/teacher/assignments/{AssignmentId:int}/archive"
+@page "/teacher/assignments/{AssignmentId:int}/archive"
 @attribute [Authorize(Roles = "Teacher")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -28,7 +28,7 @@ else
         <button type="button" class="btn btn-danger" @onclick="ArchiveAsync" disabled="@_saving">
             @(_saving ? "Archiving…" : "Archive assignment")
         </button>
-        <a href="@($"/blazor/teacher/assignments/{AssignmentId}")" class="btn btn-outline-secondary">Cancel</a>
+        <a href="@($"/teacher/assignments/{AssignmentId}")" class="btn btn-outline-secondary">Cancel</a>
     </div>
 }
 
@@ -67,7 +67,7 @@ else
         {
             var archived = await AssignmentService.ArchiveAssignmentAsync(AssignmentId, _teacherId);
             if (!archived) { _error = "This assignment is no longer available to archive."; return; }
-            Navigation.NavigateTo($"/blazor/teacher/courses/{_assignment.CourseId}/assignments");
+            Navigation.NavigateTo($"/teacher/courses/{_assignment.CourseId}/assignments");
         }
         catch (Exception exception)
         {

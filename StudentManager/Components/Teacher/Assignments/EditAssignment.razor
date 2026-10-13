@@ -1,4 +1,4 @@
-@page "/blazor/teacher/assignments/{AssignmentId:int}/edit"
+@page "/teacher/assignments/{AssignmentId:int}/edit"
 @attribute [Authorize(Roles = "Teacher")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -23,7 +23,7 @@ else
         <div class="mb-3"><label for="assignment-description" class="form-label">Description</label><InputTextArea id="assignment-description" @bind-Value="_model.Description" class="form-control" rows="5" /><ValidationMessage For="() => _model.Description" class="text-danger" /></div>
         <div class="mb-3"><label for="assignment-due" class="form-label">Due Date</label><input id="assignment-due" type="datetime-local" @bind="_model.DueDate" class="form-control" /><ValidationMessage For="() => _model.DueDate" class="text-danger" /></div>
         <div class="mb-3"><label for="assignment-points" class="form-label">Maximum Points</label><InputNumber id="assignment-points" @bind-Value="_model.MaxPoints" class="form-control" step="0.01" /><ValidationMessage For="() => _model.MaxPoints" class="text-danger" /></div>
-        <div class="d-flex gap-2"><button type="submit" class="btn btn-primary" disabled="@_saving">Save changes</button><a href="@($"/blazor/teacher/assignments/{AssignmentId}")" class="btn btn-outline-secondary">Cancel</a></div>
+        <div class="d-flex gap-2"><button type="submit" class="btn btn-primary" disabled="@_saving">Save changes</button><a href="@($"/teacher/assignments/{AssignmentId}")" class="btn btn-outline-secondary">Cancel</a></div>
     </EditForm>
 }
 
@@ -70,7 +70,7 @@ else
         {
             var updated = await AssignmentService.UpdateAssignmentAsync(_model, _teacherId);
             if (!updated) { _error = "This assignment is no longer available to edit."; return; }
-            Navigation.NavigateTo($"/blazor/teacher/assignments/{AssignmentId}");
+            Navigation.NavigateTo($"/teacher/assignments/{AssignmentId}");
         }
         catch (Exception exception)
         {

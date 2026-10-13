@@ -4,7 +4,7 @@
         @foreach (var course in Courses)
         {
             <li>
-                <a class="course-preview-card" href="@($"/blazor/student/courses/{course.CourseId}/progress")">
+                <a class="course-preview-card" href="@($"/student/courses/{course.CourseId}/progress")">
                     <span class="course-preview-code">@course.Code</span>
                     <span class="course-preview-name">@course.Name</span>
                     <span class="course-preview-action" aria-hidden="true">View progress →</span>

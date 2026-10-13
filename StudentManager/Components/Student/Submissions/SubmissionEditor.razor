@@ -14,7 +14,7 @@
             <ValidationMessage For="() => Model.Content" class="submission-field-error" />
             <p class="submission-form-note">@HelpText</p>
             <div class="submission-form-actions">
-                <a class="submission-cancel-action" href="@($"/blazor/student/assignments/{Model.AssignmentId}")">Cancel</a>
+                <a class="submission-cancel-action" href="@($"/student/assignments/{Model.AssignmentId}")">Cancel</a>
                 <button type="submit" class="submission-submit-action" disabled="@IsSaving">
                     @(IsSaving ? "Saving…" : ButtonText) <span aria-hidden="true">→</span>
                 </button>

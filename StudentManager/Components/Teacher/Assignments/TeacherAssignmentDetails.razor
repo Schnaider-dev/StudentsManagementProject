@@ -1,4 +1,4 @@
-@page "/blazor/teacher/assignments/{AssignmentId:int}"
+@page "/teacher/assignments/{AssignmentId:int}"
 @attribute [Authorize(Roles = "Teacher")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -18,19 +18,19 @@ else
 {
     <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
         <div>
-            <a href="@($"/blazor/teacher/courses/{_assignment.CourseId}/assignments")" class="text-decoration-none">← @_assignment.Course.Name assignments</a>
+            <a href="@($"/teacher/courses/{_assignment.CourseId}/assignments")" class="text-decoration-none">← @_assignment.Course.Name assignments</a>
             <h1 class="mt-2">@_assignment.Title</h1>
             <p class="text-muted mb-0">@_assignment.Course.Code — @_assignment.Course.Name</p>
         </div>
         <div class="d-flex gap-2">
             @if (_assignment.IsActive)
             {
-                <a href="@($"/blazor/teacher/assignments/{AssignmentId}/edit")" class="btn btn-outline-secondary">Edit</a>
+                <a href="@($"/teacher/assignments/{AssignmentId}/edit")" class="btn btn-outline-secondary">Edit</a>
             }
-            <a href="@($"/blazor/teacher/assignments/{AssignmentId}/grades")" class="btn btn-primary">Review submissions</a>
+            <a href="@($"/teacher/assignments/{AssignmentId}/grades")" class="btn btn-primary">Review submissions</a>
             @if (_assignment.IsActive)
             {
-                <a href="@($"/blazor/teacher/assignments/{AssignmentId}/archive")" class="btn btn-outline-danger">Archive</a>
+                <a href="@($"/teacher/assignments/{AssignmentId}/archive")" class="btn btn-outline-danger">Archive</a>
             }
         </div>
     </div>

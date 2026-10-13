@@ -26,7 +26,7 @@ else
                         <p class="all-assignment-course">@assignment.CourseCode · @assignment.CourseName</p>
                     }
                     <div class="student-assignment-title-row">
-                        <h3><a href="@($"/blazor/student/assignments/{assignment.AssignmentId}")">@assignment.Title</a></h3>
+                        <h3><a href="@($"/student/assignments/{assignment.AssignmentId}")">@assignment.Title</a></h3>
                         <span class="assignment-status @status.Item2">@status.Item1</span>
                     </div>
                     @if (!string.IsNullOrWhiteSpace(assignment.Description))
@@ -46,7 +46,7 @@ else
                         }
                     </div>
                 </div>
-                <a class="assignment-card-action" href="@($"/blazor/student/assignments/{assignment.AssignmentId}")">
+                <a class="assignment-card-action" href="@($"/student/assignments/{assignment.AssignmentId}")">
                     View details <span aria-hidden="true">→</span>
                 </a>
             </article>

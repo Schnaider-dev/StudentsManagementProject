@@ -1,4 +1,4 @@
-@page "/blazor/teacher/courses/{CourseId:int}/archive"
+@page "/teacher/courses/{CourseId:int}/archive"
 @attribute [Authorize(Roles = "Teacher")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -53,14 +53,14 @@ else if (_course is not null)
                 @(_isArchiving ? "Archiving…" : "Archive course")
             </button>
         }
-        <a href="@($"/blazor/teacher/courses/{_course.CourseId}")"
+        <a href="@($"/teacher/courses/{_course.CourseId}")"
            class="btn btn-outline-secondary">Cancel</a>
     </div>
 }
 else
 {
     <div class="alert alert-danger" role="alert">@_errorMessage</div>
-    <a href="/blazor/teacher/courses">Back to my courses</a>
+    <a href="/teacher/courses">Back to my courses</a>
 }
 
 @code {
@@ -136,7 +136,7 @@ else
                 return;
             }
 
-            NavigationManager.NavigateTo("/blazor/teacher/courses");
+            NavigationManager.NavigateTo("/teacher/courses");
         }
         catch (Exception exception)
         {

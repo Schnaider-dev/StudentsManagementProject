@@ -1,4 +1,4 @@
-@page "/blazor/student/assignments"
+@page "/student/assignments"
 @attribute [Authorize(Roles = "Student")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -8,7 +8,7 @@
 <PageTitle>All Assignments - StudentManager</PageTitle>
 <div class="student-assignments-page">
     <div class="student-assignments-header">
-        <a class="assignments-back-link" href="/blazor/student/dashboard">← Back to dashboard</a>
+        <a class="assignments-back-link" href="/student/dashboard">← Back to dashboard</a>
         <p class="assignments-eyebrow">Your coursework</p>
         <h1>All assignments</h1>
         <p class="assignments-subtitle">Assignments from your active courses, ordered by due date.</p>

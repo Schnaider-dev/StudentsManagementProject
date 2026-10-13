@@ -1,4 +1,4 @@
-@page "/blazor/student/courses/{CourseId:int}/assignments"
+@page "/student/courses/{CourseId:int}/assignments"
 @attribute [Authorize(Roles = "Student")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
@@ -18,7 +18,7 @@
     else
     {
         <div class="student-assignments-header">
-            <a class="assignments-back-link" href="@($"/blazor/student/courses/{CourseId}/progress")">← Back to course progress</a>
+            <a class="assignments-back-link" href="@($"/student/courses/{CourseId}/progress")">← Back to course progress</a>
             <p class="assignments-eyebrow">@_model.CourseCode</p>
             <h1>@_model.CourseName</h1>
             <p class="assignments-subtitle">Assignments and your submission progress for this course.</p>
