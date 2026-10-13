@@ -1,0 +1,16 @@
+<article class="dashboard-stat-card">
+    <p class="dashboard-stat-value @ValueClass">@Value</p>
+    <div class="dashboard-stat-heading">
+        <h2>@Label</h2>
+        <svg class="metric-icon" aria-hidden="true">
+            <use href="@($"#{Icon}")"></use>
+        </svg>
+    </div>
+</article>
+
+@code {
+    [Parameter, EditorRequired] public string Value { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Icon { get; set; } = string.Empty;
+    [Parameter] public string ValueClass { get; set; } = string.Empty;
+}

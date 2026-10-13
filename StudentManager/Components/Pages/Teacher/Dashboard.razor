@@ -20,34 +20,10 @@
 
     <div class="dashboard-container">
         <section class="summary-cards" aria-label="Your teaching summary">
-            <article class="dashboard-stat-card">
-                <p class="dashboard-stat-value">@model.ActiveCourseCount</p>
-                <div class="dashboard-stat-heading">
-                    <h2>Active courses</h2>
-                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-book"></use></svg>
-                </div>
-            </article>
-            <article class="dashboard-stat-card">
-                <p class="dashboard-stat-value">@model.ActiveStudentCount</p>
-                <div class="dashboard-stat-heading">
-                    <h2>Active students</h2>
-                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-users"></use></svg>
-                </div>
-            </article>
-            <article class="dashboard-stat-card">
-                <p class="dashboard-stat-value">@model.ActiveAssignmentCount</p>
-                <div class="dashboard-stat-heading">
-                    <h2>Active assignments</h2>
-                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-clipboard"></use></svg>
-                </div>
-            </article>
-            <article class="dashboard-stat-card">
-                <p class="dashboard-stat-value">@toGrade</p>
-                <div class="dashboard-stat-heading">
-                    <h2>Submissions to grade</h2>
-                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-message-clock"></use></svg>
-                </div>
-            </article>
+            <DashboardStatCard Value="@model.ActiveCourseCount.ToString()" Label="Active courses" Icon="icon-book" />
+            <DashboardStatCard Value="@model.ActiveStudentCount.ToString()" Label="Active students" Icon="icon-users" />
+            <DashboardStatCard Value="@model.ActiveAssignmentCount.ToString()" Label="Active assignments" Icon="icon-clipboard" />
+            <DashboardStatCard Value="@toGrade.ToString()" Label="Submissions to grade" Icon="icon-message-clock" />
         </section>
 
         <div class="dashboard-content">

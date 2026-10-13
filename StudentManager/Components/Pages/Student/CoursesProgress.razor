@@ -30,41 +30,12 @@
         </div>
 
         <section class="summary-section" aria-label="Course summary">
-            <article class="summary-card">
-                <div class="summary-card-heading">
-                    <h3>Total assignments</h3>
-                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-clipboard"></use></svg>
-                </div>
-                <p class="summary-value">@model.TotalAssignments</p>
-            </article>
-            <article class="summary-card">
-                <div class="summary-card-heading">
-                    <h3>Submitted</h3>
-                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-upload"></use></svg>
-                </div>
-                <p class="summary-value">@model.SubmittedAssignments</p>
-            </article>
-            <article class="summary-card">
-                <div class="summary-card-heading">
-                    <h3>Graded</h3>
-                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-check"></use></svg>
-                </div>
-                <p class="summary-value">@model.GradedAssignments</p>
-            </article>
-            <article class="summary-card">
-                <div class="summary-card-heading">
-                    <h3>Average score</h3>
-                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-chart"></use></svg>
-                </div>
-                @if (model.AveragePercentage is decimal average)
-                {
-                    <p class="summary-value">@average.ToString("0.##")<span>%</span></p>
-                }
-                else
-                {
-                    <p class="summary-value summary-value-empty">Not graded yet</p>
-                }
-            </article>
+            <CourseProgressSummaryCard Label="Total assignments" Value="@model.TotalAssignments.ToString()" Icon="icon-clipboard" />
+            <CourseProgressSummaryCard Label="Submitted" Value="@model.SubmittedAssignments.ToString()" Icon="icon-upload" />
+            <CourseProgressSummaryCard Label="Graded" Value="@model.GradedAssignments.ToString()" Icon="icon-check" />
+            <CourseProgressSummaryCard Label="Average score" Icon="icon-chart"
+                                       Value="@(model.AveragePercentage is decimal average ? $"{average:0.##}%" : "Not graded yet")"
+                                       IsEmpty="@(model.AveragePercentage is null)" />
         </section>
 
         <section class="progress-section" aria-labelledby="progress-heading">

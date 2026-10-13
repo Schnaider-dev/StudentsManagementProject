@@ -18,41 +18,12 @@
 
     <div class="dashboard-container">
         <section class="summary-cards" aria-label="Your learning summary">
-            <article class="dashboard-stat-card">
-                <p class="dashboard-stat-value">@model.ActiveCourseCount</p>
-                <div class="dashboard-stat-heading">
-                    <h2>Active courses</h2>
-                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-book"></use></svg>
-                </div>
-            </article>
-            <article class="dashboard-stat-card">
-                <p class="dashboard-stat-value">@model.PendingAssignmentCount</p>
-                <div class="dashboard-stat-heading">
-                    <h2>Pending assignments</h2>
-                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-clock"></use></svg>
-                </div>
-            </article>
-            <article class="dashboard-stat-card">
-                <p class="dashboard-stat-value">@model.GradedAssignmentCount</p>
-                <div class="dashboard-stat-heading">
-                    <h2>Graded assignments</h2>
-                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-check"></use></svg>
-                </div>
-            </article>
-            <article class="dashboard-stat-card">
-                @if (model.OverallAveragePercentage is decimal average)
-                {
-                    <p class="dashboard-stat-value">@average.ToString("0.##")%</p>
-                }
-                else
-                {
-                    <p class="dashboard-stat-value dashboard-stat-empty">Not graded yet</p>
-                }
-                <div class="dashboard-stat-heading">
-                    <h2>Overall score</h2>
-                    <svg class="metric-icon" aria-hidden="true"><use href="#icon-chart"></use></svg>
-                </div>
-            </article>
+            <DashboardStatCard Value="@model.ActiveCourseCount.ToString()" Label="Active courses" Icon="icon-book" />
+            <DashboardStatCard Value="@model.PendingAssignmentCount.ToString()" Label="Pending assignments" Icon="icon-clock" />
+            <DashboardStatCard Value="@model.GradedAssignmentCount.ToString()" Label="Graded assignments" Icon="icon-check" />
+            <DashboardStatCard Value="@(model.OverallAveragePercentage is decimal average ? $"{average:0.##}%" : "Not graded yet")"
+                               Label="Overall score" Icon="icon-chart"
+                               ValueClass="@(model.OverallAveragePercentage is null ? "dashboard-stat-empty" : "")" />
         </section>
 
         <section class="dashboard-content">
