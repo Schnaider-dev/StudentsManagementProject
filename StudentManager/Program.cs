@@ -8,26 +8,13 @@ using StudentManager.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var useSqlServer = builder.Environment.IsProduction();
-var connectionStringName = useSqlServer
-    ? "ProductionConnection"
-    : "DefaultConnection";
 var connectionString =
-    builder.Configuration.GetConnectionString(connectionStringName)
+    builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException(
-        $"Connection string '{connectionStringName}' was not found.");
+        "Connection string 'DefaultConnection' was not found.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    if (useSqlServer)
-    {
-        options.UseSqlServer(connectionString);
-    }
-    else
-    {
-        options.UseSqlite(connectionString);
-    }
-});
+    options.UseSqlite(connectionString));
 
 builder.Services.AddScoped<ICourseService, CourseService>();
 
@@ -63,7 +50,16 @@ builder.Services.AddRazorComponents()
 
 var app = builder.Build();
 
-// Roles are needed before development seed users can be assigned to them.
+// Create the database and apply pending migrations during application startup.
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext =
+        scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    await dbContext.Database.MigrateAsync();
+}
+
+// Roles are needed before users can be assigned to them.
 await DbInitializer.SeedRolesAsync(app.Services);
 
 // Keep demo credentials and sample school data out of non-development environments.
