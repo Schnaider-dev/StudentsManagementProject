@@ -1,4 +1,5 @@
 @inherits LayoutComponentBase
+@inject UserManager<ApplicationUser> UserManager
 
 <div class="blazor-app @_roleClass">
     <svg class="app-icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -57,7 +58,7 @@
                 <div class="navbar-nav align-items-md-center gap-md-2">
                     <AuthorizeView>
                         <Authorized Context="auth">
-                            <span class="nav-link">@auth.User.Identity?.Name</span>
+                            <span class="nav-link">@_displayName</span>
                             <form action="/Identity/Account/Logout" method="post" class="m-0">
                                 <AntiforgeryToken />
                                 <input type="hidden" name="returnUrl" value="/Identity/Account/Login" />
@@ -86,6 +87,7 @@
     private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
 
     private string _roleClass = string.Empty;
+    private string _displayName = string.Empty;
 
     private string HomeUrl => _roleClass switch
     {
@@ -103,10 +105,31 @@
     protected override async Task OnParametersSetAsync()
     {
         var user = (await AuthenticationStateTask).User;
+
         _roleClass = user.IsInRole("Teacher")
             ? "role-teacher"
             : user.IsInRole("Student")
                 ? "role-student"
                 : "role-guest";
+
+        _displayName = user.Identity?.Name ?? string.Empty;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            var applicationUser = await UserManager.GetUserAsync(user);
+
+            if (applicationUser is not null)
+            {
+                var fullName = string.Join(
+                    " ",
+                    new[] { applicationUser.FirstName, applicationUser.LastName }
+                        .Where(name => !string.IsNullOrWhiteSpace(name)));
+
+                if (!string.IsNullOrWhiteSpace(fullName))
+                {
+                    _displayName = fullName;
+                }
+            }
+        }
     }
 }
