@@ -92,6 +92,7 @@ public class ProgressService : IProgressService
             .ToListAsync();
 
         var earnedPoints = gradedResults.Sum(item => item.Score);
+        // Weight each result by its available points; ungraded work is not part of the average.
         var possiblePoints =
             gradedResults.Sum(item => item.MaxPoints);
 
@@ -186,6 +187,7 @@ public class ProgressService : IProgressService
         var earnedPoints = gradedAssignments.Sum(
             item => item.Score!.Value);
 
+        // Calculate over graded assignments only, using points rather than averaging percentages.
         var possiblePoints = gradedAssignments.Sum(
             item => item.MaxPoints);
 
@@ -358,6 +360,7 @@ public class ProgressService : IProgressService
         decimal earnedPoints,
         decimal possiblePoints)
     {
+        // No grade data is represented as unknown instead of a misleading zero percent.
         if (possiblePoints <= 0)
         {
             return null;

@@ -63,8 +63,10 @@ builder.Services.AddRazorComponents()
 
 var app = builder.Build();
 
+// Roles are needed before development seed users can be assigned to them.
 await DbInitializer.SeedRolesAsync(app.Services);
 
+// Keep demo credentials and sample school data out of non-development environments.
 if (app.Environment.IsDevelopment())
 {
     await SeedData.SeedAsync(app.Services);
@@ -78,6 +80,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+// Authentication must populate the user principal before role authorization runs.
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
