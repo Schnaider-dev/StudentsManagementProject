@@ -1,0 +1,64 @@
+@page "/student/courses/{CourseId:int}/assignments"
+@attribute [Authorize(Roles = "Student")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject ISubmissionService SubmissionService
+@inject ILogger<CourseAssignments> Logger
+
+<PageTitle>@(_model?.CourseName ?? "Assignments") - StudentManager</PageTitle>
+<div class="student-assignments-page">
+    @if (_error is not null)
+    {
+        <div class="alert alert-danger" role="alert">@_error</div>
+    }
+    else if (_model is null)
+    {
+        <p role="status">Loading assignments…</p>
+    }
+    else
+    {
+        <div class="student-assignments-header">
+            <a class="assignments-back-link" href="@($"/student/courses/{CourseId}/progress")">← Back to course progress</a>
+            <p class="assignments-eyebrow">@_model.CourseCode</p>
+            <h1>@_model.CourseName</h1>
+            <p class="assignments-subtitle">Assignments and your submission progress for this course.</p>
+        </div>
+        <AssignmentSummary Assignments="_model.Assignments" />
+        <section class="assignment-list-section" aria-labelledby="assignments-heading">
+            <h2 id="assignments-heading">Your assignments</h2>
+            <StudentAssignmentList Assignments="_model.Assignments" />
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter] public int CourseId { get; set; }
+    private CourseAssignmentsViewModel? _model;
+    private string? _error;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var principal = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        var studentId = UserManager.GetUserId(principal);
+        if (studentId is null)
+        {
+            throw new InvalidOperationException("The signed-in student account could not be identified.");
+        }
+
+        _model = null;
+        _error = null;
+        try
+        {
+            _model = await SubmissionService.GetCourseAssignmentsAsync(CourseId, studentId);
+            if (_model is null)
+            {
+                _error = "That course could not be found in your active enrollments.";
+            }
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to load assignments for student {StudentId}, course {CourseId}.", studentId, CourseId);
+            _error = "Course assignments couldn't be loaded. Please try again.";
+        }
+    }
+}

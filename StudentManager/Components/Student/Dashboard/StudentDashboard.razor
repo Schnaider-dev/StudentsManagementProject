@@ -1,0 +1,101 @@
+@page "/student/dashboard"
+@attribute [Authorize(Roles = "Student")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject IProgressService ProgressService
+
+<PageTitle>My Dashboard - StudentManager</PageTitle>
+
+<div class="dashboard-page-heading">
+    <h1>My Dashboard</h1>
+</div>
+
+<div class="dashboard-container">
+    @if (_model is null)
+    {
+        <p role="status">Loading your dashboard…</p>
+    }
+    else
+    {
+        <section class="summary-cards" aria-label="Your learning summary">
+            <DashboardStatCard Value="@_model.ActiveCourseCount.ToString()"
+                               Label="Active courses"
+                               Icon="icon-book" />
+            <DashboardStatCard Value="@_model.PendingAssignmentCount.ToString()"
+                               Label="Pending assignments"
+                               Icon="icon-clock" />
+            <DashboardStatCard Value="@_model.GradedAssignmentCount.ToString()"
+                               Label="Graded assignments"
+                               Icon="icon-check" />
+            <DashboardStatCard Value="@AverageValue"
+                               Label="Overall score"
+                               Icon="icon-chart"
+                               ValueClass="@AverageClass" />
+        </section>
+
+        <section class="dashboard-content">
+            <section class="dashboard-panel courses-section">
+                <div class="dashboard-panel-heading">
+                    <div>
+                        <p class="dashboard-section-label">Your learning</p>
+                        <h2>My courses</h2>
+                    </div>
+                    @if (_model.ActiveCourseCount > 0)
+                    {
+                        <a class="dashboard-panel-link" href="/student/courses">
+                            All courses <span aria-hidden="true">→</span>
+                        </a>
+                    }
+                </div>
+                <CoursePreviewList Courses="_model.ActiveCourses"
+                                   TotalCourseCount="_model.ActiveCourseCount" />
+            </section>
+
+            <section class="dashboard-panel assignment-section">
+                <div class="dashboard-panel-heading">
+                    <div>
+                        <p class="dashboard-section-label">Coming up</p>
+                        <h2>Pending assignments</h2>
+                    </div>
+                    @if (_model.PendingAssignmentCount > 0)
+                    {
+                        <a class="dashboard-panel-link" href="/student/assignments">
+                            All assignments <span aria-hidden="true">→</span>
+                        </a>
+                    }
+                </div>
+                <PendingAssignmentTable Assignments="_model.PendingAssignments"
+                                        TotalAssignmentCount="_model.PendingAssignmentCount" />
+            </section>
+        </section>
+    }
+</div>
+
+@code {
+    private StudentDashboardViewModel? _model;
+
+    private string AverageValue =>
+        _model?.OverallAveragePercentage is decimal average
+            ? $"{average:0.##}%"
+            : "Not graded yet";
+
+    private string AverageClass =>
+        _model?.OverallAveragePercentage is null
+            ? "dashboard-stat-empty"
+            : string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var principal = (await AuthenticationStateProvider
+            .GetAuthenticationStateAsync()).User;
+        var studentId = UserManager.GetUserId(principal);
+
+        if (studentId is null)
+        {
+            throw new InvalidOperationException(
+                "The signed-in student account could not be identified.");
+        }
+
+        _model = await ProgressService.GetStudentDashboardAsync(studentId);
+    }
+}

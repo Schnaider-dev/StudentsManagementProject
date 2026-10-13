@@ -1,0 +1,31 @@
+<section class="dashboard-panel">
+    <div class="dashboard-panel-heading">
+        <div>
+            <p class="dashboard-section-label">Needs attention</p>
+            <h2>Grading</h2>
+        </div>
+    </div>
+    <div class="dashboard-empty-state">
+        @if (UngradedSubmissionCount > 0)
+        {
+            <p>
+                @(UngradedSubmissionCount == 1
+                    ? "1 submission is waiting for a grade."
+                    : $"{UngradedSubmissionCount} submissions are waiting for a grade.")
+                Open a course and choose an assignment to grade its submissions.
+            </p>
+            <a class="dashboard-panel-link" href="/Teacher/Courses">
+                Go to my courses <span aria-hidden="true">→</span>
+            </a>
+        }
+        else
+        {
+            <p>You are all caught up—there is nothing to grade.</p>
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter]
+    public int UngradedSubmissionCount { get; set; }
+}

@@ -1,0 +1,30 @@
+<article class="summary-card">
+    <div class="summary-card-heading">
+        <h3>@Label</h3>
+        <svg class="metric-icon" aria-hidden="true">
+            <use href="@($"#{Icon}")"></use>
+        </svg>
+    </div>
+    @if (IsEmpty)
+    {
+        <p class="summary-value summary-value-empty">@Value</p>
+    }
+    else
+    {
+        <p class="summary-value">@Value</p>
+    }
+</article>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Value { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Icon { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool IsEmpty { get; set; }
+}

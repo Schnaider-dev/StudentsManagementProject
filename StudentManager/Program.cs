@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using StudentManager.Components;
 using StudentManager.Data;
 using StudentManager.Models;
 using StudentManager.Services;
@@ -7,13 +8,26 @@ using StudentManager.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var useSqlServer = builder.Environment.IsProduction();
+var connectionStringName = useSqlServer
+    ? "ProductionConnection"
+    : "DefaultConnection";
 var connectionString =
-    builder.Configuration.GetConnectionString("DefaultConnection")
+    builder.Configuration.GetConnectionString(connectionStringName)
     ?? throw new InvalidOperationException(
-        "Connection string 'DefaultConnection' was not found.");
+        $"Connection string '{connectionStringName}' was not found.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(connectionString));
+{
+    if (useSqlServer)
+    {
+        options.UseSqlServer(connectionString);
+    }
+    else
+    {
+        options.UseSqlite(connectionString);
+    }
+});
 
 builder.Services.AddScoped<ICourseService, CourseService>();
 
@@ -42,8 +56,10 @@ builder.Services
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
 
 var app = builder.Build();
 
@@ -58,7 +74,6 @@ if (app.Environment.IsDevelopment())
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
@@ -68,19 +83,13 @@ app.UseRouting();
 // Authentication must populate the user principal before role authorization runs.
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseAntiforgery();
 
 app.MapStaticAssets();
 
-app.MapControllerRoute(
-        name: "areas",
-        pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
-app.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
 app.MapRazorPages();
+
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
 
 app.Run();

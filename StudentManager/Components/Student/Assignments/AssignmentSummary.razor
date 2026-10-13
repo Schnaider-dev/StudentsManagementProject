@@ -1,0 +1,23 @@
+<section class="assignment-summary" aria-label="Assignment summary">
+    <article class="assignment-summary-card">
+        <span class="assignment-summary-value">@Assignments.Count</span>
+        <span class="assignment-summary-label">Total assignments</span>
+    </article>
+    <article class="assignment-summary-card">
+        <span class="assignment-summary-value">@Assignments.Count(item => !item.SubmissionId.HasValue)</span>
+        <span class="assignment-summary-label">To submit</span>
+    </article>
+    <article class="assignment-summary-card">
+        <span class="assignment-summary-value">@Assignments.Count(item => item.SubmissionId.HasValue)</span>
+        <span class="assignment-summary-label">Submitted</span>
+    </article>
+    <article class="assignment-summary-card">
+        <span class="assignment-summary-value">@Assignments.Count(item => item.IsGraded)</span>
+        <span class="assignment-summary-label">Graded</span>
+    </article>
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<StudentAssignmentViewModel> Assignments { get; set; } = Array.Empty<StudentAssignmentViewModel>();
+}

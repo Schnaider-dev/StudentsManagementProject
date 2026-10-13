@@ -1,0 +1,37 @@
+<article class="available-course-card">
+    <div class="available-course-details">
+        <div class="available-course-copy">
+            <h2 class="available-course-name">(@Course.Code) @Course.Name</h2>
+            <p class="available-course-teacher">
+                Taught by: <strong>@Course.TeacherName</strong>
+            </p>
+            <p class="available-course-description">
+                @(string.IsNullOrWhiteSpace(Course.Description)
+                    ? "No description provided."
+                    : Course.Description)
+            </p>
+        </div>
+        <button type="button"
+                class="course-action-button"
+                disabled="@IsEnrolling"
+                @onclick="Enroll">
+            @(IsEnrolling ? "Enrolling…" : "Enroll")
+        </button>
+    </div>
+</article>
+
+@code {
+    [Parameter, EditorRequired]
+    public AvailableCourseViewModel Course { get; set; } = default!;
+
+    [Parameter]
+    public bool IsEnrolling { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnEnroll { get; set; }
+
+    private Task Enroll()
+    {
+        return OnEnroll.InvokeAsync(Course.CourseId);
+    }
+}

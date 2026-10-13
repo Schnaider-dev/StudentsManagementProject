@@ -1,0 +1,83 @@
+@page "/"
+@attribute [AllowAnonymous]
+
+<PageTitle>Home - StudentManager</PageTitle>
+
+<section class="home-hero">
+    @if (_role == "Teacher" || _role == "Student")
+    {
+        <h1>Welcome back</h1>
+        @if (_role == "Teacher")
+        {
+            <p class="home-lead">Manage your courses, set assignments, and grade your students' work.</p>
+            <div class="home-actions">
+                <a class="btn btn-primary btn-lg" href="/teacher/dashboard">Go to dashboard</a>
+                <a class="btn btn-outline-secondary btn-lg" href="/teacher/courses">My courses</a>
+            </div>
+        }
+        else
+        {
+            <p class="home-lead">Check your courses, upcoming assignments, and grades.</p>
+            <div class="home-actions">
+                <a class="btn btn-primary btn-lg" href="/student/dashboard">Go to dashboard</a>
+                <a class="btn btn-outline-secondary btn-lg" href="/student/courses">My courses</a>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="home-eyebrow">A clearer path through every course</p>
+        <h1>Keep track of courses, assignments, and grades</h1>
+        <p class="home-lead">
+            StudentManager is one place for students to follow their progress
+            and for teachers to run their courses.
+        </p>
+        <div class="home-actions">
+            <a class="btn btn-primary btn-lg" href="/Identity/Account/Register">Create account</a>
+            <a class="btn btn-outline-secondary btn-lg" href="/Identity/Account/Login">Log in</a>
+        </div>
+    }
+</section>
+
+@if (_role is null)
+{
+    <section class="home-roles" aria-label="What you can do">
+        <article class="home-role home-role-student">
+            <span class="home-role-label">For students</span>
+            <h2>Stay on top of your learning</h2>
+            <ul>
+                <li>Enrol in courses and manage your schedule</li>
+                <li>See assignments and their deadlines</li>
+                <li>Submit your work and read feedback</li>
+                <li>Follow your grades and progress</li>
+            </ul>
+        </article>
+        <article class="home-role home-role-teacher">
+            <span class="home-role-label">For teachers</span>
+            <h2>Bring your courses together</h2>
+            <ul>
+                <li>Create and manage courses</li>
+                <li>Set assignments with deadlines</li>
+                <li>Grade submissions and leave feedback</li>
+                <li>See how each student is doing</li>
+            </ul>
+        </article>
+    </section>
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
+
+    private string? _role;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var user = (await AuthenticationStateTask).User;
+        _role = user.IsInRole("Teacher")
+            ? "Teacher"
+            : user.IsInRole("Student")
+                ? "Student"
+                : null;
+    }
+}

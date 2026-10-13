@@ -1,0 +1,59 @@
+@page "/teacher/dashboard"
+@attribute [Authorize(Roles = "Teacher")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject IProgressService ProgressService
+
+<PageTitle>My Dashboard - StudentManager</PageTitle>
+
+<div class="dashboard-page-heading">
+    <h1>My Dashboard</h1>
+</div>
+
+<div class="dashboard-container">
+    @if (_model is null)
+    {
+        <p role="status">Loading your dashboard…</p>
+    }
+    else
+    {
+        <section class="summary-cards" aria-label="Your teaching summary">
+            <DashboardStatCard Value="@_model.ActiveCourseCount.ToString()"
+                               Label="Active courses"
+                               Icon="icon-book" />
+            <DashboardStatCard Value="@_model.ActiveStudentCount.ToString()"
+                               Label="Active students"
+                               Icon="icon-users" />
+            <DashboardStatCard Value="@_model.ActiveAssignmentCount.ToString()"
+                               Label="Active assignments"
+                               Icon="icon-clipboard" />
+            <DashboardStatCard Value="@_model.UngradedSubmissionCount.ToString()"
+                               Label="Submissions to grade"
+                               Icon="icon-message-clock" />
+        </section>
+
+        <div class="dashboard-content">
+            <GradingPanel UngradedSubmissionCount="_model.UngradedSubmissionCount" />
+            <CoursesPanel ActiveCourseCount="_model.ActiveCourseCount" />
+        </div>
+    }
+</div>
+
+@code {
+    private TeacherDashboardViewModel? _model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var principal = (await AuthenticationStateProvider
+            .GetAuthenticationStateAsync()).User;
+        var teacherId = UserManager.GetUserId(principal);
+
+        if (teacherId is null)
+        {
+            throw new InvalidOperationException(
+                "The signed-in teacher account could not be identified.");
+        }
+
+        _model = await ProgressService.GetTeacherDashboardAsync(teacherId);
+    }
+}

@@ -1,0 +1,91 @@
+@page "/teacher/submissions/{SubmissionId:int}/grade"
+@attribute [Authorize(Roles = "Teacher")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject IGradingService GradingService
+@inject NavigationManager Navigation
+@inject ILogger<EditGrade> Logger
+
+<PageTitle>Grade Submission - StudentManager</PageTitle>
+@if (_error is not null) { <div class="alert alert-danger" role="alert">@_error</div> }
+@if (_model is null)
+{
+    @if (_error is null) { <p role="status">Loading submission…</p> }
+}
+else
+{
+    <div class="mb-4">
+        <a href="@($"/teacher/assignments/{_model.AssignmentId}/grades")" class="text-decoration-none">← Back to submissions</a>
+        <h1 class="mt-2">@(_model.GradeId.HasValue ? "Edit grade" : "Grade submission")</h1>
+        <p class="text-muted mb-0">@_model.StudentName · @_model.AssignmentTitle</p>
+    </div>
+    <div class="card mb-4"><div class="card-body">Maximum score: <strong>@_model.MaxPoints.ToString("0.##")</strong> points</div></div>
+    <EditForm Model="_model" OnValidSubmit="SaveAsync">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" role="alert" />
+        <div class="mb-3">
+            <label for="grade-score" class="form-label">Score</label>
+            <div class="input-group">
+                <InputNumber id="grade-score" @bind-Value="_model.Score" class="form-control" min="0" max="@_model.MaxPoints" step="0.01" />
+                <span class="input-group-text">/ @_model.MaxPoints.ToString("0.##")</span>
+            </div>
+            <ValidationMessage For="() => _model.Score" class="text-danger" />
+        </div>
+        <div class="mb-3">
+            <label for="grade-feedback" class="form-label">Feedback</label>
+            <InputTextArea id="grade-feedback" @bind-Value="_model.Feedback" class="form-control" rows="5" />
+            <ValidationMessage For="() => _model.Feedback" class="text-danger" />
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary" disabled="@_saving">@(_saving ? "Saving…" : "Save grade")</button>
+            <a href="@($"/teacher/assignments/{_model.AssignmentId}/grades")" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int SubmissionId { get; set; }
+    private GradeEditViewModel? _model;
+    private string? _teacherId;
+    private string? _error;
+    private bool _saving;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var principal = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        _teacherId = UserManager.GetUserId(principal);
+        if (_teacherId is null) throw new InvalidOperationException("The signed-in teacher account could not be identified.");
+        _model = null;
+        _error = null;
+        try
+        {
+            _model = await GradingService.GetGradeFormAsync(SubmissionId, _teacherId);
+            if (_model is null) _error = "That submission could not be found.";
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to load grade form for submission {SubmissionId}.", SubmissionId);
+            _error = "The grade form couldn't be loaded. Please try again.";
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_model is null || _teacherId is null) return;
+        _saving = true;
+        _error = null;
+        try
+        {
+            var saved = await GradingService.SaveGradeAsync(_model, _teacherId);
+            if (!saved) { _error = "This submission is no longer available to grade."; return; }
+            Navigation.NavigateTo($"/teacher/assignments/{_model.AssignmentId}/grades");
+        }
+        catch (InvalidOperationException exception) { _error = exception.Message; }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to save grade for submission {SubmissionId}.", SubmissionId);
+            _error = "The grade couldn't be saved. Please try again.";
+        }
+        finally { _saving = false; }
+    }
+}

@@ -1,0 +1,144 @@
+@page "/student/courses/{CourseId:int}/progress"
+@attribute [Authorize(Roles = "Student")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject IProgressService ProgressService
+@inject ILogger<CourseProgress> Logger
+
+<PageTitle>@(_model?.CourseName ?? "Course Progress") - StudentManager</PageTitle>
+
+<div class="course-progress-page">
+    @if (_errorMessage is not null)
+    {
+        <div class="alert alert-danger" role="alert">@_errorMessage</div>
+    }
+    else if (_model is null)
+    {
+        <p role="status">Loading course progress…</p>
+    }
+    else
+    {
+        <div class="course-progress-header">
+            <div>
+                <a class="course-progress-back-link" href="/student/courses">
+                    <span aria-hidden="true">←</span> Back to My Courses
+                </a>
+                <p class="course-progress-eyebrow">@_model.CourseCode</p>
+                <h1>Course Progress</h1>
+                <h2>@_model.CourseName</h2>
+                <p class="course-progress-teacher">Instructor: @_model.TeacherName</p>
+            </div>
+        </div>
+
+        <section class="summary-section" aria-label="Course summary">
+            <CourseProgressSummaryCard Label="Total assignments"
+                                       Value="@_model.TotalAssignments.ToString()"
+                                       Icon="icon-clipboard" />
+            <CourseProgressSummaryCard Label="Submitted"
+                                       Value="@_model.SubmittedAssignments.ToString()"
+                                       Icon="icon-upload" />
+            <CourseProgressSummaryCard Label="Graded"
+                                       Value="@_model.GradedAssignments.ToString()"
+                                       Icon="icon-check" />
+            <CourseProgressSummaryCard Label="Average score"
+                                       Value="@AverageValue"
+                                       Icon="icon-chart"
+                                       IsEmpty="@(_model.AveragePercentage is null)" />
+        </section>
+
+        <section class="progress-section" aria-labelledby="progress-heading">
+            <div class="section-heading">
+                <div>
+                    <p class="section-eyebrow">Your work</p>
+                    <h2 id="progress-heading" class="heading-with-icon">
+                        <svg class="heading-icon" aria-hidden="true">
+                            <use href="#icon-chart"></use>
+                        </svg>
+                        Assignment progress
+                    </h2>
+                </div>
+            </div>
+            <div class="submission-progress-track"
+                 role="progressbar"
+                 aria-label="Assignments submitted"
+                 aria-valuemin="0"
+                 aria-valuemax="100"
+                 aria-valuenow="@SubmittedRatio">
+                <div class="submission-progress-fill" style="@($"width: {SubmittedRatio}%")"></div>
+            </div>
+            <div class="progress-legend">
+                <span><span class="legend-dot legend-dot-submitted"></span>@_model.SubmittedAssignments submitted</span>
+                <span>
+                    <span class="legend-dot legend-dot-pending"></span>
+                    @(_model.TotalAssignments - _model.SubmittedAssignments) pending
+                </span>
+            </div>
+        </section>
+
+        <section class="assignments-section" aria-labelledby="assignments-heading">
+            <div class="section-heading">
+                <div>
+                    <p class="section-eyebrow">Coursework</p>
+                    <h2 id="assignments-heading" class="heading-with-icon">
+                        <svg class="heading-icon" aria-hidden="true">
+                            <use href="#icon-clipboard"></use>
+                        </svg>
+                        Assignments
+                    </h2>
+                </div>
+            </div>
+            <AssignmentProgressTable Assignments="_model.Assignments" />
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int CourseId { get; set; }
+
+    private CourseProgressViewModel? _model;
+    private string? _errorMessage;
+
+    private string AverageValue =>
+        _model?.AveragePercentage is decimal average
+            ? $"{average:0.##}%"
+            : "Not graded yet";
+
+    private int SubmittedRatio =>
+        _model is null || _model.TotalAssignments == 0
+            ? 0
+            : _model.SubmittedAssignments * 100 / _model.TotalAssignments;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var principal = (await AuthenticationStateProvider
+            .GetAuthenticationStateAsync()).User;
+        var studentId = UserManager.GetUserId(principal);
+
+        if (studentId is null)
+        {
+            throw new InvalidOperationException(
+                "The signed-in student account could not be identified.");
+        }
+
+        _errorMessage = null;
+        _model = null;
+
+        try
+        {
+            _model = await ProgressService.GetCourseProgressAsync(
+                CourseId,
+                studentId);
+
+            if (_model is null)
+            {
+                _errorMessage = "That course could not be found in your active enrollments.";
+            }
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to load course progress for student {StudentId}, course {CourseId}.", studentId, CourseId);
+            _errorMessage = "Course progress couldn't be loaded. Please try again.";
+        }
+    }
+}

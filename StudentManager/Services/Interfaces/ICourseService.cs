@@ -7,25 +7,31 @@ public interface ICourseService
 {
     Task<IReadOnlyList<Course>> GetTeacherCoursesAsync(
         string teacherId,
-        bool includeInactive = false);
+        bool includeInactive = false,
+        CancellationToken cancellationToken = default);
 
     Task<Course?> GetTeacherCourseAsync(
         int courseId,
-        string teacherId);
+        string teacherId,
+        CancellationToken cancellationToken = default);
 
     Task<bool> CourseCodeExistsAsync(
         string code,
-        int? excludedCourseId = null);
+        int? excludedCourseId = null,
+        CancellationToken cancellationToken = default);
 
     Task<Course> CreateCourseAsync(
         CourseCreateViewModel model,
-        string teacherId);
+        string teacherId,
+        CancellationToken cancellationToken = default);
 
     Task<bool> UpdateCourseAsync(
         CourseEditViewModel model,
-        string teacherId);
+        string teacherId,
+        CancellationToken cancellationToken = default);
 
     Task<bool> ArchiveCourseAsync(
         int courseId,
-        string teacherId);
+        string teacherId,
+        CancellationToken cancellationToken = default);
 }

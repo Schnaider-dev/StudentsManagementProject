@@ -1,0 +1,45 @@
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th scope="col">Code</th>
+                <th scope="col">Course</th>
+                <th scope="col">Students</th>
+                <th scope="col">Assignments</th>
+                <th scope="col">Created</th>
+                <th scope="col"><span class="visually-hidden">Actions</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var course in Courses)
+            {
+                <tr>
+                    <td>@course.Code</td>
+                    <td>
+                        <a href="@($"/teacher/courses/{course.CourseId}")">@course.Name</a>
+                    </td>
+                    <td>@course.Enrollments.Count</td>
+                    <td>@course.Assignments.Count</td>
+                    <td>
+                        <time datetime="@course.CreatedAt.ToString("O")">
+                            @course.CreatedAt.ToLocalTime().ToString("d")
+                        </time>
+                    </td>
+                    <td class="text-nowrap">
+                        <a href="@($"/teacher/courses/{course.CourseId}/edit")"
+                           class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <a href="@($"/Teacher/Students?courseId={course.CourseId}")"
+                           class="btn btn-sm btn-outline-secondary">Students</a>
+                        <a href="@($"/teacher/courses/{course.CourseId}/assignments")"
+                           class="btn btn-sm btn-outline-primary">Assignments</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<Course> Courses { get; set; } = Array.Empty<Course>();
+}

@@ -1,0 +1,79 @@
+@page "/teacher/assignments/{AssignmentId:int}/archive"
+@attribute [Authorize(Roles = "Teacher")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject IAssignmentService AssignmentService
+@inject NavigationManager Navigation
+@inject ILogger<ArchiveAssignment> Logger
+
+<PageTitle>Archive Assignment - StudentManager</PageTitle>
+<h1>Archive assignment</h1>
+@if (_error is not null) { <div class="alert alert-danger" role="alert">@_error</div> }
+@if (_assignment is null)
+{
+    @if (_error is null) { <p role="status">Loading assignment…</p> }
+}
+else
+{
+    <p class="text-muted">@_assignment.Course.Code — @_assignment.Course.Name</p>
+    <div class="alert alert-warning mt-3" role="alert">
+        <p>Archive <strong>@_assignment.Title</strong>?</p>
+        <p class="mb-0">Students will no longer be able to work on this assignment. Existing submissions and grades will be retained.</p>
+    </div>
+    <dl class="row">
+        <dt class="col-sm-3">Due date</dt><dd class="col-sm-9">@_assignment.DueDate.ToLocalTime().ToString("g")</dd>
+        <dt class="col-sm-3">Submissions</dt><dd class="col-sm-9">@_assignment.Submissions.Count</dd>
+    </dl>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-danger" @onclick="ArchiveAsync" disabled="@_saving">
+            @(_saving ? "Archiving…" : "Archive assignment")
+        </button>
+        <a href="@($"/teacher/assignments/{AssignmentId}")" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+}
+
+@code {
+    [Parameter] public int AssignmentId { get; set; }
+    private Assignment? _assignment;
+    private string? _teacherId;
+    private string? _error;
+    private bool _saving;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var principal = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        _teacherId = UserManager.GetUserId(principal);
+        if (_teacherId is null) throw new InvalidOperationException("The signed-in teacher account could not be identified.");
+        _assignment = null;
+        _error = null;
+        try
+        {
+            _assignment = await AssignmentService.GetTeacherAssignmentAsync(AssignmentId, _teacherId);
+            if (_assignment is null || !_assignment.IsActive) _error = "That active assignment could not be found.";
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to load assignment {AssignmentId} for archiving.", AssignmentId);
+            _error = "Assignment information couldn't be loaded. Please try again.";
+        }
+    }
+
+    private async Task ArchiveAsync()
+    {
+        if (_teacherId is null || _assignment is null) return;
+        _saving = true;
+        _error = null;
+        try
+        {
+            var archived = await AssignmentService.ArchiveAssignmentAsync(AssignmentId, _teacherId);
+            if (!archived) { _error = "This assignment is no longer available to archive."; return; }
+            Navigation.NavigateTo($"/teacher/courses/{_assignment.CourseId}/assignments");
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to archive assignment {AssignmentId}.", AssignmentId);
+            _error = "The assignment couldn't be archived. Please try again.";
+        }
+        finally { _saving = false; }
+    }
+}

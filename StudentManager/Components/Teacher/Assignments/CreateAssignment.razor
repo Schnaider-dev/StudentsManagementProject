@@ -1,0 +1,76 @@
+@page "/teacher/courses/{CourseId:int}/assignments/create"
+@attribute [Authorize(Roles = "Teacher")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject ICourseService CourseService
+@inject IAssignmentService AssignmentService
+@inject NavigationManager Navigation
+@inject ILogger<CreateAssignment> Logger
+
+<PageTitle>Create Assignment - StudentManager</PageTitle>
+<h1>Create assignment</h1>
+@if (_error is not null) { <div class="alert alert-danger" role="alert">@_error</div> }
+@if (_course is null)
+{
+    @if (_error is null) { <p role="status">Loading course…</p> }
+}
+else
+{
+    <p class="text-muted">For @_course.Name</p>
+    <EditForm Model="_model" OnValidSubmit="CreateAsync" class="mt-4">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" role="alert" />
+        <div class="mb-3"><label for="assignment-title" class="form-label">Title</label><InputText id="assignment-title" @bind-Value="_model.Title" class="form-control" /><ValidationMessage For="() => _model.Title" class="text-danger" /></div>
+        <div class="mb-3"><label for="assignment-description" class="form-label">Description</label><InputTextArea id="assignment-description" @bind-Value="_model.Description" class="form-control" rows="5" /><ValidationMessage For="() => _model.Description" class="text-danger" /></div>
+        <div class="mb-3"><label for="assignment-due" class="form-label">Due Date</label><input id="assignment-due" type="datetime-local" @bind="_model.DueDate" class="form-control" /><ValidationMessage For="() => _model.DueDate" class="text-danger" /></div>
+        <div class="mb-3"><label for="assignment-points" class="form-label">Maximum Points</label><InputNumber id="assignment-points" @bind-Value="_model.MaxPoints" class="form-control" step="0.01" /><ValidationMessage For="() => _model.MaxPoints" class="text-danger" /></div>
+        <div class="d-flex gap-2"><button type="submit" class="btn btn-primary" disabled="@_saving">Create assignment</button><a href="@($"/teacher/courses/{CourseId}/assignments")" class="btn btn-outline-secondary">Cancel</a></div>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int CourseId { get; set; }
+    private Course? _course;
+    private AssignmentCreateViewModel _model = new();
+    private string? _teacherId;
+    private string? _error;
+    private bool _saving;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var principal = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        _teacherId = UserManager.GetUserId(principal);
+        if (_teacherId is null) throw new InvalidOperationException("The signed-in teacher account could not be identified.");
+        _model = new AssignmentCreateViewModel { CourseId = CourseId };
+        _error = null;
+        try
+        {
+            _course = await CourseService.GetTeacherCourseAsync(CourseId, _teacherId);
+            if (_course is null || !_course.IsActive) _error = "That active course could not be found.";
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to load course {CourseId} for assignment creation.", CourseId);
+            _error = "Course information couldn't be loaded. Please try again.";
+        }
+    }
+
+    private async Task CreateAsync()
+    {
+        if (_teacherId is null) return;
+        _saving = true;
+        _error = null;
+        try
+        {
+            var assignment = await AssignmentService.CreateAssignmentAsync(_model, _teacherId);
+            Navigation.NavigateTo($"/teacher/assignments/{assignment.AssignmentId}");
+        }
+        catch (InvalidOperationException exception) { _error = exception.Message; }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to create assignment for course {CourseId}.", CourseId);
+            _error = "The assignment couldn't be created. Please try again.";
+        }
+        finally { _saving = false; }
+    }
+}

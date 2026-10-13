@@ -1,0 +1,97 @@
+@page "/student/submissions/{SubmissionId:int}/edit"
+@attribute [Authorize(Roles = "Student")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject ISubmissionService SubmissionService
+@inject NavigationManager Navigation
+@inject ILogger<EditSubmission> Logger
+
+<PageTitle>Edit Submission - StudentManager</PageTitle>
+<div class="student-assignments-page">
+    @if (_error is not null)
+    {
+        <div class="alert alert-danger" role="alert">@_error</div>
+    }
+    else if (_model is null)
+    {
+        <p role="status">Loading submission…</p>
+    }
+    else
+    {
+        <div class="submission-form-header">
+            <a class="submission-back-link" href="@($"/student/assignments/{_model.AssignmentId}")">← Back to assignment</a>
+            <p class="submission-eyebrow">Update your work</p>
+            <h1>@_model.AssignmentTitle</h1>
+            <p class="submission-intro">Make your changes below. Graded submissions cannot be edited.</p>
+        </div>
+        <EditForm Model="_model" OnValidSubmit="SaveAsync">
+            <DataAnnotationsValidator />
+            <SubmissionEditor Model="_model" IsSaving="_isSaving" Heading="Edit submission"
+                              ButtonText="Save changes"
+                              HelpText="Your updated response replaces the current submission. You can edit it again until it is graded." />
+        </EditForm>
+    }
+</div>
+
+@code {
+    [Parameter] public int SubmissionId { get; set; }
+    private SubmissionViewModel? _model;
+    private string? _error;
+    private string? _studentId;
+    private bool _isSaving;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var principal = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        _studentId = UserManager.GetUserId(principal);
+        if (_studentId is null) throw new InvalidOperationException("The signed-in student account could not be identified.");
+        _model = null;
+        _error = null;
+        var submission = await SubmissionService.GetSubmissionAsync(SubmissionId, _studentId);
+        if (submission is null)
+        {
+            _error = "That submission could not be found.";
+        }
+        else if (submission.Grade is not null)
+        {
+            _error = "A graded submission cannot be edited.";
+        }
+        else
+        {
+            _model = new SubmissionViewModel
+            {
+                SubmissionId = submission.SubmissionId,
+                AssignmentId = submission.AssignmentId,
+                AssignmentTitle = submission.Assignment.Title,
+                Content = submission.Content
+            };
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_model is null || _studentId is null) return;
+        _isSaving = true;
+        _error = null;
+        try
+        {
+            var updated = await SubmissionService.UpdateSubmissionAsync(_model, _studentId);
+            if (!updated)
+            {
+                _error = "This submission is no longer available to edit.";
+                return;
+            }
+            Navigation.NavigateTo($"/student/submissions/{SubmissionId}");
+        }
+        catch (InvalidOperationException exception)
+        {
+            _error = exception.Message;
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to update submission {SubmissionId} for student {StudentId}.", SubmissionId, _studentId);
+            _error = "Your submission couldn't be updated. Please try again.";
+        }
+        finally { _isSaving = false; }
+    }
+}

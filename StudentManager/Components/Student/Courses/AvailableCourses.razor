@@ -1,0 +1,189 @@
+@page "/student/courses/available"
+@attribute [Authorize(Roles = "Student")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject IEnrollmentService EnrollmentService
+@inject ILogger<AvailableCourses> Logger
+
+<PageTitle>Available Courses - StudentManager</PageTitle>
+
+<div class="available-courses-page">
+    <a class="avalaible-course-mycourses-link" href="/student/courses">
+        <span aria-hidden="true">←</span> Back to My Courses
+    </a>
+    <h1 class="available-courses-title">Available Courses</h1>
+
+    @if (_errorMessage is not null)
+    {
+        <div class="alert alert-danger" role="alert">@_errorMessage</div>
+    }
+
+    <form class="course-search-form" @onsubmit="SearchAsync" @onsubmit:preventDefault>
+        <label class="available-visually-hidden" for="course-search">Search courses</label>
+        <input id="course-search"
+               type="search"
+               class="course-search-input"
+               placeholder="Search courses..."
+               @bind="_search" />
+
+        <label class="available-visually-hidden" for="course-filter">Search field</label>
+        <select id="course-filter" class="course-search-filter" @bind="_filter">
+            <option value="">All fields</option>
+            <option value="code">By Code</option>
+            <option value="name">By Name</option>
+            <option value="teacher">By Teacher</option>
+        </select>
+        <button type="submit" class="course-action-button" disabled="@_isLoading">
+            Search
+        </button>
+    </form>
+
+    @if (_isLoading && _page is null)
+    {
+        <p role="status">Loading available courses…</p>
+    }
+    else if (_page is not null)
+    {
+        <p class="available-courses-count" aria-live="polite">
+            Showing @_page.Courses.Count of @_page.TotalCount available courses
+        </p>
+
+        @if (_page.Courses.Count == 0)
+        {
+            <section class="available-courses-empty" aria-live="polite">
+                <p>No available courses match your search.</p>
+                @if (string.IsNullOrWhiteSpace(_search))
+                {
+                    <a class="course-action-button course-return-link" href="/student/courses">
+                        Go Back
+                    </a>
+                }
+                else
+                {
+                    <button type="button" class="course-action-button course-return-link"
+                            @onclick="ClearSearchAsync">
+                        Clear search
+                    </button>
+                }
+            </section>
+        }
+        else
+        {
+            <div class="available-course-list">
+                @foreach (var course in _page.Courses)
+                {
+                    <AvailableCourseCard Course="course"
+                                         IsEnrolling="@(_enrollingCourseId == course.CourseId)"
+                                         OnEnroll="EnrollAsync" />
+                }
+            </div>
+        }
+
+        <CoursePagination Page="_page" OnPageChanged="ChangePageAsync" />
+    }
+    else if (!_isLoading)
+    {
+        <button type="button" class="course-action-button" @onclick="() => LoadCoursesAsync(1)">
+            Try again
+        </button>
+    }
+</div>
+
+@code {
+    private AvailableCoursesPageViewModel? _page;
+    private string _search = string.Empty;
+    private string _filter = string.Empty;
+    private string? _errorMessage;
+    private string? _studentId;
+    private int? _enrollingCourseId;
+    private bool _isLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var principal = (await AuthenticationStateProvider
+            .GetAuthenticationStateAsync()).User;
+        _studentId = UserManager.GetUserId(principal);
+
+        if (_studentId is null)
+        {
+            throw new InvalidOperationException(
+                "The signed-in student account could not be identified.");
+        }
+
+        await LoadCoursesAsync(1);
+    }
+
+    private Task SearchAsync()
+    {
+        return LoadCoursesAsync(1);
+    }
+
+    private Task ClearSearchAsync()
+    {
+        _search = string.Empty;
+        _filter = string.Empty;
+        return LoadCoursesAsync(1);
+    }
+
+    private Task ChangePageAsync(int page)
+    {
+        return LoadCoursesAsync(page);
+    }
+
+    private async Task LoadCoursesAsync(int page)
+    {
+        _isLoading = true;
+        _errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            _page = await EnrollmentService.GetAvailableCoursesAsync(
+                _studentId!,
+                page,
+                pageSize: 10,
+                _search,
+                _filter);
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to load available courses for student {StudentId}.", _studentId);
+            _errorMessage = "Available courses couldn't be loaded. Please try again.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task EnrollAsync(int courseId)
+    {
+        _enrollingCourseId = courseId;
+        _errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var enrolled = await EnrollmentService.EnrollAsync(
+                courseId,
+                _studentId!);
+
+            if (!enrolled)
+            {
+                _errorMessage = "The course is unavailable or you are already enrolled.";
+                return;
+            }
+
+            await LoadCoursesAsync(_page?.CurrentPage ?? 1);
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to enroll student {StudentId} in course {CourseId}.", _studentId, courseId);
+            _errorMessage = "Enrollment couldn't be completed. Please try again.";
+        }
+        finally
+        {
+            _enrollingCourseId = null;
+        }
+    }
+}

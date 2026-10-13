@@ -1,0 +1,82 @@
+@page "/teacher/assignments/{AssignmentId:int}/edit"
+@attribute [Authorize(Roles = "Teacher")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject IAssignmentService AssignmentService
+@inject NavigationManager Navigation
+@inject ILogger<EditAssignment> Logger
+
+<PageTitle>Edit Assignment - StudentManager</PageTitle>
+<h1>Edit assignment</h1>
+@if (_error is not null) { <div class="alert alert-danger" role="alert">@_error</div> }
+@if (_model is null)
+{
+    @if (_error is null) { <p role="status">Loading assignment…</p> }
+}
+else
+{
+    <p class="text-muted">For @_courseName</p>
+    <EditForm Model="_model" OnValidSubmit="SaveAsync" class="mt-4">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" role="alert" />
+        <div class="mb-3"><label for="assignment-title" class="form-label">Title</label><InputText id="assignment-title" @bind-Value="_model.Title" class="form-control" /><ValidationMessage For="() => _model.Title" class="text-danger" /></div>
+        <div class="mb-3"><label for="assignment-description" class="form-label">Description</label><InputTextArea id="assignment-description" @bind-Value="_model.Description" class="form-control" rows="5" /><ValidationMessage For="() => _model.Description" class="text-danger" /></div>
+        <div class="mb-3"><label for="assignment-due" class="form-label">Due Date</label><input id="assignment-due" type="datetime-local" @bind="_model.DueDate" class="form-control" /><ValidationMessage For="() => _model.DueDate" class="text-danger" /></div>
+        <div class="mb-3"><label for="assignment-points" class="form-label">Maximum Points</label><InputNumber id="assignment-points" @bind-Value="_model.MaxPoints" class="form-control" step="0.01" /><ValidationMessage For="() => _model.MaxPoints" class="text-danger" /></div>
+        <div class="d-flex gap-2"><button type="submit" class="btn btn-primary" disabled="@_saving">Save changes</button><a href="@($"/teacher/assignments/{AssignmentId}")" class="btn btn-outline-secondary">Cancel</a></div>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int AssignmentId { get; set; }
+    private AssignmentEditViewModel? _model;
+    private string _courseName = string.Empty;
+    private string? _teacherId;
+    private string? _error;
+    private bool _saving;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var principal = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        _teacherId = UserManager.GetUserId(principal);
+        if (_teacherId is null) throw new InvalidOperationException("The signed-in teacher account could not be identified.");
+        _model = null;
+        _error = null;
+        try
+        {
+            var assignment = await AssignmentService.GetTeacherAssignmentAsync(AssignmentId, _teacherId);
+            if (assignment is null || !assignment.IsActive) { _error = "That active assignment could not be found."; return; }
+            _courseName = assignment.Course.Name;
+            _model = new AssignmentEditViewModel
+            {
+                AssignmentId = assignment.AssignmentId, CourseId = assignment.CourseId,
+                Title = assignment.Title, Description = assignment.Description,
+                DueDate = assignment.DueDate, MaxPoints = assignment.MaxPoints
+            };
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to load assignment {AssignmentId} for editing.", AssignmentId);
+            _error = "Assignment information couldn't be loaded. Please try again.";
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_model is null || _teacherId is null) return;
+        _saving = true;
+        _error = null;
+        try
+        {
+            var updated = await AssignmentService.UpdateAssignmentAsync(_model, _teacherId);
+            if (!updated) { _error = "This assignment is no longer available to edit."; return; }
+            Navigation.NavigateTo($"/teacher/assignments/{AssignmentId}");
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to update assignment {AssignmentId}.", AssignmentId);
+            _error = "The assignment couldn't be updated. Please try again.";
+        }
+        finally { _saving = false; }
+    }
+}

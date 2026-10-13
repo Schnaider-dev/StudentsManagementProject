@@ -1,0 +1,159 @@
+@page "/teacher/courses/{CourseId:int}/edit"
+@attribute [Authorize(Roles = "Teacher")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject ICourseService CourseService
+@inject NavigationManager NavigationManager
+@inject ILogger<EditCourse> Logger
+
+<PageTitle>Edit Course - StudentManager</PageTitle>
+
+<h1>Edit course</h1>
+<p class="text-muted">Update the course details.</p>
+
+@if (_isLoading)
+{
+    <p role="status">Loading course…</p>
+}
+else if (_model is not null)
+{
+    <EditForm Model="_model" OnValidSubmit="SaveAsync" FormName="edit-course" class="mt-4">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" role="alert" />
+
+        @if (_errorMessage is not null)
+        {
+            <div class="alert alert-danger" role="alert">@_errorMessage</div>
+        }
+
+        <CourseFormFields Code="_model.Code"
+                          CodeChanged="@(value => _model.Code = value)"
+                          CodeExpression="@(() => _model.Code)"
+                          Name="_model.Name"
+                          NameChanged="@(value => _model.Name = value)"
+                          NameExpression="@(() => _model.Name)"
+                          Description="_model.Description"
+                          DescriptionChanged="SetDescription" />
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary" disabled="@_isSaving">
+                @(_isSaving ? "Saving…" : "Save changes")
+            </button>
+            <a href="@($"/teacher/courses/{CourseId}")"
+               class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </EditForm>
+}
+else
+{
+    <div class="alert alert-danger" role="alert">@_errorMessage</div>
+    <a href="/teacher/courses">Back to my courses</a>
+}
+
+@code {
+    [Parameter]
+    public int CourseId { get; set; }
+
+    private CourseEditViewModel? _model;
+    private string? _errorMessage;
+    private bool _isLoading = true;
+    private bool _isSaving;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _isLoading = true;
+        _model = null;
+        _errorMessage = null;
+
+        try
+        {
+            var principal = (await AuthenticationStateProvider
+                .GetAuthenticationStateAsync()).User;
+            var teacherId = UserManager.GetUserId(principal);
+
+            if (teacherId is null)
+            {
+                throw new InvalidOperationException(
+                    "The signed-in teacher account could not be identified.");
+            }
+
+            var course = await CourseService.GetTeacherCourseAsync(CourseId, teacherId);
+            if (course is null)
+            {
+                _errorMessage = "That course could not be found.";
+                return;
+            }
+
+            _model = new CourseEditViewModel
+            {
+                CourseId = course.CourseId,
+                Code = course.Code,
+                Name = course.Name,
+                Description = course.Description
+            };
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to load course {CourseId} for editing.", CourseId);
+            _errorMessage = "The course couldn't be loaded. Please try again.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void SetDescription(ChangeEventArgs args)
+    {
+        if (_model is not null)
+        {
+            _model.Description = args.Value?.ToString();
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_model is null)
+        {
+            return;
+        }
+
+        _isSaving = true;
+        _errorMessage = null;
+
+        try
+        {
+            var principal = (await AuthenticationStateProvider
+                .GetAuthenticationStateAsync()).User;
+            var teacherId = UserManager.GetUserId(principal);
+
+            if (teacherId is null)
+            {
+                throw new InvalidOperationException(
+                    "The signed-in teacher account could not be identified.");
+            }
+
+            var updated = await CourseService.UpdateCourseAsync(_model, teacherId);
+            if (!updated)
+            {
+                _errorMessage = "That course could not be found.";
+                return;
+            }
+
+            NavigationManager.NavigateTo($"/teacher/courses/{CourseId}");
+        }
+        catch (InvalidOperationException exception)
+        {
+            _errorMessage = exception.Message;
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to update course {CourseId}.", CourseId);
+            _errorMessage = "The course couldn't be updated. Please try again.";
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+}

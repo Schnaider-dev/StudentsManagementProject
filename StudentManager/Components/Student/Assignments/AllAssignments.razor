@@ -1,0 +1,58 @@
+@page "/student/assignments"
+@attribute [Authorize(Roles = "Student")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject ISubmissionService SubmissionService
+@inject ILogger<AllAssignments> Logger
+
+<PageTitle>All Assignments - StudentManager</PageTitle>
+<div class="student-assignments-page">
+    <div class="student-assignments-header">
+        <a class="assignments-back-link" href="/student/dashboard">← Back to dashboard</a>
+        <p class="assignments-eyebrow">Your coursework</p>
+        <h1>All assignments</h1>
+        <p class="assignments-subtitle">Assignments from your active courses, ordered by due date.</p>
+    </div>
+    @if (_error is not null)
+    {
+        <div class="alert alert-danger" role="alert">@_error</div>
+    }
+    else if (_assignments is null)
+    {
+        <p role="status">Loading assignments…</p>
+    }
+    else
+    {
+        <AssignmentSummary Assignments="_assignments" />
+        <section class="assignment-list-section" aria-labelledby="assignments-heading">
+            <h2 id="assignments-heading">Assignment list</h2>
+            <StudentAssignmentList Assignments="_assignments" ShowCourse="true"
+                                   EmptyMessage="Your active courses do not have any assignments right now." />
+        </section>
+    }
+</div>
+
+@code {
+    private IReadOnlyList<StudentAssignmentViewModel>? _assignments;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var principal = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        var studentId = UserManager.GetUserId(principal);
+        if (studentId is null)
+        {
+            throw new InvalidOperationException("The signed-in student account could not be identified.");
+        }
+
+        try
+        {
+            _assignments = await SubmissionService.GetAllAssignmentsAsync(studentId);
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to load assignments for student {StudentId}.", studentId);
+            _error = "Assignments couldn't be loaded. Please refresh and try again.";
+        }
+    }
+}

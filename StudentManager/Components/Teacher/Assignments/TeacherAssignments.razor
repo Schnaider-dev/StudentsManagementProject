@@ -1,0 +1,93 @@
+@page "/teacher/courses/{CourseId:int}/assignments"
+@attribute [Authorize(Roles = "Teacher")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject ICourseService CourseService
+@inject IAssignmentService AssignmentService
+@inject ILogger<TeacherAssignments> Logger
+
+<PageTitle>@(_course?.Name ?? "Assignments") - StudentManager</PageTitle>
+<div class="mb-4">
+    @if (_error is not null)
+    {
+        <div class="alert alert-danger" role="alert">@_error</div>
+    }
+    else if (_course is null)
+    {
+        <p role="status">Loading assignments…</p>
+    }
+    else
+    {
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+            <div>
+                <a href="@($"/teacher/courses/{CourseId}")" class="text-decoration-none">← @_course.Name</a>
+                <h1 class="mt-2">Assignments</h1>
+                <p class="text-muted mb-0">@_course.Code — @_course.Name</p>
+            </div>
+            @if (_course.IsActive)
+            {
+                <a href="@($"/teacher/courses/{CourseId}/assignments/create")" class="btn btn-primary">Create assignment</a>
+            }
+        </div>
+        @if (_assignments.Count == 0)
+        {
+            <div class="alert alert-info" role="status">This course has no active assignments yet.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead><tr><th>Assignment</th><th>Due</th><th>Points</th><th>Submissions</th><th>Graded</th><th><span class="visually-hidden">Actions</span></th></tr></thead>
+                    <tbody>
+                    @foreach (var assignment in _assignments)
+                    {
+                        <tr>
+                            <td><a href="@($"/teacher/assignments/{assignment.AssignmentId}")">@assignment.Title</a></td>
+                            <td><time datetime="@assignment.DueDate.ToString("O")">@assignment.DueDate.ToLocalTime().ToString("g")</time></td>
+                            <td>@assignment.MaxPoints.ToString("0.##")</td>
+                            <td>@assignment.Submissions.Count</td>
+                            <td>@assignment.Submissions.Count(item => item.Grade is not null)</td>
+                            <td class="text-nowrap">
+                                <a href="@($"/teacher/assignments/{assignment.AssignmentId}/grades")" class="btn btn-sm btn-outline-primary">Grades</a>
+                                <a href="@($"/teacher/assignments/{assignment.AssignmentId}/edit")" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                <a href="@($"/teacher/assignments/{assignment.AssignmentId}/archive")" class="btn btn-sm btn-outline-danger">Archive</a>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public int CourseId { get; set; }
+    private Course? _course;
+    private IReadOnlyList<Assignment> _assignments = Array.Empty<Assignment>();
+    private string? _error;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var principal = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        var teacherId = UserManager.GetUserId(principal);
+        if (teacherId is null) throw new InvalidOperationException("The signed-in teacher account could not be identified.");
+        _course = null;
+        _error = null;
+        try
+        {
+            _course = await CourseService.GetTeacherCourseAsync(CourseId, teacherId);
+            if (_course is null)
+            {
+                _error = "That course could not be found.";
+                return;
+            }
+            _assignments = await AssignmentService.GetCourseAssignmentsAsync(CourseId, teacherId);
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to load assignments for teacher {TeacherId}, course {CourseId}.", teacherId, CourseId);
+            _error = "Course assignments couldn't be loaded. Please try again.";
+        }
+    }
+}

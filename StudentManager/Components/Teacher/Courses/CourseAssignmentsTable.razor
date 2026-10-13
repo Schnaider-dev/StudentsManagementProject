@@ -1,0 +1,64 @@
+<section aria-labelledby="assignments-heading">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 id="assignments-heading" class="h4 mb-0">
+            Assignments <span class="text-muted">(@ActiveAssignments.Count)</span>
+        </h2>
+        @if (Course.IsActive)
+        {
+            <a href="@($"/teacher/courses/{Course.CourseId}/assignments/create")"
+               class="btn btn-sm btn-primary">Create assignment</a>
+        }
+    </div>
+
+    @if (ActiveAssignments.Count == 0)
+    {
+        <p class="text-muted">There are no active assignments for this course.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col">Assignment</th>
+                        <th scope="col">Due</th>
+                        <th scope="col">Submissions</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var assignment in ActiveAssignments)
+                    {
+                        <tr>
+                            <td>
+                                <a href="@($"/teacher/assignments/{assignment.AssignmentId}")">
+                                    @assignment.Title
+                                </a>
+                            </td>
+                            <td>
+                                <time datetime="@assignment.DueDate.ToString("O")">
+                                    @assignment.DueDate.ToLocalTime().ToString("g")
+                                </time>
+                            </td>
+                            <td>@assignment.Submissions.Count</td>
+                            <td>
+                                <a href="@($"/teacher/assignments/{assignment.AssignmentId}/grades")"
+                                   class="btn btn-sm btn-outline-primary">Review submissions</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public Course Course { get; set; } = default!;
+
+    private List<Assignment> ActiveAssignments => Course.Assignments
+        .Where(assignment => assignment.IsActive)
+        .OrderBy(assignment => assignment.DueDate)
+        .ToList();
+}

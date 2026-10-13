@@ -19,7 +19,8 @@ public class AssignmentProgressViewModel
     public decimal? Percentage { get; set; }
 
     public string? Feedback { get; set; }
-    public string? Grade { get; set; }
-public string? Status { get; set; }
 
+    public string Grade { get; set; } = "-";
+
+    public string Status { get; set; } = string.Empty;
 }

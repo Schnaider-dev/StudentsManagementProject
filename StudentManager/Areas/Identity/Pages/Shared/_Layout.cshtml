@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - StudentManager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body class="role-guest">
+    <header class="app-header">
+        <nav class="navbar">
+            <div class="container">
+                <a class="navbar-brand" href="/">StudentManager</a>
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="/Identity/Account/Login">Log in</a>
+                    <a class="nav-link" href="/Identity/Account/Register">Register</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main class="container app-main identity-main">
+        @RenderBody()
+    </main>
+    <footer class="app-footer">
+        <div class="container">&copy; @DateTime.Now.Year StudentManager</div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
