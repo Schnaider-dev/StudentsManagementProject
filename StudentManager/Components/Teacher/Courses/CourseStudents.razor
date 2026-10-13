@@ -1,0 +1,125 @@
+@page "/teacher/courses/{CourseId:int}/students"
+@attribute [Authorize(Roles = "Teacher")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject IProgressService ProgressService
+@inject ILogger<CourseStudents> Logger
+
+<PageTitle>Students - @(_model?.CourseCode ?? "Course") - StudentManager</PageTitle>
+
+@if (_errorMessage is not null)
+{
+    <div class="alert alert-danger" role="alert">@_errorMessage</div>
+}
+else if (_isLoading)
+{
+    <p role="status">Loading enrolled students…</p>
+}
+else if (_model is not null)
+{
+    <div class="mb-4">
+        <a href="@($"/teacher/courses/{_model.CourseId}")"
+           class="text-decoration-none">&larr; @_model.CourseName</a>
+        <h1 class="mt-2">Enrolled students</h1>
+        <p class="text-muted mb-0">@_model.CourseCode — @_model.CourseName</p>
+    </div>
+
+    @if (_model.Students.Count == 0)
+    {
+        <div class="alert alert-info" role="status">
+            No students are enrolled in this course.
+        </div>
+    }
+    else
+    {
+        <p class="text-muted">@_model.Students.Count enrolled student(s)</p>
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col">Student</th>
+                        <th scope="col">Student number</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Enrolled</th>
+                        <th scope="col">Submitted</th>
+                        <th scope="col">Graded</th>
+                        <th scope="col">Average</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var student in _model.Students)
+                    {
+                        <tr>
+                            <td>@student.StudentName</td>
+                            <td>@(string.IsNullOrWhiteSpace(student.StudentNumber)
+                                      ? "—"
+                                      : student.StudentNumber)</td>
+                            <td><a href="@($"mailto:{student.Email}")">@student.Email</a></td>
+                            <td>
+                                <time datetime="@student.EnrolledAt.ToString("O")">
+                                    @student.EnrolledAt.ToLocalTime().ToString("d")
+                                </time>
+                            </td>
+                            <td>@student.SubmittedAssignmentCount</td>
+                            <td>@student.GradedAssignmentCount</td>
+                            <td>@(student.AveragePercentage is decimal average
+                                      ? $"{average:F1}%"
+                                      : "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+}
+
+@code {
+    [Parameter]
+    public int CourseId { get; set; }
+
+    private CourseStudentsViewModel? _model;
+    private bool _isLoading = true;
+    private string? _errorMessage;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _model = null;
+        _errorMessage = null;
+        _isLoading = true;
+
+        try
+        {
+            var principal = (await AuthenticationStateProvider
+                .GetAuthenticationStateAsync()).User;
+            var teacherId = UserManager.GetUserId(principal);
+
+            if (teacherId is null)
+            {
+                throw new InvalidOperationException(
+                    "The signed-in teacher account could not be identified.");
+            }
+
+            _model = await ProgressService.GetCourseStudentsAsync(
+                CourseId,
+                teacherId);
+
+            if (_model is null)
+            {
+                _errorMessage = "That course could not be found.";
+            }
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(
+                exception,
+                "Failed to load enrolled students for course {CourseId}.",
+                CourseId);
+            _errorMessage =
+                "The enrolled students couldn't be loaded. Please try again.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

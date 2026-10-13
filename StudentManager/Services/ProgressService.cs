@@ -282,7 +282,7 @@ public class ProgressService : IProgressService
             .AsNoTracking()
             .Where(enrollment =>
                 enrollment.CourseId == courseId &&
-                enrollment.Status == EnrollmentStatus.Active)
+                enrollment.Status != EnrollmentStatus.Dropped)
             .Include(enrollment => enrollment.Student)
             .OrderBy(enrollment => enrollment.Student.LastName)
             .ThenBy(enrollment => enrollment.Student.FirstName)

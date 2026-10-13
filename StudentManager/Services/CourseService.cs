@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using StudentManager.Data;
 using StudentManager.Models;
+using StudentManager.Models.Enums;
 using StudentManager.Services.Interfaces;
 using StudentManager.ViewModels.Teacher;
 
@@ -31,7 +32,9 @@ public class CourseService : ICourseService
         }
 
         return await query
-            .Include(course => course.Enrollments)
+            .Include(course => course.Enrollments
+                .Where(enrollment =>
+                    enrollment.Status != EnrollmentStatus.Dropped))
             .Include(course => course.Assignments)
             .OrderBy(course => course.Code)
             .ToListAsync(cancellationToken);
@@ -44,7 +47,9 @@ public class CourseService : ICourseService
     {
         return await _context.Courses
             .AsNoTracking()
-            .Include(course => course.Enrollments)
+            .Include(course => course.Enrollments
+                .Where(enrollment =>
+                    enrollment.Status != EnrollmentStatus.Dropped))
                 .ThenInclude(enrollment => enrollment.Student)
             .Include(course => course.Assignments)
                 .ThenInclude(assignment => assignment.Submissions)

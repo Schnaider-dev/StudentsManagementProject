@@ -3,7 +3,7 @@
         <h2 id="students-heading" class="h4 mb-0">
             Students <span class="text-muted">(@Course.Enrollments.Count)</span>
         </h2>
-        <a href="@($"/Teacher/Students?courseId={Course.CourseId}")"
+        <a href="@($"/teacher/courses/{Course.CourseId}/students")"
            class="btn btn-sm btn-outline-primary">View students</a>
     </div>
 
