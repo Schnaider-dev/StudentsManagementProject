@@ -166,7 +166,6 @@ h3 {
   border-bottom: 1px solid var(--color-border);
   /* Цветная полоса сверху показывает, под какой ролью ты вошла */
   border-top: 4px solid var(--color-primary);
-  white-space: nowrap;
 }
 
 
@@ -182,6 +181,7 @@ body.role-guest .app-header {
   font-weight: 700;
   font-size: 1.2rem;
   color: var(--color-primary);
+  white-space: nowrap;
 }
 
 .navbar-brand:hover {

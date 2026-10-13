@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace StudentManager.ViewModels.Teacher;
 
-public class CourseEditViewModel
+public class CourseEditViewModel : ICourseFormModel
 {
     [Required]
     public int CourseId { get; set; }

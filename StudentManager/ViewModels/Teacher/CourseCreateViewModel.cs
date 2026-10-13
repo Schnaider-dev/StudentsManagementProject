@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace StudentManager.ViewModels.Teacher;
 
-public class CourseCreateViewModel
+public class CourseCreateViewModel : ICourseFormModel
 {
     [Required]
     [StringLength(20)]

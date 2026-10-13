@@ -26,14 +26,7 @@ else if (_model is not null)
             <div class="alert alert-danger" role="alert">@_errorMessage</div>
         }
 
-        <CourseFormFields Code="_model.Code"
-                          CodeChanged="@(value => _model.Code = value)"
-                          CodeExpression="@(() => _model.Code)"
-                          Name="_model.Name"
-                          NameChanged="@(value => _model.Name = value)"
-                          NameExpression="@(() => _model.Name)"
-                          Description="_model.Description"
-                          DescriptionChanged="SetDescription" />
+        <CourseFormFields Model="_model" />
 
         <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary" disabled="@_isSaving">
@@ -100,14 +93,6 @@ else
         finally
         {
             _isLoading = false;
-        }
-    }
-
-    private void SetDescription(ChangeEventArgs args)
-    {
-        if (_model is not null)
-        {
-            _model.Description = args.Value?.ToString();
         }
     }
 

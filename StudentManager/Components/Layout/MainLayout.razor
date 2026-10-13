@@ -41,35 +41,46 @@
         <nav class="navbar navbar-expand-md">
             <div class="container">
                 <a class="navbar-brand" href="@HomeUrl">StudentManager</a>
-                <div class="navbar-nav me-auto">
-                    @if (_roleClass == "role-student")
-                    {
-                        <a class="nav-link" href="/student/dashboard">Dashboard</a>
-                        <a class="nav-link" href="/student/courses">My courses</a>
-                        <a class="nav-link" href="/student/courses/available">Browse courses</a>
-                        <a class="nav-link" href="/student/assignments">Assignments</a>
-                    }
-                    else if (_roleClass == "role-teacher")
-                    {
-                        <a class="nav-link" href="/teacher/dashboard">Dashboard</a>
-                        <a class="nav-link" href="/teacher/courses">My courses</a>
-                    }
-                </div>
-                <div class="navbar-nav align-items-md-center gap-md-2">
-                    <AuthorizeView>
-                        <Authorized Context="auth">
-                            <span class="nav-link">@_displayName</span>
-                            <form action="/Identity/Account/Logout" method="post" class="m-0">
-                                <AntiforgeryToken />
-                                <input type="hidden" name="returnUrl" value="/Identity/Account/Login" />
-                                <button type="submit" class="nav-link border-0 bg-transparent">Log out</button>
-                            </form>
-                        </Authorized>
-                        <NotAuthorized>
-                            <a class="nav-link" href="@LoginUrl">Log in</a>
-                            <a class="nav-link" href="@RegisterUrl">Register</a>
-                        </NotAuthorized>
-                    </AuthorizeView>
+                <button class="navbar-toggler"
+                        type="button"
+                        aria-label="Toggle navigation"
+                        aria-controls="main-navigation"
+                        aria-expanded="@_isNavMenuOpen"
+                        @onclick="ToggleNavMenu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div id="main-navigation"
+                     class="@(_isNavMenuOpen ? "collapse navbar-collapse show" : "collapse navbar-collapse")">
+                    <div class="navbar-nav me-auto">
+                        @if (_roleClass == "role-student")
+                        {
+                            <a class="nav-link" href="/student/dashboard" @onclick="CloseNavMenu">Dashboard</a>
+                            <a class="nav-link" href="/student/courses" @onclick="CloseNavMenu">My courses</a>
+                            <a class="nav-link" href="/student/courses/available" @onclick="CloseNavMenu">Browse courses</a>
+                            <a class="nav-link" href="/student/assignments" @onclick="CloseNavMenu">Assignments</a>
+                        }
+                        else if (_roleClass == "role-teacher")
+                        {
+                            <a class="nav-link" href="/teacher/dashboard" @onclick="CloseNavMenu">Dashboard</a>
+                            <a class="nav-link" href="/teacher/courses" @onclick="CloseNavMenu">My courses</a>
+                        }
+                    </div>
+                    <div class="navbar-nav align-items-md-center gap-md-2">
+                        <AuthorizeView>
+                            <Authorized>
+                                <span class="nav-link">@_displayName</span>
+                                <form action="/Identity/Account/Logout" method="post" class="m-0">
+                                    <AntiforgeryToken />
+                                    <input type="hidden" name="returnUrl" value="/Identity/Account/Login" />
+                                    <button type="submit" class="nav-link border-0 bg-transparent">Log out</button>
+                                </form>
+                            </Authorized>
+                            <NotAuthorized>
+                                <a class="nav-link" href="@LoginUrl" @onclick="CloseNavMenu">Log in</a>
+                                <a class="nav-link" href="@RegisterUrl" @onclick="CloseNavMenu">Register</a>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -88,6 +99,11 @@
 
     private string _roleClass = string.Empty;
     private string _displayName = string.Empty;
+    private bool _isNavMenuOpen;
+
+    private void ToggleNavMenu() => _isNavMenuOpen = !_isNavMenuOpen;
+
+    private void CloseNavMenu() => _isNavMenuOpen = false;
 
     private string HomeUrl => _roleClass switch
     {
